@@ -1,0 +1,233 @@
+.login-container {
+    background-image: url('/images/intro-background-laptop.png');
+  background-size: cover;
+  background-position:  top center;
+  background-repeat: no-repeat;
+  background-color: var(--color-bg-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+
+}
+
+.registration-container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.registration-card {
+  background-color: var(--color-bg-white);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo img {
+  max-width: 100px;
+  height: auto;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: var(--color-heading);
+  text-align: center;
+}
+
+.role-options {
+  display: flex;
+  gap: 50px;
+  margin-bottom: 25px;
+  justify-content: center;
+}
+
+.role-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.role-checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-text-light);
+  border-radius: 50%;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.role-checkbox:checked {
+  background-color: var(--color-bg-white);
+  border: 2px solid var(--color-primary);
+}
+
+.role-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  top: 48%;
+  left: 48%;
+  transform: translate(-48%, -48%);
+}
+
+.role-label {
+  color: var(--color-text-dark);
+  font-size: 1.2rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  display: block;
+  color: var(--color-text-dark);
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 55px 10px 15px;
+  border: 1px solid #A5A5A5;
+  border-radius: 15px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  text-align: right;
+  direction: rtl;
+  
+
+}
+.form-control::placeholder {
+  opacity: 0.6; 
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 48, 144, 0.2);
+
+}
+
+
+
+.input-icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-light);
+}
+
+.password-toggle {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  z-index: 2;
+}
+
+.password-toggle svg {
+  width: 100%;
+  height: 100%;
+}
+
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+    font-size: 1.2rem;
+  font-weight: 500;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color:var(--color-button-primary);
+  color: white; 
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  direction: rtl; 
+  gap: 10px;
+}
+
+
+.btn-primary:hover {
+  background-color: var(--color-button-secondary);
+}
+
+.btn-icon {
+  font-size: 1rem;
+}
+
+.btn-text {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--color-text-medium);
+  position: relative;
+  padding-top: 15px;
+}
+
+
+.login-link a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: underline;
+}
+
+.login-link a:hover {
+  color: var(--color-button-secondary);
+
+}
+
+@media (max-width: 992px) {
+  .intro-bg-container {
+    background-image: url('../images/intro-background-Mobile.png');
+  }
+}
+
+@media (max-width: 576px) {
+  .role-options {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+  
+  .registration-card {
+    padding: 30px;
+  }
+
+  .title {
+    margin-bottom: 30px;
+  }
+}

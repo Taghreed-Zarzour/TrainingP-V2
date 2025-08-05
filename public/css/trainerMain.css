@@ -1,0 +1,1115 @@
+/* ========================================
+   TRAINER MAIN PAGE STYLES
+   ========================================
+   
+   Table of Contents:
+   1. Navigation Styles
+   2. Hero Section
+   3. Registration Cards
+   4. Features Section
+   5. Info Section
+   6. Benefits Section
+   7. Simple Steps Section
+   8. Additional Info Section Styles
+   9. Back to Top Button
+   10. Utility Classes
+   11. Responsive Design
+   ======================================== */
+
+/* ========================================
+   1. NAVIGATION STYLES
+   ======================================== */
+
+/* Main Navbar */
+.navbar {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.navbar-brand img {
+  height: 40px;
+  width: auto;
+}
+
+/* Navigation Links */
+.navbar-nav .nav-link {
+  color: #495057;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #007bff;
+}
+
+.navbar-nav .nav-link.active {
+  color: #007bff;
+  font-weight: 600;
+}
+
+/* Search Container */
+.search-container {
+  position: relative;
+  width: 300px;
+}
+
+.search-input {
+  padding-right: 2.5rem;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  height: 38px;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Authentication Buttons */
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* Settings and Utility Buttons */
+.btn-link {
+  border: none;
+  background: none;
+  color: #6c757d;
+  font-size: 1.1rem;
+}
+
+.btn-link:hover {
+  color: #007bff;
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #007bff;
+}
+
+/* ========================================
+   2. HERO SECTION
+   ======================================== */
+
+/* Main Hero Container */
+.trainer-main-section {
+  position: relative;
+  overflow: hidden;
+  background-image: url('../images/Ellipsetop.png'), url('../images/Ellipsetop.png');
+  background-position: right, left;
+  background-repeat: no-repeat;
+}
+
+.trainer-main-section-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Background Decorations */
+.background-decoration {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  opacity: 0.1;
+}
+
+.ellipse-bg {
+  width: 100%;
+  height: auto;
+  max-width: 800px;
+}
+
+/* Hero Content Text */
+.hero-content {
+  padding: 2rem 0;
+  text-align: right;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.highlight-text {
+  position: relative;
+}
+
+.hero-subtitle {
+  font-size: 3rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.brand-highlight {
+  color: var(--color-primary);
+  font-weight: 700;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.hero-description {
+  font-size: 1.2rem;
+  color: #6c757d;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+}
+
+/* Call-to-Action Buttons */
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cta-btn {
+  background: #0066cc;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.cta-btn:hover {
+  background: #0052a3;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 102, 204, 0.3);
+}
+
+.cta-btn-secondary {
+  background: transparent;
+  color: #28a745;
+  border: 2px solid #28a745;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.cta-btn-secondary:hover {
+  background: #28a745;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Decorative Elements */
+.dot-grid-trainer {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 10px;
+  margin-top: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.dot-row-trainer {
+  display: flex;
+  gap: 2px;
+}
+
+.dot-trainer {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: #d3d3d3;
+}
+
+/* ========================================
+   3. REGISTRATION CARDS
+   ======================================== */
+
+/* Registration Cards Container */
+.registration-cards {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+/* Free Registration Card */
+.registration-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  width: 220px;
+  height: 200px;
+  border: 1px solid var(--02---Dark-Color---Gray---200, #D6D6D6);
+}
+
+.free-card {
+  transform: rotate(-5deg);
+}
+
+/* Card Content */
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.price-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0066cc;
+  margin-bottom: 0.5rem;
+}
+
+.price-desc {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.date {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+/* Card Buttons */
+.card-btn {
+  background: #0066cc;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  border: none;
+  width: 100%;
+}
+
+.card-btn:hover {
+  background: #0052a3;
+  transform: translateY(-2px);
+}
+
+/* Promo Information */
+.promo-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid var(--02---Dark-Color---Gray---200, #D6D6D6);
+  border-radius: 12px;
+  transform: rotate(-5deg);
+  background-color: #fff;
+  padding: 0.8rem 1.5rem;
+}
+
+.promo-icon {
+  height: 24px;
+}
+
+.promo-text {
+  color: black;
+  font-size: 1rem;
+}
+
+/* Registration Modal */
+.registration-modal {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 220px;
+  height: 275px;
+  transform: rotate(5deg);
+  border: 1px solid var(--02---Dark-Color---Gray---200, #D6D6D6);
+}
+
+.modal-header {
+  background: #f8f9fa;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 1rem;
+}
+
+.modal-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dot.red {
+  background: #dc3545;
+}
+
+.dot.yellow {
+  background: #ffc107;
+}
+
+.dot.green {
+  background: #28a745;
+}
+
+.modal-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.modal-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.modal-btn.btn-primary {
+  background: #0066cc;
+  color: white;
+}
+
+.modal-btn.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.modal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   4. FEATURES SECTION
+   ======================================== */
+
+/* Features Section Container */
+.features-section {
+  padding: 4rem 0;
+  margin-top: 2rem;
+}
+
+.features-section .row {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Feature Card Layouts */
+.features-section .row .feature-card:nth-child(odd) {
+  flex-direction: column;
+  border-radius: 0 0 50% 50%;
+}
+
+.features-section .row .feature-card:nth-child(even) {
+  flex-direction: column-reverse;
+  border-radius: 0 0 50% 50%;
+  align-items: end;
+}
+
+/* Feature Card Base */
+.feature-card {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  padding: 0rem;
+  text-align: right;
+  width: 300px;
+}
+
+/* Feature Icon Container */
+.feature-iconn {
+  background-color: white !important;
+  padding: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  padding: 1rem 0.5rem;
+  border: 13px solid #F8F8F8;
+}
+
+.feature-img {
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Feature Content */
+.feature-content {
+  flex: 1;
+  order: 1;
+  display: flex;
+  width: 100%;
+  padding: 1rem;
+  flex-direction: column;
+  background: #F8F8F8;
+}
+
+.feature-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.feature-description {
+  font-size: 0.8rem;
+  color: #6c757d;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Border Radius Utilities */
+.round-top {
+  border-radius: 50% 50% 0 0;
+}
+
+.round-bottom {
+  border-radius: 0 0 50% 50%;
+}
+
+/* ========================================
+   5. INFO SECTION
+   ======================================== */
+
+/* Info Section Container */
+.info-section {
+  position: relative;
+  background-color: var(--color-primary);
+  overflow: hidden;
+  color: white;
+  padding: 2rem 0;
+  border-radius: 32px;
+  margin-top: 2rem;
+  transform: rotate(-1deg);
+}
+
+.info-section .info-section-content h2 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.info-section-content-text h1 {
+  font-size: 80px;
+  font-weight: 600;
+  text-align: center;
+  position: relative;
+}
+
+.info-section-content-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Info Section Decorative Elements */
+.white-cots-info {
+  position: absolute;
+  top: 0;
+  left: -14%;
+  z-index: 100;
+}
+
+.info-section-image {
+  position: absolute;
+  bottom: 0;
+  right: 5%;
+  z-index: 100;
+}
+
+.info-section-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('../images/info-section-grid.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.grey-container-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #D6D6D6;
+  z-index: -10000;
+  transform: rotate(1deg);
+  border-radius: 32px;
+}
+
+/* ========================================
+   6. BENEFITS SECTION
+   ======================================== */
+
+/* Feature Box Container */
+.feature-box-container {
+  border: 1px solid #D6D6D6;
+  padding: 1rem;
+  height: 200px;
+  width: 33.33%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content p {
+  font-size: 22px;
+  width: 200px;
+}
+
+/* ========================================
+   7. SIMPLE STEPS SECTION
+   ======================================== */
+
+/* Steps Section Container */
+.section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+  margin-top: 50px;
+}
+
+.text-area {
+  flex: 1;
+  margin-right: 40px;
+}
+
+.heading {
+  font-size: 40px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.heading span {
+  color: var(--color-primary);
+}
+
+/* Steps Grid */
+.steps {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.step {
+  background-color: #FFFFFF;
+  border-radius: 15px;
+  padding: 10px;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: 0px 0px 8px 0px #6B6B6B26;
+}
+
+.step-icon {
+  width: 65px;
+  height: 65px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.step01 {
+  background-color: #ffddd9;
+}
+
+.step02 {
+  background-color: #fff6cc;
+}
+
+.step03 {
+  background-color: #d4f7e8;
+}
+
+.step-number {
+  color: #F8F8F8;
+  font-size: 48px;
+  margin-left: 10px;
+}
+
+.step-text {
+  flex: 1;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Steps Images */
+.images {
+  display: flex;
+  gap: 20px;
+}
+
+.images img {
+  max-width: 300px;
+}
+
+/* Decorative Dots Grid */
+.dot-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 10px;
+  margin-top: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.dot-row {
+  display: flex;
+  gap: 2px;
+}
+
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: #d3d3d3;
+}
+
+/* ========================================
+   8. ADDITIONAL INFO SECTION STYLES
+   ======================================== */
+
+/* Additional Info Section Text */
+.info-section-content-text1 {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.info-section-content-text2 {
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.info-section-image2 {
+  align-self: end;
+}
+
+/* Register Button */
+.register-button:hover,
+.register-button {
+  color: var(--color-primary);
+  font-weight: 500;
+  font-size: 22px;
+  background-color: white;
+  border: 1px solid var(--color-primary);
+}
+
+/* ========================================
+   9. BACK TO TOP BUTTON
+   ======================================== */
+
+.back-to-top-btn {
+  position: fixed;
+  left: 30px;
+  bottom: 30px;
+  width: 50px;
+  height: 50px;
+  background: var(--color-primary, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 1000;
+  transform: rotate(-90deg);
+}
+
+.hero-img {
+  position: absolute;
+  top: -10%;
+  right: 0;
+  height: 0%;
+}
+
+.back-to-top-btn.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* ========================================
+   10. UTILITY CLASSES
+   ======================================== */
+
+/* Number Styling */
+.number {
+  font-weight: bold;
+  font-size: 48px;
+  color: var(--color-primary);
+  margin-left: 1rem;
+  white-space: nowrap;
+}
+
+/* Underline Title */
+.underline-title {
+  text-decoration: underline;
+  text-decoration-color: #0d6efd;
+  text-underline-offset: 6px;
+}
+
+/* ========================================
+   11. RESPONSIVE DESIGN
+   ======================================== */
+
+/* RTL Support */
+[dir="rtl"] .search-input {
+  padding-left: 2.5rem;
+  padding-right: 0.75rem;
+}
+
+[dir="rtl"] .search-icon {
+  left: 12px;
+  right: auto;
+}
+
+[dir="rtl"] .dropdown-menu-end {
+  left: 0;
+  right: auto;
+}
+
+/* Mobile Navigation (max-width: 991.98px) */
+@media (max-width: 991.98px) {
+  .search-container {
+    width: 100%;
+    margin: 1rem 0;
+  }
+
+  .d-flex.align-items-center {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+
+  .btn-sm {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Tablet Design (max-width: 768px) */
+@media (max-width: 768px) {
+  /* Hero Section */
+  .hero-title {
+    font-size: 2.5rem;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 2rem;
+  }
+
+  .hero-description {
+    font-size: 1.1rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+  }
+
+  .registration-cards {
+    margin-top: 2rem;
+  }
+
+  .hero-content {
+    text-align: center;
+  }
+
+  /* Features Section */
+  .features-section {
+    padding: 2rem 0;
+    margin-top: 2rem;
+  }
+
+  .feature-card {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+  }
+
+  .feature-icon {
+    order: 1;
+    width: 100px;
+    height: 100px;
+  }
+
+  .feature-content {
+    order: 2;
+  }
+
+  .feature-img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .feature-title {
+    font-size: 1.3rem;
+  }
+
+  .feature-description {
+    font-size: 1rem;
+  }
+}
+
+/* Mobile Design (max-width: 576px) */
+@media (max-width: 576px) {
+  /* Hero Section */
+  .hero-subtitle {
+    font-size: 1.8rem;
+  }
+
+  .price {
+    font-size: 2rem;
+  }
+
+  /* Features Section */
+  .feature-title {
+    font-size: 1.2rem;
+  }
+
+  .feature-description {
+    font-size: 0.95rem;
+  }
+
+  .feature-card {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  /* Back to Top Button Mobile */
+  .back-to-top-btn {
+    left: 20px;
+    bottom: 20px;
+    width: 45px;
+    height: 45px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 320px) {
+  .hero-img {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  /* Hide problematic background image on small screens */
+  img[src*="gridSection1trainer.png"] {
+    display: none;
+  }
+
+  /* Alternative styling for the section */
+  .trainer-main-section {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.95));
+  }
+
+  .trainer-main-section-content {
+    position: relative;
+    width: 100%;
+    padding: 10px;
+    margin: 0;
+  }
+
+  /* Rest of the mobile styles */
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100% !important;
+    padding: 0 10px !important;
+    margin: 0 !important;
+    overflow-x: hidden;
+  }
+
+  .trainer-main-section-content .d-flex {
+    flex-direction: column;
+  }
+
+  .registration-cards {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 10px 0;
+  }
+
+  .registration-card,
+  .registration-modal {
+    width: 100%;
+    max-width: 280px;
+    transform: none !important;
+    margin: 5px 0;
+  }
+
+  .features-section .row {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 10px;
+  }
+
+  .feature-card {
+    width: 100%;
+    max-width: 280px;
+    margin: 5px auto;
+  }
+
+  .info-section {
+    width: calc(100% - 20px);
+    margin: 10px;
+    transform: none;
+  }
+
+  .benefits-section .d-flex {
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+  }
+
+  .feature-box-container {
+    width: 100% !important;
+    margin: 5px 0;
+  }
+
+  .section {
+    flex-direction: column;
+    padding: 10px;
+    gap: 20px;
+  }
+
+  .images-container .d-flex {
+    flex-direction: column;
+  }
+
+  .image-wrapper {
+    width: 100% !important;
+    padding: 5px !important;
+  }
+}
