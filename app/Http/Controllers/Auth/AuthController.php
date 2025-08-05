@@ -120,7 +120,7 @@ public function login(LoginRequest $request)
         if (isset($response['redirect'])) {
             return redirect($response['redirect'])->with('failed', $response['msg']);
         }
-        return view('index')->with('failed', $response['msg']);
+        return redirect()->route('login')->with('failed', $response['msg']);
     }
 }
 

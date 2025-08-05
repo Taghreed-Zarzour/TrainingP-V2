@@ -165,10 +165,10 @@ class TrainingProgramServices
     {
         // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب
         $weights = [
-            'basic_info' => 25,      // المعلومات الأساسية (الاسم، الوصف، إلخ)
-            'details' => 20,         // التفاصيل (المخرجات، المتطلبات، الفئة المستهدفة، المزايا)
-            'settings' => 30,        // الإعدادات (السعر، الموعد النهائي، الحد الأقصى للمتدربين، إلخ)
-            'sessions' => 25,        // الجلسات
+            'basic_info' => 7,      // المعلومات الأساسية (الاسم، الوصف، إلخ)
+            'details' => 4,         // التفاصيل (المخرجات، المتطلبات، الفئة المستهدفة، المزايا)
+            'settings' => 4,        // الإعدادات (السعر، الموعد النهائي، الحد الأقصى للمتدربين، إلخ)
+            'sessions' => 3,        // الجلسات
         ];
         
         $totalWeight = array_sum($weights);
@@ -219,7 +219,7 @@ class TrainingProgramServices
             
             $settingCompleted = 0;
             foreach ($settingFields as $field) {
-                if (!is_null($program->AdditionalSetting->$field)) {
+                if (!empty($program->AdditionalSetting->$field)) {
                     $settingCompleted++;
                 }
             }
@@ -256,7 +256,6 @@ class TrainingProgramServices
         
         // حساب النسبة الإجمالية
         $overallPercentage = ($completedWeight / $totalWeight) * 100;
-        
         return intval($overallPercentage);
     }
     
