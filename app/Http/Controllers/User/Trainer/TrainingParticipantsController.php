@@ -55,4 +55,14 @@ public function bulkAccept($programId)
     return back()->with('success', 'تم قبول جميع المتدربين بنجاح ');
 }
 
+public function deleteAcceptedTrainee($trainee_id, $program_id){
+
+    $traineeEnrollment = Enrollment::where('trainee_id',$trainee_id)->where('training_programs_id',$program_id)->first();
+    $traineeEnrollment->status = 'pending';
+    $traineeEnrollment->save();
+
+    return back()->with('success', 'تم حذف المتدرب بنجاح');
+
+}
+
 }

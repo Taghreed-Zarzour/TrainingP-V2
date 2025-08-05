@@ -33,6 +33,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo(UserType::class);
     }
+
+    public function feedbacks()
+{
+    return $this->hasMany(feedback::class);
+}
+
+
 public function nationalities()
 {
     return $this->belongsToMany(Country::class, 'user_nationalities', 'user_id', 'country_id');

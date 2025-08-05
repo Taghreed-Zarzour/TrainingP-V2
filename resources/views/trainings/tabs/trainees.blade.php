@@ -165,7 +165,7 @@
 
                                 <td class="text-center">
                                     <form
-                                        action="#"
+                                        action="{{ route('acceptedTrainee.delete', ['trainee_id' => $trainee->id , 'program_id'=> $program->id]) }}"
                                         method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')

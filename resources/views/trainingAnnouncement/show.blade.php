@@ -280,10 +280,11 @@
                                                     @foreach ($program->sessions as $i => $session)
                                                         <tr style="border-bottom: 1px solid #dee2e6;">
                                                             <td class="p-3 text-center">
-                                                                {{ isset($session_day[$i]) ? \Carbon\Carbon::parse($session_day[$i])->locale('ar')->dayName : '' }}
+                                                                {{ isset($session_day[$i]) ? $session_day[$i] : '' }}
                                                             </td>
+
                                                             <td class="p-3 text-center">
-                                                                {{ isset($date_display[$i]) ? \Carbon\Carbon::parse($date_display[$i])->locale('ar')->translatedFormat('d F') : '' }}
+                                                                {{ isset($session_day[$i]) ? $session_day[$i] : '' }}
                                                             </td>
                                                             <td class="p-3 text-center">
                                                                 {{ formatTimeArabic($session->session_start_time) }} -
@@ -317,7 +318,7 @@
                                     <h5 class="trainer-name mb-1">{{ $trainer->getTranslation('name', 'ar') }}
                                         {{ $trainer->trainer?->getTranslation('last_name', 'ar') }}</h5>
                                     <p class="trainer-position mb-2">{{ $trainer->trainer?->headline ?? '' }}</p>
-                                      
+
                                     <div class="trainer-rating mb-2">
                                         @for ($i = 1; $i <= 5; $i++)
                                             @if ($i <= floor($averageTrainerRating))
@@ -332,7 +333,7 @@
                                 </div>
                             </div>
                             <p class="trainer-bio mt-3">{{ $trainer->bio ?? 'لا يوجد سيرة ذاتية متاحة' }}</p>
-                            
+
                             @if (count($assistantUsers) > 0)
                                 <h5 class="section-title mt-5">ميسرو التدريب</h5>
                                 <div class="facilitators-container d-flex flex-column flex-md-row gap-4">
@@ -361,7 +362,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal دعوة صديق -->
     <div class="modal fade" id="inviteFriendModal" tabindex="-1" aria-labelledby="inviteFriendModalLabel"
         aria-hidden="true">
@@ -415,7 +416,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal تأكيد الاشتراك -->
     <div class="modal fade" id="confirmEnrollmentModal" tabindex="-1" aria-labelledby="confirmEnrollmentModalLabel"
         aria-hidden="true">
