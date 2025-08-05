@@ -9,6 +9,34 @@
 @section('content')
 
         <main>
+
+                                <!-- زر فتح المودال -->
+{{-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+    أرسل مراجعتك
+</button>
+
+<!-- مودال إرسال مراجعة -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{{ route('feedback.store') }}" method="POST">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="reviewModalLabel">أرسل مراجعتك</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+          </div>
+          <div class="modal-body">
+            <textarea name="content" class="form-control" rows="4" placeholder="اكتب رأيك هنا..." required></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            <button type="submit" class="btn btn-success">إرسال</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+   --}}
             <section class="intro-section">
                 <div class="grid">
                     <div class="content">
@@ -23,7 +51,7 @@
                                 TrainingP
                             </div>
                         </div>
-                        
+
                         <div class="desc">
                             منظومة متكاملة تجمع المدربين، والمتدربين، والمساعدين
                             والمؤسسات في منصة احترافية واحدة — انطلق اليوم نحو

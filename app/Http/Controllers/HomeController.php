@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequests\storeFeedback;
+use App\Models\feedback;
 use App\Services\HomeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +25,7 @@ class HomeController extends Controller
                 return redirect()->route('verify-user-blade', ['id' => $user->id])
                                 ->with('msg', 'يرجى التحقق من بريدك الإلكتروني.');
             }
-            
+
             $routes = [
                 1 => 'complete-trainer-register',
                 2 => 'complete-assistant-register',
@@ -38,7 +40,7 @@ class HomeController extends Controller
                 return redirect()->route($routeName, ['id' => $user->id]);
             }
             if ($user->user_type_id == 4) {
-                return redirect()->route('homePageOrganization'); 
+                return redirect()->route('homePageOrganization');
             }
 
             return redirect()->route('homePage');
@@ -46,4 +48,17 @@ class HomeController extends Controller
 
         return view('index');
 }
+
+public function sendFeedback(storeFeedback $request)
+{
+    $data = $request->validated();
+
+    feedback::create([
+        'user_id' => auth()->id(),
+        'content' => $data['content'],
+    ]);
+
+    return back()->with('success', 'تم إرسال المراجعة بنجاح!');
+}
+
 }

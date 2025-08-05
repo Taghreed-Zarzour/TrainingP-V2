@@ -39,6 +39,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\TrainingAnnouncementSessionService;
 use App\Http\Controllers\Trainings\Trainings_CURD_Controller;
+use App\Http\Controllers\User\Trainee\RegisteredTrainingsController;
 
 // User Route - Adjusted for Session Authentication
 Route::get('/user', function (Request $request) {
@@ -141,7 +142,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::prefix('training')->group(function () {
     // إنشاء جديد - عرض النموذج الأولي
     Route::get('/create', [Trainings_CURD_Controller::class, 'showBasicInformationForm'])->name('training.create');
-    
+
     // الخطوة 1: المعلومات الأساسية
     Route::get('/basic-information/{trainingId?}', [Trainings_CURD_Controller::class, 'showBasicInformationForm'])
         ->name('training.basic');
@@ -154,23 +155,23 @@ Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBas
     // الخطوة 2: الأهداف
     Route::get('/{trainingId}/goals', [Trainings_CURD_Controller::class, 'showGoalsForm'])->name('training.goals');
     Route::post('/{trainingId}/goals', [Trainings_CURD_Controller::class, 'storeGoals'])->name('training.store.goals');
-    
+
     // الخطوة 3: الفريق
     Route::get('/{trainingId}/team', [Trainings_CURD_Controller::class, 'showTeamForm'])->name('training.team');
     Route::post('/{trainingId}/team', [Trainings_CURD_Controller::class, 'storeTeam'])->name('training.store.team');
-    
+
     // الخطوة 4: الجدولة
     Route::get('/{trainingId}/schedule', [Trainings_CURD_Controller::class, 'showScheduleForm'])->name('training.schedule');
     Route::post('/{trainingId}/schedule', [Trainings_CURD_Controller::class, 'storeSchedule'])->name('training.store.schedule');
-    
+
     // الخطوة 5: الإعدادات
     Route::get('/{trainingId}/settings', [Trainings_CURD_Controller::class, 'showSettingsForm'])->name('training.settings');
     Route::post('/{trainingId}/settings', [Trainings_CURD_Controller::class, 'storeSettings'])->name('training.store.settings');
-    
+
     // الخطوة 6: المراجعة
     Route::get('/{trainingId}/review', [Trainings_CURD_Controller::class, 'showReviewForm'])->name('training.review');
     Route::post('/{trainingId}/publish', [Trainings_CURD_Controller::class, 'publishTraining'])->name('training.publish');
-    
+
     // صفحة الإكمال
     Route::get('/{trainingId}/completed', [Trainings_CURD_Controller::class, 'showCompletionPage'])->name('training.completed');
 });
@@ -196,13 +197,14 @@ Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBas
   Route::post('/participants/{program}/{participant}/action', [TrainingParticipantsController::class, 'handleAction'])->name('participants.handleAction');
   Route::post('/participants/{program}/bulk-accept', [TrainingParticipantsController::class, 'bulkAccept'])->name('participants.bulkAccept');
   Route::post('/programs/{program}/participants/{participant}/reason', [TrainingParticipantsController::class, 'submitReason'])->name('participants.submitReason');
+  Route::delete('/trainee/{trainee_id}/delete/{program_id}', [TrainingParticipantsController::class, 'deleteAcceptedTrainee'])->name('acceptedTrainee.delete');
+
 
   Route::delete('sessions/{id}/delete', [SessionController::class, 'destroy'])->name('sessions.destroy');
   Route::put('sessions/{id}/update', [SessionController::class, 'update'])->name('sessions.update');
   Route::post('scheduling-training-sessions/{program_id}/store', [SessionController::class, 'store'])->name('session.store');
   Route::get('/sessions/{session}/attendance', [SessionController::class, 'selectSessionAttendece'])->name('sessions.attendance');
   Route::post('/sessions/{session}/attendance', [SessionController::class, 'storeSessionAttendece'])->name('attendance.store');
-  Route::get('/sessions/{session}/attendance/show', [SessionController::class, 'showSessionAttendece'])->name('attendance.show');
 
   Route::delete('assistant/{assistant_id}/delete/{program_id}', [TrainingAssistantController::class, 'deleteProgramAssistant'])->name('training.assistant.destroy');
   Route::post('assistant/{assistant_id}/add/{program_id}', [TrainingAssistantController::class, 'addProgramAssistant'])->name('training.assistant.store');
@@ -219,6 +221,10 @@ Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBas
 
   Route::delete('/programs/{program_id}/delete-photo', [TrainingProgramInfoController::class, 'deleteProgramPhoto'])->name('program.photo.delete');
   Route::post('/programs/{program_id}/update-photo', [TrainingProgramInfoController::class, 'updateOrCreateProgramPhoto'])->name('program.photo.update');
+
+  Route::get('/trainees/{trainee_id}/trainings', [RegisteredTrainingsController::class, 'trainings'])->name('trainee.trainings');
+
+  Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');
 
 });
 
