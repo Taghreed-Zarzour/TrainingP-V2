@@ -279,11 +279,12 @@
                                                 @else
                                                     @foreach ($program->sessions as $i => $session)
                                                         <tr style="border-bottom: 1px solid #dee2e6;">
-                                                            <td class="p-3 text-center">
-                                                                {{ isset($session_day[$i]) ? \Carbon\Carbon::parse($session_day[$i])->locale('ar')->dayName : '' }}
+                                                        <td class="p-3 text-center">
+                                                                {{ isset($session_day[$i]) ? $session_day[$i] : '' }}
                                                             </td>
+
                                                             <td class="p-3 text-center">
-                                                                {{ isset($date_display[$i]) ? \Carbon\Carbon::parse($date_display[$i])->locale('ar')->translatedFormat('d F') : '' }}
+                                                                {{ isset($session_day[$i]) ? $session_day[$i] : '' }}
                                                             </td>
                                                             <td class="p-3 text-center">
                                                                 {{ formatTimeArabic($session->session_start_time) }} -
