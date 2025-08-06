@@ -279,7 +279,11 @@
                                                 @else
                                                     @foreach ($program->sessions as $i => $session)
                                                         <tr style="border-bottom: 1px solid #dee2e6;">
+<<<<<<< HEAD
+                                                        <td class="p-3 text-center">
+=======
                                                             <td class="p-3 text-center">
+>>>>>>> 4b85b9db5c1256dea990096b7e7dda8c5f8622b1
                                                                 {{ isset($session_day[$i]) ? $session_day[$i] : '' }}
                                                             </td>
 

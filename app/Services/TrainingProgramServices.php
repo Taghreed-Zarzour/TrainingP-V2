@@ -249,7 +249,7 @@ class TrainingProgramServices
             
             $sessionsPercentage = ($validSessions / $program->sessions->count()) * 100;
             $completedWeight += ($sessionsPercentage / 100) * $weights['sessions'];
-        } else if ($program->AdditionalSetting && $program->AdditionalSetting->schedule_later) {
+        } else {
             // إذا تم اختيار تحديد الجلسات لاحقاً، نعتبر هذا الجزء مكتمل
             $completedWeight += $weights['sessions'];
         }
