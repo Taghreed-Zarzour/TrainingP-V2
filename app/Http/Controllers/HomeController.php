@@ -54,7 +54,8 @@ public function sendFeedback(storeFeedback $request)
     $data = $request->validated();
 
     feedback::create([
-        'user_id' => auth()->id(),
+        'user_id' => auth()->check() ? auth()->id() : null,
+
         'content' => $data['content'],
     ]);
 

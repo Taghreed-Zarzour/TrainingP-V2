@@ -228,6 +228,9 @@ Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBas
 
 });
 
+Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');
+
+
 Route::get('/trainings/announcements', [TrainingsController::class, 'index'])->name('trainings_announcements');
 Route::get('/trainings/announcements/show/{id}', [TrainingsController::class, 'show'])->name('show_trainings_announcements');
 

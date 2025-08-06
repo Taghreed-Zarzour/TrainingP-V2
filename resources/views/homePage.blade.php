@@ -35,8 +35,8 @@
         </form>
       </div>
     </div>
-  </div>
-   --}}
+  </div> --}}
+
             <section class="intro-section">
                 <div class="grid">
                     <div class="content">
