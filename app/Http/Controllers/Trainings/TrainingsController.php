@@ -28,7 +28,6 @@ class TrainingsController extends Controller
     {
         $programsResponse = $this->trainingAnnouncementService->index();
         $programs = $programsResponse['data'] ?? [];
-        
         // حساب المدة الإجمالية لكل برنامج
         foreach ($programs as $program) {
             $minutes = 0;
@@ -50,7 +49,6 @@ class TrainingsController extends Controller
         $program_classification = TrainingClassification::all(); // مجال التدريب للفلترة
         $trainerIds = TrainingProgram::pluck('user_id');
         $trainers = User::with('trainee')->whereIn('id', $trainerIds)->get();
-        
         return view('trainingAnnouncement.index', compact('programs', 'trainers','program_classification'));
     }
 

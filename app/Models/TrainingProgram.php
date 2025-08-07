@@ -13,7 +13,7 @@ class TrainingProgram extends Model
         'training_level_id',
         'program_presentation_method_id',
         'user_id',
-          'status',
+        'status',
         'schedules_later',
     ];
 
@@ -38,7 +38,7 @@ class TrainingProgram extends Model
 
     public function sessions()
     {
-        return $this->hasMany(schedulingTrainingSessions::class);
+        return $this->hasMany(schedulingTrainingSessions::class, 'training_program_id');
     }
 
     public function AdditionalSetting()
