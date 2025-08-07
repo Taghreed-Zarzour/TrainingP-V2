@@ -228,24 +228,27 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="bi-image-wrap">
-                                @if ($user->photo)
-                                    <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المدرب" />
-                                @else
-                                    <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" />
-                                @endif
+<div class="bi-image-wrap">
+    @if ($user->photo)
+        <div class="image-container">
+            <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المدرب" class="square-img" />
+        </div>
+    @else
+        <div class="image-container">
+            <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" class="square-img" />
+        </div>
+    @endif
 
-                                <div class="bi-flags">
-                                    @if ($user->nationalities && $user->nationalities->count())
-                                        @foreach ($user->nationalities->take(5) as $country)
-                                            <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
-                                                alt="{{ $country->name }}" class="flag-img"
-                                                title="{{ $country->name }}" />
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </div>
-
+    <div class="bi-flags">
+        @if ($user->nationalities && $user->nationalities->count())
+            @foreach ($user->nationalities->take(5) as $country)
+                <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
+                    alt="{{ $country->name }}" class="flag-img"
+                    title="{{ $country->name }}" />
+            @endforeach
+        @endif
+    </div>
+</div>
                             <div class="bi-title-wrap">
                                 <div class="bi-name-wrap">
                                     <div class="bi-name">{{ $user->getTranslation('name', 'ar') }}
@@ -1084,12 +1087,15 @@
                     <label class="profile-image-label">
                         <input type="file" accept="image/png, image/jpeg" id="profileImageInput" name="photo"
                             hidden />
+                            <div class="profile-image-preview-container">
+
                         <div class="profile-image-preview" id="profileImagePreview">
                             @if ($user->photo)
                                 <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المدرب" />
                             @else
                                 <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" />
                             @endif
+                        </div>
                         </div>
                     </label>
                     <div class="profile-upload-desc">
@@ -1531,7 +1537,6 @@
 
 
 
-    <hr style="margin-bottom: 40px" />
 @endsection
 
 @section('scripts')
@@ -1740,53 +1745,5 @@
             }
         });
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const wrapper = document.querySelector(".swiper-content");
-            const slides = document.querySelectorAll(".swiper-slide");
-            const nextBtn = document.querySelector(".next");
-            const prevBtn = document.querySelector(".prev");
 
-            let currentIndex = 0;
-
-            function getSlidesPerView() {
-                return window.innerWidth > 800 ? 2 : 1;
-            }
-
-            function getTotalGroups() {
-                return Math.ceil(slides.length / getSlidesPerView());
-            }
-
-            function updateSlider() {
-                const slidesPerView = getSlidesPerView();
-                const offset = (100 / slidesPerView) * currentIndex;
-                wrapper.style.transform = `translateX(${offset}%)`;
-            }
-
-            function goNext() {
-                const maxIndex = getTotalGroups() - 1;
-                currentIndex =
-                    currentIndex >= maxIndex ? 0 : currentIndex + 1;
-                updateSlider();
-            }
-
-            function goPrev() {
-                const maxIndex = getTotalGroups() - 1;
-                currentIndex =
-                    (currentIndex - 1 + maxIndex + 1) % (maxIndex + 1);
-                updateSlider();
-            }
-
-            nextBtn?.addEventListener("click", goNext);
-            prevBtn?.addEventListener("click", goPrev);
-
-            window.addEventListener("resize", () => {
-                currentIndex = 0;
-                updateSlider();
-            });
-
-            // Initial setup
-            updateSlider();
-        });
-    </script>
 @endsection

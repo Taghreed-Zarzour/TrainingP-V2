@@ -95,7 +95,7 @@
             display: flex;
             align-items: start;
             gap: 10px;
-            font-family: Arial, sans-serif;
+      
             direction: rtl;
             flex-direction: column;
         }
@@ -226,7 +226,7 @@
 
         /*تنسيقات الجدول*/
         .session-schedule {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
         }
 
         .session-schedule .card {

@@ -405,7 +405,6 @@
 .modal-header {
   background: #f8f9fa;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e9ecef;
   display: flex;
   flex-direction: row-reverse;
   align-items: center;

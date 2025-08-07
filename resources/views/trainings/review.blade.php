@@ -247,23 +247,30 @@
                                 </div>
                             @endif
                             
-                            @if (!empty($benefits))
-                                <div class="info-block">
-                                    <div class="info-block-title clickable-title" onclick="window.location.href='{{ route('training.goals', $training->id) }}'">
-                                        <span>ميزات التدريب</span>
-                                    </div>
-                                    <div class="info-block-content">
-                                        @foreach ($benefits as $item)
-                                            <div class="info-block-content-item">
-                                                <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
-                                                <div class="info-block-content-item-title">
-                                                    {{ $item }}
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
+@php
+    $filteredBenefits = array_filter($benefits, function ($item) {
+        return trim($item) !== '';
+    });
+@endphp
+
+@if (!empty($filteredBenefits))
+    <div class="info-block">
+        <div class="info-block-title clickable-title" onclick="window.location.href='{{ route('training.goals', $training->id) }}'">
+            <span>ميزات التدريب</span>
+        </div>
+        <div class="info-block-content">
+            @foreach ($filteredBenefits as $item)
+                <div class="info-block-content-item">
+                    <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+                    <div class="info-block-content-item-title">
+                        {{ $item }}
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endif
+
                             
                             <div class="info-block">
                                 <div class="info-block-title clickable-title" onclick="window.location.href='{{ route('training.schedule', $training->id) }}'">

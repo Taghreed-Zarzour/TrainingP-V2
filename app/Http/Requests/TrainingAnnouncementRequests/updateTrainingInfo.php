@@ -33,7 +33,7 @@ class updateTrainingInfo extends FormRequest
             'learning_outcomes' => 'sometimes|array',
             'learning_outcomes.*' => 'nullable|string',
 
-            'benefits' => 'sometimes|array',
+            'benefits' => 'nullable|array',
             'benefits.*' => 'nullable|string',
             
             'payment_method' => 'nullable|string',
@@ -50,7 +50,7 @@ class updateTrainingInfo extends FormRequest
 
         'description.string' => 'يجب أن يكون الوصف نصاً.',
 
-        'learning_outcomes.min' => 'يجب إدخال ٤ عناصر على الأقل من أهداف التعلم.',
+        'learning_outcomes.min' => 'يجب إدخال 2 عناصر على الأقل من أهداف التعلم.',
         'learning_outcomes.*.required' => 'كل هدف تعلم يجب أن يكون نصاً.',
 
            'welcome_message.string' => 'الرسالة الترحيبية يجب أن تكون نصاً.',

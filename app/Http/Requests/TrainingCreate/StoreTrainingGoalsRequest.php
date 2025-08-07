@@ -24,7 +24,7 @@ class StoreTrainingGoalsRequest extends FormRequest
     {
         return [
             
-            'learning_outcomes' => 'required|array|min:4',
+            'learning_outcomes' => 'required|array|min:2',
             'learning_outcomes.*' => 'required|string',
 
             'requirements' => 'nullable|array',
@@ -34,7 +34,7 @@ class StoreTrainingGoalsRequest extends FormRequest
             'target_audience.*' => 'required|string',
 
             'benefits' => 'nullable|array',
-            'benefits.*' => 'required|string',
+            'benefits.*' => 'nullable|string',
         ];
     }
 
@@ -42,12 +42,11 @@ class StoreTrainingGoalsRequest extends FormRequest
     {
         return [
             'learning_outcomes.required' => 'يرجى إدخال ما سيتعلمه المشاركون.',
-            'learning_outcomes.min' => 'يجب إدخال ٤ عناصر على الأقل من أهداف التعلم.',
+            'learning_outcomes.min' => 'يجب إدخال 2 عناصر على الأقل من أهداف التعلم.',
             'learning_outcomes.*.required' => 'كل هدف تعلم يجب أن يكون نصاً.',
 
             'requirements.*.required' => 'يرجى إدخال كل المتطلبات.',
             'target_audience.*.required' => 'يرجى إدخال جميع عناصر الجمهور المستهدف.',
-            'benefits.*.required' => 'يرجى إدخال كل فوائد التدريب.',
         ];
     }
 }

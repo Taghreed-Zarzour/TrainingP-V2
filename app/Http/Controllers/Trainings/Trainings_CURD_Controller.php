@@ -301,13 +301,19 @@ public function storeSchedule(StoreSchedulingRequest $request, $trainingId)
       $submissionMethod = $submissionMethod->value;
     }
 
+    if (!$settings->welcome_message) {
+    $settings->welcome_message = "شكرًا لتسجيلك في التدريب. يسعدنا أن تكون/ي جزءًا من هذا البرنامج، ونتطلع إلى رحلة مليئة بالتعلّم  والتطوير.
+سيتم مراجعة طلبك وإشعارك بالقبول أو الاعتذار في أقرب وقت، لذا تأكد/ي من متابعة بريدك الإلكتروني أو الإشعارات داخل المنصة.";
+}
+
+
     return view('trainings.settings', [
       'training' => $training,
       'settings' => $settings,
       'countries' => Country::all(),
       'training_files' => $trainingFiles,
-      'submissionMethod' => $submissionMethod,
-    ]);
+      'submissionMethod' => $submissionMethod,  
+      ]);
   }
 
   public function storeSettings(StoreAdditionalSettingsRequest $request, $trainingId)
@@ -388,7 +394,13 @@ public function storeSchedule(StoreSchedulingRequest $request, $trainingId)
     // إضافة الملفات الجديدة
     if ($request->hasFile('training_files')) {
       foreach ($request->file('training_files') as $file) {
-        $trainingFiles[] = $file->store('training/files', 'public');
+$filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+$extension = $file->getClientOriginalExtension();
+$timestamp = now()->format('Ymd_His');
+$uniqueFilename = $filename . '_' . $timestamp . '.' . $extension;
+
+$path = $file->storeAs('training/files', $uniqueFilename, 'public');
+$trainingFiles[] = $path;
       }
     }
 

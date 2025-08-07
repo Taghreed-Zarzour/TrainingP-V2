@@ -252,8 +252,7 @@ push('css')
 
         .filter-btn {
             padding: 10px 24px;
-            font-family: 'IBM Plex Sans Arabic', sans-serif;
-
+  
             border-radius: 12px;
             text-align: center;
             cursor: pointer;

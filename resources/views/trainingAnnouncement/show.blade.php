@@ -261,7 +261,7 @@
                             <h4 class="info-title">جدولة الجلسات</h4>
                             <div class="card">
                                 <div class="card-body p-0">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive w-100">
                                         <table class="table table-borderless m-0">
                                             <thead>
                                                 <tr style="border-bottom: 1px solid #dee2e6;">

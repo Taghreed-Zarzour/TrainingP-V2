@@ -1,98 +1,28 @@
 @extends('frontend.layouts.master')
 @section('title', 'تدريباتي')
-@section('css')
+
+@section('content')
     <style>
-        .empty-state {
-            padding: 3rem 0;
-            text-align: center;
+        .card-img-wrapper {
+            width: 100%;
+            padding-top: 100%;
+            /* يجعل الحاوية مربعة */
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            /* اختياري لتنعيم الزوايا */
         }
 
-        .empty-state img {
-            max-width: 120px;
-            margin-bottom: 1.5rem;
-        }
-
-        .empty-state h4 {
-            color: #555;
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-state p {
-            color: #777;
-            margin-bottom: 1.5rem;
-        }
-
-        .stopped-program {
-            opacity: 0.85;
-            border: 1px dashed #dee2e6;
-        }
-
-        .stopped-badge {
+        .card-img-wrapper img {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #dc3545;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 1;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .section-title span {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-count {
-            background-color: #e9ecef;
-            color: #495057;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: normal;
-        }
-
-        .restart-btn {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .restart-btn:hover {
-            background-color: #218838;
-            color: white;
-        }
-
-        .card-footer .btn-register.restart {
-            background-color: #28a745;
-        }
-
-        .card-footer .btn-register.restart:hover {
-            background-color: #218838;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* تغطي الحاوية بالكامل بدون تشويه */
         }
     </style>
-@endsection
-@section('content')
     <!-- Blue Header Section -->
     <div class="blue-header full-width-header mt-4">
         <div class="container d-flex justify-content-center">
@@ -139,9 +69,8 @@
                 <!-- قسم التدريبات المعلنة -->
                 <div class="section-title">
                     <span>
-                        <img src="{{ asset('images/courses/megaphone.svg') }}" alt="التدريبات المعلنة" width="24">
                         التدريبات المعلنة
-                        <span class="section-count">{{ count($announced) }}</span>
+                        <span class="section-count">({{ count($announced) }})</span>
                     </span>
                     @if (empty($announced))
                         <a href="{{ route('training.create') }}" class="custom-btn btn-sm">إنشاء تدريب جديد</a>
@@ -160,18 +89,20 @@
                         @foreach ($announced as $p)
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
-                                    @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                        <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                            class="card-img-top" alt="صورة التدريب">
-                                    @else
-                                        <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
-                                            alt="صورة التدريب">
-                                    @endif
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                    <div class="card-img-wrapper">
+                                        @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                            <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                class="card-img-top" alt="صورة التدريب">
+                                        @else
+                                            <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
+                                                alt="صورة التدريب">
+                                        @endif
+                                    </div>
+                                    <div class="card-body justify-content-start">
+                                        <h5 class="card-title m-0">{{ $p->title }}</h5>
                                         <div class="stats">
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/member-admin.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
                                                 <span>
                                                     @php
                                                         $pendingCount = 0;
@@ -188,7 +119,7 @@
                                                 </span>
                                             </div>
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/clock-admin.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/clock-admin.svg') }}">
                                                 @php
                                                     $hours = floor($p->total_session_duration_minutes / 60);
                                                     $minutes = $p->total_session_duration_minutes % 60;
@@ -201,7 +132,7 @@
                                                 </span>
                                             </div>
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/views.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/views.svg') }}">
                                                 <span>{{ $p->views ?? 0 }} مشاهدة</span>
                                             </div>
                                         </div>
@@ -282,11 +213,12 @@
                 </div>
 
                 <!-- قسم التدريبات المتوقفة -->
+                @if (!empty($stoppedPrograms) && count($stoppedPrograms) > 0)
+
                 <div class="section-title mt-5">
                     <span>
-                        <img src="{{ asset('images/courses/paused.svg') }}" alt="التدريبات المتوقفة" width="24">
                         التدريبات المتوقفة
-                        <span class="section-count">{{ count($stoppedPrograms ?? []) }}</span>
+                        <span class="section-count">({{ count($stoppedPrograms ?? []) }})</span>
                     </span>
                 </div>
 
@@ -302,18 +234,20 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3 stopped-program">
                                     <div class="stopped-badge">متوقف</div>
-                                    @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                        <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                            class="card-img-top" alt="صورة التدريب">
-                                    @else
-                                        <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
-                                            alt="صورة التدريب">
-                                    @endif
-                                    <div class="card-body">
+                                    <div class="card-img-wrapper">
+                                        @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                            <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                class="card-img-top" alt="صورة التدريب">
+                                        @else
+                                            <img src="{{ asset('images/cources/sample-course.jpg') }}"
+                                                class="card-img-top" alt="صورة التدريب">
+                                        @endif
+                                    </div>
+                                    <div class="card-body justify-content-start">
                                         <h5 class="card-title">{{ $p->title }}</h5>
                                         <div class="stats">
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/member-admin.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
                                                 <span>
                                                     @php
                                                         $pendingCount = 0;
@@ -330,7 +264,7 @@
                                                 </span>
                                             </div>
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/clock-admin.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/clock-admin.svg') }}">
                                                 @php
                                                     $hours = floor($p->total_session_duration_minutes / 60);
                                                     $minutes = $p->total_session_duration_minutes % 60;
@@ -343,7 +277,7 @@
                                                 </span>
                                             </div>
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/views.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/views.svg') }}">
                                                 <span>{{ $p->views ?? 0 }} مشاهدة</span>
                                             </div>
                                         </div>
@@ -355,12 +289,12 @@
                                                     <img src="{{ asset('images/cources/edit.svg') }}">
                                                 </a>
                                             </div>
-                                            <div class="restart-btn">
-                                                <form method="POST" action="{{ route('trainings.rePublish', $p->id) }}">
+                                            <div class="">
+                                                <form class="p-0" method="POST"
+                                                    action="{{ route('trainings.rePublish', $p->id) }}">
                                                     @csrf
                                                     <button type="submit" class="restart-btn" title="إعادة نشر التدريب">
-                                                        <img src="{{ asset('images/cources/restart.svg') }}"
-                                                            width="16">
+
                                                         إعادة النشر
                                                     </button>
                                                 </form>
@@ -368,13 +302,13 @@
                                         </div>
                                         <a href="{{ route('training.details', $p->id) }}#registrants"
                                             class="btn btn-register restart">
-                                            <img src="{{ asset('images/courses/members.svg') }}">
+                                            <img src="{{ asset('images/cources/register-icon.svg') }}">
                                             قائمة المسجلين
                                         </a>
                                     </div>
                                 </div>
                             </div>
-                            <!-- مودال تأكيد إعادة النشر -->
+                            {{-- <!-- مودال تأكيد إعادة النشر -->
                             <div class="modal fade" id="restartAdModal-{{ $p->id }}" tabindex="-1"
                                 aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
@@ -417,10 +351,11 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         @endforeach
                     @endif
                 </div>
+                @endif
             </div>
 
             <!-- تبويب تدريبات قيد الإنشاء -->
@@ -437,12 +372,14 @@
                         @foreach ($drafts as $p)
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
+                                      <div class="card-img-wrapper">
                                     @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
                                         <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
                                             class="card-img-top">
                                     @else
                                         <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top">
                                     @endif
+                                        </div>
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $p->title }}</h5>
                                         <!-- شريط التقدم -->
@@ -529,18 +466,20 @@
                         @foreach ($ongoing as $p)
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
-                                    @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                        <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                            class="card-img-top" alt="صورة التدريب">
-                                    @else
-                                        <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
-                                            alt="صورة التدريب">
-                                    @endif
+                                    <div class="card-img-wrapper">
+                                        @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                            <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                class="card-img-top" alt="صورة التدريب">
+                                        @else
+                                            <img src="{{ asset('images/cources/sample-course.jpg') }}"
+                                                class="card-img-top" alt="صورة التدريب">
+                                        @endif
+                                    </div>
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $p->title }}</h5>
                                         <div class="stats">
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/member-admin.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
                                                 <span>
                                                     @php
                                                         $acceptedCount = 0;
@@ -557,7 +496,7 @@
                                                 </span>
                                             </div>
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/clock-admin.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/clock-admin.svg') }}">
                                                 @php
                                                     $hours = floor($p->total_session_duration_minutes / 60);
                                                     $minutes = $p->total_session_duration_minutes % 60;
@@ -570,7 +509,7 @@
                                                 </span>
                                             </div>
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/views.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/views.svg') }}">
                                                 <span>{{ $p->views ?? 0 }} مشاهدة</span>
                                             </div>
                                         </div>
@@ -602,18 +541,20 @@
                         @foreach ($completed as $p)
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
-                                    @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                        <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                            class="card-img-top" alt="صورة التدريب">
-                                    @else
-                                        <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
-                                            alt="صورة التدريب">
-                                    @endif
+                                    <div class="card-img-wrapper">
+                                        @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                            <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                class="card-img-top" alt="صورة التدريب">
+                                        @else
+                                            <img src="{{ asset('images/cources/sample-course.jpg') }}"
+                                                class="card-img-top" alt="صورة التدريب">
+                                        @endif
+                                    </div>
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $p->title }}</h5>
                                         <div class="stats">
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/member-admin.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
                                                 <span>
                                                     @php
                                                         $acceptedCount = 0;
@@ -630,7 +571,7 @@
                                                 </span>
                                             </div>
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/clock-admin.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/clock-admin.svg') }}">
                                                 @php
                                                     $hours = floor($p->total_session_duration_minutes / 60);
                                                     $minutes = $p->total_session_duration_minutes % 60;
@@ -643,7 +584,7 @@
                                                 </span>
                                             </div>
                                             <div class="stat-item">
-                                                <img class="ps-2" src="{{ asset('images/cources/views.svg') }}">
+                                                <img class="pe-2" src="{{ asset('images/cources/views.svg') }}">
                                                 <span>{{ $p->views ?? 0 }} مشاهدة</span>
                                             </div>
                                         </div>
@@ -665,7 +606,7 @@
     </div>
 @endsection
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // حفظ واستعادة التبويب النشط
@@ -725,7 +666,7 @@
             // إضافة عنوان التدريب في رسائل التأكيد
             document.querySelectorAll(
                 '[data-bs-target^="#stopAdModal"], [data-bs-target^="#deleteTrainingModal"], [data-bs-target^="#restartAdModal"]'
-                ).forEach(btn => {
+            ).forEach(btn => {
                 btn.addEventListener('click', function() {
                     const trainingTitle = this.closest('.card').querySelector('.card-title')
                         .textContent;

@@ -3,6 +3,56 @@
 @section('css')
 @endsection
 @section('content')
+<style>
+ /* النص */
+        .switch-label {
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .profile-image-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+              aspect-ratio:initial;
+                  border-radius: 8px;
+                  overflow: visible;
+        }
+
+        .profile-image-shown {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .profile-image-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .profile-image-btn:hover {
+            background: #2563eb;
+        }
+
+        .profile-image-default {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-direction: column;
+        }
+
+
+</style>
     <main>
         <div class="publish-training-page">
             <div class="grid">

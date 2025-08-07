@@ -16,7 +16,7 @@
     background: #ffffff;
     outline: none;
     transition: border 0.2s;
-    font-family: inherit;
+  
     box-sizing: border-box;
     width: 100%;
     /* margin-bottom: 24px;

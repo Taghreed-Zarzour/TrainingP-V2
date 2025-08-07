@@ -219,11 +219,11 @@
                     </li>
                 </ul>
                 <div class="tab-content" id="mainTabsContent">
-                    <div class="tab-pane fade show active" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                    <div class="tab-pane fade show active px-5" id="stats" role="tabpanel" aria-labelledby="stats-tab">
                         @include('trainings.tabs.statistics')
                     </div>
 
-                    <div class="tab-pane fade" id="sessions" role="tabpanel" aria-labelledby="sessions-tab">
+                    <div class="tab-pane fade  px-5" id="sessions" role="tabpanel" aria-labelledby="sessions-tab">
                         @include('trainings.tabs.sessions')
                     </div>
 
@@ -231,19 +231,19 @@
                         @include('trainings.tabs.registrants')
                     </div>
 
-                    <div class="tab-pane fade" id="trainees" role="tabpanel" aria-labelledby="trainees-tab">
+                    <div class="tab-pane fade  px-5" id="trainees" role="tabpanel" aria-labelledby="trainees-tab">
                         @include('trainings.tabs.trainees')
                     </div>
 
-                    <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
+                    <div class="tab-pane fade  px-5" id="info" role="tabpanel" aria-labelledby="info-tab">
                         @include('trainings.tabs.info')
                     </div>
 
-                    <div class="tab-pane fade" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
+                    <div class="tab-pane fade  px-5" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
                         @include('trainings.tabs.attachments')
                     </div>
 
-                    <div class="tab-pane fade" id="assistants" role="tabpanel" aria-labelledby="assistants-tab">
+                    <div class="tab-pane fade  px-5" id="assistants" role="tabpanel" aria-labelledby="assistants-tab">
                         @include('trainings.tabs.assistants')
                     </div>
                 </div>
@@ -254,7 +254,7 @@
 
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>

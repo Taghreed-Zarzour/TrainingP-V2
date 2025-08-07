@@ -100,7 +100,10 @@ public function index()
         ->whereIn('session_id', $totalSessions)
         ->count();
 
-      $percentage = round(($attendedSessions / count($totalSessions)) * 100, 2);
+$sessionCount = count($totalSessions);
+$percentage = $sessionCount > 0 
+    ? round(($attendedSessions / $sessionCount) * 100, 2)
+    : 0;
       $attendanceStats[$trainee->id] = $percentage;
     }
 

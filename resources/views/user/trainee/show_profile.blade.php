@@ -173,24 +173,24 @@
             border-color: #dae0e5;
         }
         .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            background-color: #003090;
+            border-color: #003090;
         }
         .btn-primary:hover {
             background-color: var(--primary-hover);
             border-color: var(--primary-hover);
         }
         .download-btn {
-            border: 2px solid var(--primary-color);
+            border: 2px solid #003090;
             border-radius: 12px;
             font-size: 1rem;
             font-weight: 500;
             padding: 10px;
-            color: var(--primary-color);
+            color: #003090;
             transition: background 0.3s, color 0.3s;
         }
         .download-btn:hover {
-            background-color: var(--primary-color);
+            background-color: #003090;
             color: #fff;
         }
         .download-btn:hover svg path {
@@ -355,13 +355,13 @@
                             <div class="card-body">
                                 <!-- الصورة -->
                                 <div class="text-center flex-shrink-0 position-relative"
-                                    style="width: 200px; height: 200px;">
+                                    style="width: 250px; height: 250px; border-radius: 23px;">
                                     @if ($user->photo)
                                         <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المتدرب"
-                                            class="img-profile w-100 h-100 object-fit-cover rounded">
+                                            class="img-profile w-100 h-100 object-fit-cover rounded-4">
                                     @else
                                         <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية"
-                                            class="img-profile w-100 h-100 object-fit-cover rounded">
+                                            class="img-profile w-100 h-100 object-fit-cover rounded-4">
                                     @endif
                                     <!-- الأعلام فوق الصورة في الزاوية السفلية اليسرى -->
                                     @if ($user->nationalities && $user->nationalities->count())
@@ -498,7 +498,7 @@
                             <div class="w-100">
                                 <span class="text-muted mb-3">حمّل سيرتك الذاتية بشكل سهل وسريع</span>
                             </div>
-                            <button class="btn btn-outline-primary download-btn px-5"
+                            <button class="btn download-btn px-5"
                                 onclick="document.getElementById('cv-upload').click()">
                                 <svg width="25" height="24" viewBox="0 0 25 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -628,16 +628,27 @@
                     <label class="profile-image-label">
                         <input type="file" accept="image/png, image/jpeg" id="profileImageInput" name="photo"
                             hidden />
-                        <div class="profile-image-preview" id="profileImagePreview">
-                            @if ($user->photo)
-                                <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المتدرب" />
-                            @else
-                                <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" />
-                            @endif
-                        </div>
-                        <div class="profile-upload-desc">
-                            أرفق صورة شخصية مربعة وواضحة (JPG أو PNG، حد أقصى 5MB).
-                        </div>
+<div class="profile-image-preview-container">
+    <div class="profile-image-preview" id="profileImagePreview">
+        @if ($user->photo)
+            <div class="image-container">
+                <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المتدرب" />
+            </div>
+        @else
+            <div class="image-container">
+                <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" />
+            </div>
+        @endif
+    </div>
+
+</div>
+  <div class="profile-upload-desc">
+        أرفق صورة شخصية مربعة وواضحة (JPG أو PNG، حد أقصى 5MB).
+    </div>
+<style>
+    
+
+</style>
                     </label>
                 </div>
             </div>
@@ -834,9 +845,7 @@
         </form>
     </div>
 @endsection
-@section('line')
-    <hr style="width: 100%; margin-bottom: 40px; margin-top: 60px;" />
-@endsection
+
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/validator@13.9.0/validator.min.js"></script>
     <script src="{{ asset('js/profile-image.js') }}"></script>

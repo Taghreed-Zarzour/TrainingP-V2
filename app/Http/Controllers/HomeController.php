@@ -59,7 +59,7 @@ public function sendFeedback(storeFeedback $request)
         'content' => $data['content'],
     ]);
 
-    return back()->with('success', 'تم إرسال المراجعة بنجاح!');
+return back()->with('showThankYouModal', true);
 }
 
 }

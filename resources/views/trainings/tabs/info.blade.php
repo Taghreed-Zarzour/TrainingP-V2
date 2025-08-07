@@ -110,28 +110,34 @@
                 @endif
             </div>
             <!-- ميزات التدريب -->
-            <div class="mb-5">
-                <h3 class="section-title">ميزات التدريب</h3>
-                @if(isset($program->detail) && $program->detail->benefits)
-                    @php
-                        $benefits = is_array($program->detail->benefits) 
-                            ? $program->detail->benefits 
-                            : json_decode($program->detail->benefits ?? '[]', true);
-                    @endphp
-                    @if(is_array($benefits) && count($benefits) > 0)
-                        @foreach($benefits as $benefit)
-                            <div class="list-item">
-                                <img src="{{ asset('images/icons/check-circle.svg') }}" alt="check" width="20" height="20">
-                                <span>{{ $benefit }}</span>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="empty-state">لم يتم تحديد ميزات التدريب بعد</div>
-                    @endif
-                @else
-                    <div class="empty-state">لم يتم تحديد ميزات التدريب بعد</div>
-                @endif
+@php
+    $benefits = [];
+
+    if (isset($program->detail) && $program->detail->benefits) {
+        $benefits = is_array($program->detail->benefits) 
+            ? $program->detail->benefits 
+            : json_decode($program->detail->benefits, true);
+
+        // إزالة العناصر الفارغة أو التي تحتوي فقط على فراغات
+        $benefits = array_filter($benefits, function($b) {
+            return trim($b) !== '';
+        });
+    }
+@endphp
+
+@if(!empty($benefits))
+    <div class="mb-5">
+        <h3 class="section-title">ميزات التدريب</h3>
+        @foreach($benefits as $benefit)
+            <div class="list-item">
+                <img src="{{ asset('images/icons/check-circle.svg') }}" alt="check" width="20" height="20">
+                <span>{{ $benefit }}</span>
             </div>
+        @endforeach
+    </div>
+@endif
+
+
         </div>
         <!-- العمود الثاني -->
         <div style="flex: 1; min-width: 300px;">
@@ -263,10 +269,10 @@
                     <div class="input-group">
                         <label>ما الذي سيتعلمه المشاركون في هذا التدريب؟ <span class="required">*</span></label>
                         <div class="sub-label">
-                            يجب عليك تحديد 4 أهداف أو نتائج للتعلم على الأقل.
+                            يجب عليك تحديد 2 أهداف أو نتائج للتعلم على الأقل.
                         </div>
                         @foreach ($learningOutcomes as $index => $outcome)
-                            <div class="{{ $index < 4 ? 'input-without-remove' : 'input-with-remove' }}">
+                            <div class="{{ $index < 2 ? 'input-without-remove' : 'input-with-remove' }}">
                                 <input type="text" name="learning_outcomes[]" 
                                        value="{{ is_array($outcome) ? '' : $outcome }}"
                                        placeholder="مثال: تدريب أساسيات برمجة الأردوينو" />
@@ -321,7 +327,7 @@
                         </button>
                     </div>
                     <div class="input-group">
-                        <label>ما هي ميزات التدريب؟<span class="required">*</span></label>
+                        <label>ما هي ميزات التدريب؟</span></label>
                         <div class="sub-label">
                             اذكر النقاط التي تميز هذا التدريب عن غيره.
                         </div>
@@ -436,9 +442,9 @@
         document.getElementById('editTrainingForm').addEventListener('submit', function(e) {
             // التحقق من وجود أهداف تعلم
             const learningOutcomes = document.querySelectorAll('input[name="learning_outcomes[]"]').length;
-            if (learningOutcomes < 4) {
+            if (learningOutcomes < 2) {
                 e.preventDefault();
-                alert('يجب تحديد 4 أهداف أو نتائج للتعلم على الأقل');
+                alert('يجب تحديد 2 أهداف أو نتائج للتعلم على الأقل');
                 return;
             }
             
@@ -458,13 +464,6 @@
                 return;
             }
             
-            // التحقق من وجود ميزات
-            const benefits = document.querySelectorAll('input[name="benefits[]"]').length;
-            if (benefits < 1) {
-                e.preventDefault();
-                alert('يجب تحديد ميزة واحدة على الأقل');
-                return;
-            }
             
             // التحقق من آلية الدفع إذا كان التدريب مدفوع
             if (!freeRadio.checked) {

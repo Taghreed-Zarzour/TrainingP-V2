@@ -142,20 +142,20 @@
         @endif
     </div>
     @if ($programs->isEmpty())
-         <div class="empty-state text-center py-5 col-4" style="justify-self: center;">
+         <div class="empty-state text-center py-5 col-12" style="justify-self: center;">
             
             <h5 class="fw-bold mb-3">لا توجد برامج تدريبية متاحة حالياً</h5>
-            <p class="text-muted mb-4">يمكنك متابعتنا لمعرفة أحدث البرامج عند توفرها</p>
+            <p class="text-muted mb-4">يمكنك متابعتنا لمعرفة أحدث البرامج التدريبية عند توفرها</p>
             
             @auth
                 @if(in_array(auth()->user()->user_type_id, [1, 4]))
-                <a href="{{ route('training.create') }}" class="custom-btn">
+                <a href="{{ route('training.create') }}" class="btn custom-btn">
                     إنشاء تدريب جديد
                 </a>
                 @endif
             @else
-                <a href="{{ route('register') }}" class="btn btn-primary me-2">إنشاء حساب</a>
-                <a href="{{ route('login') }}" class="btn btn-outline-primary">تسجيل الدخول</a>
+                <a href="{{ route('register') }}" class="btn signup-btn m-2">إنشاء حساب</a>
+                <a href="{{ route('login') }}" class="btn signup-btn m-2">تسجيل الدخول</a>
             @endauth
         </div>
     @else
@@ -174,7 +174,7 @@
                         : asset('images/training.jpg') 
                 }}" class="card-img-top" alt="صورة التدريب">
             </div>
-            <div class="card-body d-flex flex-column justify-content-between gap-1">
+            <div class="card-body d-flex flex-column justify-content-between gap-1 align-items-start">
                 <h6 class="fw-bold">{{ $program->title }}</h6>
                 <div class="trainer-info mt-2 mb-2">
                     @php
@@ -284,14 +284,17 @@
                     </li>
                 </ul>
                 <div class="text-start mt-2">
-                    @if (!$program->AdditionalSetting || $program->AdditionalSetting->cost == 0 || $program->AdditionalSetting->cost == null)
-                        <span class="price-tag price-free">مجاني</span>
-                    @else
-                        <span class="price-tag">
-                            {{ number_format($program->AdditionalSetting->cost, 2) }}
-                            {{ $program->AdditionalSetting->currency ?? '' }}
-                        </span>
-                    @endif
+@if (!$program->AdditionalSetting || $program->AdditionalSetting->cost == 0 || $program->AdditionalSetting->cost == null)
+    <span class="price-tag price-free">مجاني</span>
+@else
+    <span class="price-tag">
+        {{ (fmod($program->AdditionalSetting->cost, 1) == 0) 
+            ? number_format($program->AdditionalSetting->cost, 0) 
+            : number_format($program->AdditionalSetting->cost, 2) }}
+        {{ $program->AdditionalSetting->currency ?? '' }}
+    </span>
+@endif
+
                 </div>
             </div>
         </div>
@@ -305,7 +308,7 @@
 </div>
 @endsection
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
     <script src="{{ asset('js/singleselect.js') }}"></script>
     <script>
         //التنقل بين الكروت عن طريق الأزرار

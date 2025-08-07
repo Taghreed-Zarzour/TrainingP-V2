@@ -25,6 +25,26 @@
                         </div>
                     </div>
 
+
+                      {{-- @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                    @if (session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif --}}
                     <form action="{{ route('training.store.goals', $training->id) }}" method="POST" id="training-goals-form">
                         @csrf
 
@@ -36,15 +56,15 @@
                             @php
                                 $learningOutcomes = old(
                                     'learning_outcomes',
-                                    isset($learning_outcomes) ? $learning_outcomes : array_fill(0, 4, ''),
+                                    isset($learning_outcomes) ? $learning_outcomes : array_fill(0, 2, ''),
                                 );
                                 if (is_string($learningOutcomes)) {
                                     $learningOutcomes = json_decode($learningOutcomes, true) ?? [];
                                 }
-                                $learningOutcomes = array_pad($learningOutcomes, 4, '');
+                                $learningOutcomes = array_pad($learningOutcomes, 2, '');
                             @endphp
                             @foreach ($learningOutcomes as $index => $outcome)
-                                <div class="{{ $index < 4 ? 'input-without-remove' : 'input-with-remove' }}">
+                                <div class="{{ $index < 2 ? 'input-without-remove' : 'input-with-remove' }}">
                                     <input type="text" name="learning_outcomes[]"
                                         value="{{ is_array($outcome) ? '' : $outcome }}"
                                         placeholder="مثال: تدريب أساسيات برمجة الأردوينو" />
@@ -122,7 +142,7 @@
                         </div>
                         
                         <div class="input-group">
-                            <label>ما هي ميزات التدريب؟<span class="required">*</span></label>
+                            <label>ما هي ميزات التدريب؟</label>
                             <div class="sub-label">
                                 اذكر النقاط التي تميز هذا التدريب عن غيره.
                             </div>
@@ -226,9 +246,9 @@
                 
                 // التحقق من وجود 4 نتائج تعلم على الأقل
                 const learningOutcomes = document.querySelectorAll('input[name^="learning_outcomes"]');
-                if (learningOutcomes.length < 4) {
+                if (learningOutcomes.length < 2) {
                     isValid = false;
-                    alert('يجب إدخال 4 نتائج تعلم على الأقل');
+                    alert('يجب إدخال 2 نتائج تعلم على الأقل');
                 }
                 
                 // التحقق من الحقول المطلوبة

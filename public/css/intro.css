@@ -66,7 +66,7 @@
   padding: 0;
 
   color: var(--color-text-medium);
-  text-align: right;
+  text-align: center;
   animation: fadeInUp 1s ease-out 0.4s both;
 }
 

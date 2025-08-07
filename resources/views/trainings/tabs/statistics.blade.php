@@ -1,8 +1,5 @@
 <style>
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
+    .
 
 
     .stats-row {
@@ -124,6 +121,8 @@
     @endif
 </div>
 {{-- تمهيد بيانات الرسم --}}
+@if(count($program->sessions) > 0 && count($sessionAttendanceCounts) > 0 && array_sum($sessionAttendanceCounts) > 0)
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // الحصول على عدد الجلسات وإنشاء مصفوفة العناوين الجديدة
@@ -400,3 +399,4 @@
         plugins: [dashedGridPlugin, customLabel, removeVerticalBorder, blueShadowPlugin]
     });
 </script>
+    @endif

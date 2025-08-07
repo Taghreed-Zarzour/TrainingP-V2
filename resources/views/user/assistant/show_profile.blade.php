@@ -311,10 +311,10 @@
                                     style="width: 200px; height: 200px;">
                                     @if ($user->photo)
                                         <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المساعد"
-                                            class="img-profile w-100 h-100 object-fit-cover rounded">
+                                            class="img-profile w-100 h-100 object-fit-cover rounded-4">
                                     @else
                                         <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية"
-                                            class="img-profile w-100 h-100 object-fit-cover rounded">
+                                            class="img-profile w-100 h-100 object-fit-cover rounded-4">
                                     @endif
 
                                     <!-- الأعلام فوق الصورة في الزاوية السفلية اليسرى -->
@@ -368,7 +368,7 @@
                                 <div class="edit-button-container d-flex align-items-center mt-3" style="gap: 8px;">
                                     <!-- زر التحميل (كبير) -->
                                     <a download href="{{ asset('storage/' . $user->userCv->cv_file) }}"
-                                        class="btn btn-outline-primary custom-btn flex-grow-1">
+                                        class="download-btn flex-grow-1">
                                         <svg style="margin-left: 8px;" width="24" height="20" viewBox="0 0 24 20"
                                             fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -523,12 +523,12 @@
                         <div class="card-body text-center">
                             <img src="{{ asset('images/trainer-account/cv.svg') }}" alt="سيرة ذاتية"
                                 style="max-width: 100px;" />
-                            <div class="w-100">
+                            <div class="desc w-100">
                                 <span class="text-muted mb-3">حمّل سيرتك الذاتية بشكل سهل وسريع</span>
                             </div>
-                            <button class="btn btn-outline-primary custom-btn px-5"
+                            <button class="btn download-btn px-5"
                                 onclick="document.getElementById('cv-upload').click()">
-                                <svg width="25" height="24" viewBox="0 0 25 24" fill="none"
+<svg width="25" height="24" viewBox="0 0 25 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M18.3359 12.75H6.33594C6.13743 12.7487 5.94742 12.6693 5.80706 12.5289C5.66669 12.3885 5.58725 12.1985 5.58594 12C5.58725 11.8015 5.66669 11.6115 5.80706 11.4711C5.94742 11.3307 6.13743 11.2513 6.33594 11.25H18.3359C18.5344 11.2513 18.7245 11.3307 18.8648 11.4711C19.0052 11.6115 19.0846 11.8015 19.0859 12C19.0846 12.1985 19.0052 12.3885 18.8648 12.5289C18.7245 12.6693 18.5344 12.7487 18.3359 12.75Z"
@@ -564,7 +564,7 @@
         </div>
         <div class="modal-desc">قم بتحديث معلوماتك الشخصية</div>
 
-        <form class="modal-form" action="{{ route('assistant_update_personal_information') }}" method="POST"
+        <form class="modal-form" action="{{ route('update_assistant_personal_information') }}" method="POST"
             enctype="multipart/form-data" id="personalInfoForm">
             @csrf
             @method('PUT')
@@ -574,12 +574,14 @@
                     <label class="profile-image-label">
                         <input type="file" accept="image/png, image/jpeg" id="profileImageInput" name="photo"
                             hidden />
+                        <div class="profile-image-preview-container">  
                         <div class="profile-image-preview" id="profileImagePreview">
                             @if ($user->photo)
                                 <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المساعد" />
                             @else
                                 <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" />
                             @endif
+                        </div>
                         </div>
                         <div class="profile-upload-desc">
                             أرفق صورة شخصية مربعة وواضحة (JPG أو PNG، حد أقصى 5MB).
@@ -717,7 +719,7 @@
         </div>
         <div class="modal-desc">قم بتحديث معلومات الخبرات والتعليم الخاصة بك</div>
 
-        <form class="modal-form" action="{{ route('assistant_update_experience_and_education') }}" method="POST"
+        <form class="modal-form" action="{{ route('update_experience_and_education') }}" method="POST"
             id="professionalSummaryForm">
             @csrf
             @method('PUT')
@@ -818,9 +820,6 @@
     </div>
 @endsection
 
-@section('line')
-    <hr style="width: 100%; margin-bottom: 40px; margin-top: 60px;" />
-@endsection
 
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/validator@13.9.0/validator.min.js"></script>
@@ -829,7 +828,6 @@
     <script src="{{ asset('js/mutliselect.js') }}"></script>
     <script src="{{ asset('js/singleselect.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // التحقق من صحة النماذج
