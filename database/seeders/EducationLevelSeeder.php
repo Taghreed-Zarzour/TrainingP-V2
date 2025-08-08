@@ -11,7 +11,7 @@ class EducationLevelSeeder extends Seeder
     {
         $levels = [
             'ثانوي',
-            'دبلوم',
+            'معهد متوسط',
             'بكالوريوس',
             'ماجستير',
             'دكتوراه',

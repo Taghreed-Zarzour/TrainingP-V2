@@ -110,4 +110,9 @@ public function nationalities()
             'password' => 'hashed',
         ];
     }
+    public function trainingPrograms()
+{
+    return $this->hasMany(TrainingProgram::class, 'user_id');
+}
+
 }

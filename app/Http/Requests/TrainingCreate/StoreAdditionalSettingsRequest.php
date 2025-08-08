@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Requests\TrainingCreate;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\SchedulingTrainingSessions;
+use App\Models\schedulingTrainingSessions;
 
 class StoreAdditionalSettingsRequest extends FormRequest
 {
@@ -95,7 +95,7 @@ class StoreAdditionalSettingsRequest extends FormRequest
                     
                     if ($trainingId) {
                         // البحث عن أول جلسة مرتبطة بالتدريب
-                        $firstSession = SchedulingTrainingSessions::where('training_program_id', $trainingId)
+                        $firstSession = schedulingTrainingSessions::where('training_program_id', $trainingId)
                             ->orderBy('session_date', 'asc')
                             ->first();
                             
@@ -234,7 +234,7 @@ class StoreAdditionalSettingsRequest extends FormRequest
                 }
                 
                 // التحقق من تاريخ الانتهاء مقابل تاريخ الجلسة الأولى
-                $firstSession = SchedulingTrainingSessions::where('training_program_id', $trainingId)
+                $firstSession = schedulingTrainingSessions::where('training_program_id', $trainingId)
                     ->orderBy('session_date', 'asc')
                     ->first();
                     

@@ -93,7 +93,6 @@ class TrainingProgramServices
                             continue;
                         }
                     } catch (\Exception $e) {
-                        // في حال فشل التحويل لأي سبب
                         $draft[] = $program;
                         continue;
                     }
@@ -111,7 +110,6 @@ class TrainingProgramServices
                             continue;
                         }
                     } catch (\Exception $e) {
-                        // في حال فشل التحويل لأي سبب
                         $draft[] = $program;
                         continue;
                     }
@@ -152,7 +150,6 @@ class TrainingProgramServices
             if ($program->completion_percentage === 100) {
                 $stopped[] = $program;
             } else {
-                // إذا لم تكن مكتملة، ضعها في المسودات
                 $draft[] = $program;
             }
         }
@@ -163,12 +160,12 @@ class TrainingProgramServices
     // حساب نسبة اكتمال التدريب بشكل احترافي
     public function calculateCompletion(TrainingProgram $program)
     {
-        // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب
+        // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب (تم تعديل الأوزان)
         $weights = [
-            'basic_info' => 7,      // المعلومات الأساسية (الاسم، الوصف، إلخ)
-            'details' => 4,         // التفاصيل (المخرجات، المتطلبات، الفئة المستهدفة، المزايا)
-            'settings' => 4,        // الإعدادات (السعر، الموعد النهائي، الحد الأقصى للمتدربين، إلخ)
-            'sessions' => 3,        // الجلسات
+            'basic_info' => 0,      // المعلومات الأساسية (الاسم، الوصف، إلخ) — قللنا الوزن
+            'details' => 3,         // التفاصيل (المخرجات، المتطلبات، الفئة المستهدفة، المزايا) — زدنا الوزن
+            'settings' => 3,        // الإعدادات (السعر، الموعد النهائي، الحد الأقصى للمتدربين، إلخ) — زدنا الوزن
+            'sessions' => 3,        // الجلسات — زدنا الوزن
         ];
         
         $totalWeight = array_sum($weights);
@@ -189,7 +186,7 @@ class TrainingProgramServices
         }
         
         $basicPercentage = ($basicCompleted / count($basicFields)) * 100;
-        if ($basicPercentage >= 80) { // نعتبر المعلومات الأساسية مكتملة إذا تم تعبئة 80% منها على الأقل
+        if ($basicPercentage >= 80) {
             $completedWeight += $weights['basic_info'];
         } else {
             $completedWeight += ($basicPercentage / 100) * $weights['basic_info'];
@@ -237,7 +234,6 @@ class TrainingProgramServices
         
         // 4. التحقق من الجلسات
         if ($program->sessions && $program->sessions->count() > 0) {
-            // نتحقق من أن كل جلسة لها تاريخ ووقت بداية ونهاية
             $validSessions = 0;
             foreach ($program->sessions as $session) {
                 if (!empty($session->session_date) && 
@@ -250,16 +246,14 @@ class TrainingProgramServices
             $sessionsPercentage = ($validSessions / $program->sessions->count()) * 100;
             $completedWeight += ($sessionsPercentage / 100) * $weights['sessions'];
         } else {
-            // إذا تم اختيار تحديد الجلسات لاحقاً، نعتبر هذا الجزء مكتمل
             $completedWeight += $weights['sessions'];
         }
         
-        // حساب النسبة الإجمالية
         $overallPercentage = ($completedWeight / $totalWeight) * 100;
         return intval($overallPercentage);
     }
     
-    // جلب برنامج تدريب مع جميع التفاصيل المرتبطة به
+    // بقية الكود كما هو (جلب، حذف، إيقاف، إعادة نشر)
     public function getProgramWithDetails($id)
     {
         $userId = Auth::id();
@@ -271,7 +265,6 @@ class TrainingProgramServices
         ])->where('user_id', $userId)->findOrFail($id);
     }
     
-    // حذف برنامج كامل مع جميع البيانات المرتبطة
     public function deleteProgram($id)
     {
         $userId = Auth::id();

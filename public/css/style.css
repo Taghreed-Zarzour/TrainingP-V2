@@ -2083,6 +2083,8 @@ footer .absolute .terms-conditions a {
 .card-block .card-body {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    align-content: baseline;
 }
 
 .trainer-account-page .base-info .bi-image-wrap {
@@ -2111,7 +2113,7 @@ footer .absolute .terms-conditions a {
 .trainer-account-page .base-info .bi-image-wrap .bi-flags img {
     width: 32px;
     height: 20px;
-    object-fit: contain;
+    object-fit: fill;
     object-position: center;
 }
 
@@ -2119,6 +2121,7 @@ footer .absolute .terms-conditions a {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .trainer-account-page .base-info .bi-title-wrap .bi-name-wrap {
@@ -2292,6 +2295,7 @@ footer .absolute .terms-conditions a {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 @media only screen and (max-width: 1000px) {
@@ -2475,17 +2479,20 @@ footer .absolute .terms-conditions a {
     margin-bottom: 1rem;
 }
 
-.trainer-account-page .reviews .reviews-title-wrap .reviews-title {
+ .reviews-title {
     font-family: IBM Plex Sans Arabic;
     font-weight: 500;
     font-size: 28px;
     line-height: 100%;
     letter-spacing: 0%;
     color: #000000;
+
+
+
 }
 
 @media only screen and (max-width: 1000px) {
-    .trainer-account-page .reviews .reviews-title-wrap .reviews-title {
+     .reviews-title {
         font-size: 24px;
     }
 }

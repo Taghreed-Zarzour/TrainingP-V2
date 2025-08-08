@@ -22,7 +22,7 @@ return new class extends Migration
             ->onUpdate('cascade');
 
 
-            $table->string('bio')
+            $table->text('bio')
             ->nullable();
 
             $table->foreignId('country_id')

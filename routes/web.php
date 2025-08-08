@@ -140,6 +140,12 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
 
   Route::prefix('training')->group(function () {
+
+Route::get('/start-create-training', function () {
+    return view('trainings.start_training');
+})->name('startCreateTraining');
+
+
     // إنشاء جديد - عرض النموذج الأولي
     Route::get('/create', [Trainings_CURD_Controller::class, 'showBasicInformationForm'])->name('training.create');
 
@@ -211,7 +217,7 @@ Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBas
 
   Route::post('/training/{program_id}/upload-files', [TrainingProgramInfoController::class, 'uploadTrainingFiles'])
     ->name('training.file.upload');
-  Route::delete('training/{program_id}/attachment/{file_index}', [TrainingProgramInfoController::class, 'deleteTrainigFile'])->name('training.file.delete');
+  Route::delete('training/{program_id}/attachment/{file_index}', [TrainingProgramInfoController::class, 'deleteTrainingFile'])->name('training.file.delete');
 
   Route::post('/trainer/{trainer_id}/rate', [TrainerRatingController::class, 'store'])
     ->name('trainer.rating.store');

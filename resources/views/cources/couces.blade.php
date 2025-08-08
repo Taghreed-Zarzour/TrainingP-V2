@@ -277,7 +277,7 @@
                 <div class="row align-items-center">
                     <!-- الصورة على اليمين -->
                     <div class="col-lg-4   image-column">
-                        <img src="{{ asset('images/cources/sample-course.jpg') }}" class="training-image"
+                        <img src="{{ asset('images/cources/training-default-img.svg') }}" class="training-image"
                             alt="صورة التدريب">
                     </div>
 

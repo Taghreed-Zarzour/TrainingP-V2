@@ -1,20 +1,6 @@
 @extends('frontend.layouts.master')
 @section('title', 'حساب المتدرب')
-@section('css')
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap"
-        rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap"
-        rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.min.css" />
-    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logos/logo.svg') }}">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-@endsection
+
 @section('content')
     @php
         // تعريف المتغيرات العامة للاستخدام في جميع أجزاء الصفحة
@@ -492,7 +478,7 @@
                 <div class="custom-card col-12 mb-4">
                     <!-- السيرة الذاتية -->
                     <div class="card">
-                        <div class="card-body text-center">
+                        <div class="card-body text-center align-content-center">
                             <img src="{{ asset('images/trainer-account/cv.svg') }}" alt="سيرة ذاتية"
                                 style="max-width: 100px;" />
                             <div class="w-100">
@@ -853,7 +839,6 @@
     <script src="{{ asset('js/mutliselect.js') }}"></script>
     <script src="{{ asset('js/singleselect.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // التحقق من صحة النماذج
   document.addEventListener("DOMContentLoaded", function () {

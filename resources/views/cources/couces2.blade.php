@@ -558,7 +558,7 @@
             <div class="col-lg-4 order-lg-1 ">
                 <div class="small-card ">
 
-                    <img src="{{ asset('images/cources/sample-course.jpg') }}" class="square-image" alt="صورة التدريب">
+                    <img src="{{ asset('images/cources/training-default-img.svg') }}" class="square-image" alt="صورة التدريب">
                     <div class="price-section mt-3 ">
                         <div class="price mb-3">سعر التسجيل: 199.9 دولار أمريكي</div>
                         <div class="time-left">

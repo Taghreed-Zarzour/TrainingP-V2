@@ -57,7 +57,7 @@
                                     @endphp
                                     <img src="{{ asset($imagePath) }}" alt="صورة التدريب">
                                 @else
-                                    <img src="{{ asset('images/training.jpg') }}" alt="صورة افتراضية">
+                                    <img src="{{ asset('images/cources/training-default-img.svg') }}" alt="صورة افتراضية">
                                 @endif
                                 
                                 @if (!(auth()->user()->userType?->type === 'مؤسسة'))
@@ -149,7 +149,12 @@
                                 @if (!empty($training->AdditionalSetting) && !empty($training->AdditionalSetting->application_deadline))
                                     <div class="training-details-item clickable-title" onclick="window.location.href='{{ route('training.settings', $training->id) }}'">
                                         <img src="{{ asset('images/training-details/calendar.svg') }}" alt="">
-                                        <p>تاريخ انتهاء التقديم: {{ $training->AdditionalSetting->application_deadline->format('d/m/Y') }}</p>
+                                        <p>تاريخ انتهاء التقديم: {{ $training?->AdditionalSetting?->application_deadline 
+    ? \Carbon\Carbon::parse($training->AdditionalSetting->application_deadline)
+        ->locale('ar')
+        ->translatedFormat('d F Y')
+    : 'غير معروف' }}
+</p>
                                     </div>
                                 @endif
                                 
@@ -168,7 +173,7 @@
                                                 @else
                                                     {{ number_format($cost, 2, '.', ',') }}
                                                 @endif
-                                                {{ $settings['currency'] ?? '' }}
+                                                {{ $training->AdditionalSetting->currency ?? '' }}
                                             @endif                                        @else
                                             ---
                                         @endif

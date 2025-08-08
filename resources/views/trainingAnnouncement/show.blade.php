@@ -15,13 +15,13 @@
                     </h1>
                 </div>
                 <div class="trainer-name">تم الإنشاء بواسطة:
-                  @if($trainer)
-                  <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
-                                                            style="display: contents;  text-decoration: none; color: inherit;">
-                    <span class="text-decoration-underline">{{ $trainer->getTranslation('name', 'ar') }}
-                        {{ $trainer->trainer?->getTranslation('last_name', 'ar') }}</span></a>
+                    @if ($trainer)
+                        <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
+                            style="display: contents;  text-decoration: none; color: inherit;">
+                            <span class="text-decoration-underline">{{ $trainer->getTranslation('name', 'ar') }}
+                                {{ $trainer->trainer?->getTranslation('last_name', 'ar') }}</span></a>
                     @else
-                    <span>غير محدد</span>
+                        <span>غير محدد</span>
                     @endif
                 </div>
                 <div
@@ -54,8 +54,8 @@
             <div class="col-lg-4 order-lg-1">
                 <div class="small-card">
                     @if ($program->AdditionalSetting?->profile_image)
-                        <img src="{{ asset('storage/' . $program->AdditionalSetting->profile_image) }}" class="square-image"
-                            alt="صورة التدريب">
+                        <img src="{{ asset('storage/' . $program->AdditionalSetting->profile_image) }}"
+                            class="square-image" alt="صورة التدريب">
                     @else
                         <img src="{{ asset('images/training.jpg') }}" class="square-image" alt="صورة التدريب">
                     @endif
@@ -105,8 +105,10 @@
                             </div>
                             @if ($program->AdditionalSetting?->application_submission_method)
                                 <div class="mb-3">
-                                    <img class="pe-2" src="{{ asset('images/cources/Register.svg') }}" alt="طريقة التسجيل">
-                                    طريقة التسجيل: {{ $program->AdditionalSetting->application_submission_method->label() }}
+                                    <img class="pe-2" src="{{ asset('images/cources/Register.svg') }}"
+                                        alt="طريقة التسجيل">
+                                    طريقة التسجيل:
+                                    {{ $program->AdditionalSetting->application_submission_method->label() }}
                                 </div>
                             @endif
                             @if ($program->AdditionalSetting?->max_trainees)
@@ -144,25 +146,28 @@
                                                     تم إرسال طلبك مسبقًا، في انتظار الموافقة.
                                                 </div>
                                             </div>
-                                            @break
+                                        @break
+
                                         @case('accepted')
                                             <div class="col-12">
                                                 <div class="alert alert-success text-center mb-0">
                                                     تم قبولك في التدريب، بالتوفيق!
                                                 </div>
                                             </div>
-                                            @break
+                                        @break
+
                                         @case('rejected')
                                             <div class="col-12">
                                                 <div class="alert alert-danger text-center mb-0">
                                                     تم رفض طلبك للانضمام.
-                                                    @if(!empty($enrollment?->rejection_reason))
+                                                    @if (!empty($enrollment?->rejection_reason))
                                                         <br>
                                                         <strong>السبب:</strong> {{ $enrollment->rejection_reason }}
                                                     @endif
                                                 </div>
                                             </div>
-                                            @break
+                                        @break
+
                                         @default
                                             <div class="col-12">
                                                 <div class="alert alert-info text-center mb-0">
@@ -228,32 +233,44 @@
                             'المتطلبات او الشروط اللازمة للالتحاق بالتدريب' => $program->detail?->requirements ?? [],
                             'ميزات التدريب' => $program->detail?->benefits ?? [],
                         ];
+
+                        // نحول كل عنصر لمصفوفة ونتأكد إنه فيه بيانات غير فاضية
+                        $hasAnyData = collect($details)->some(function ($items) {
+                            $items = is_array($items) ? $items : json_decode($items, true);
+                            $items = array_filter($items, fn($value) => !empty($value)); // إزالة العناصر الفارغة
+                            return !empty($items);
+                        });
                     @endphp
-                    <div class="info-box">
-                        <h4 class="info-title mt-1">وصف التدريب</h4>
-                        <p>{{ $program->description ?? 'لا يوجد وصف متاح' }}</p>
-                        @foreach ($details as $title => $items)
-                            <div class="">
-                                <h4 class="info-title mt-5">{{ $title }}</h4>
+
+                    @if ($hasAnyData)
+                        <div class="info-box">
+                            <h4 class="info-title mt-1">وصف التدريب</h4>
+                            <p>{{ $program->description ?? 'لا يوجد وصف متاح' }}</p>
+
+                            @foreach ($details as $title => $items)
                                 @php
                                     $items = is_array($items) ? $items : json_decode($items, true);
+                                    $items = array_filter($items, fn($value) => !empty($value)); // حذف القيم الفارغة
                                 @endphp
+
                                 @if (!empty($items))
-                                    <ul class="list-unstyled ">
-                                        @foreach ($items as $item)
-                                            <li class="d-flex align-items-start mb-2">
-                                                <img src="{{ asset('images/icons/check-circle.svg') }}" alt="check"
-                                                    class="me-2" width="20" height="20">
-                                                <span>{{ $item }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @else
-                                    <p class="text-muted">لا توجد بيانات متاحة لهذا القسم.</p>
+                                    <div class="">
+                                        <h4 class="info-title mt-5">{{ $title }}</h4>
+                                        <ul class="list-unstyled">
+                                            @foreach ($items as $item)
+                                                <li class="d-flex align-items-start mb-2">
+                                                    <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                        alt="check" class="me-2" width="20" height="20">
+                                                    <span>{{ $item }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
                                 @endif
-                            </div>
-                        @endforeach
-                    </div>
+                            @endforeach
+                        </div>
+                    @endif
+
 
                     <!-- الجلسات التدريبية -->
                     <div class="container mt-5">
@@ -274,26 +291,24 @@
                                             <tbody>
                                                 @if (!$program->sessions || $program->sessions->isEmpty())
                                                     <tr>
-                                                        <td colspan="4" class="text-center">لا توجد جلسات لهذا البرنامج.</td>
+                                                        <td colspan="4" class="text-center">لا توجد جلسات لهذا
+                                                            البرنامج.</td>
                                                     </tr>
                                                 @else
                                                     @foreach ($program->sessions as $i => $session)
                                                         <tr style="border-bottom: 1px solid #dee2e6;">
-<<<<<<< HEAD
-                                                        <td class="p-3 text-center">
-=======
                                                             <td class="p-3 text-center">
->>>>>>> 4b85b9db5c1256dea990096b7e7dda8c5f8622b1
-                                                                {{ isset($session_day[$i]) ? $session_day[$i] : '' }}
+                                                                {{ isset($session_day[$i]) ? \Carbon\Carbon::parse($session_day[$i])->locale('ar')->dayName : '' }}
                                                             </td>
-
                                                             <td class="p-3 text-center">
-                                                                {{ isset($session_day[$i]) ? $session_day[$i] : '' }}
+                                                                {{ isset($date_display[$i]) ? \Carbon\Carbon::parse($date_display[$i])->locale('ar')->translatedFormat('d F') : '' }}
                                                             </td>
                                                             <td class="p-3 text-center">
                                                                 {{ formatTimeArabic($session->session_start_time) }} -
                                                                 {{ formatTimeArabic($session->session_end_time) }}</td>
-                                                            <td class="p-3 text-center">{{ isset($session_duration[$i]) ? $session_duration[$i] : '' }} ساعة</td>
+                                                            <td class="p-3 text-center">
+                                                                {{ isset($session_duration[$i]) ? $session_duration[$i] : '' }}
+                                                                ساعة</td>
                                                         </tr>
                                                     @endforeach
                                                 @endif
@@ -307,36 +322,44 @@
                     <!-- مقدم التدريب -->
                     <div class="info-box mt-5">
                         <h4 class="info-title">مقدم التدريب</h4>
-                        @if($trainer)
+                        @if ($trainer)
                             <div class="trainer-card d-flex flex-column flex-md-row align-items-start gap-4">
-                                <div class="trainer-image text-center">
-                                    @if ($trainer->photo)
-                                        <img src="{{ asset('storage/' . $trainer->photo) }}" alt="{{ $trainer->name }}"
-                                            class="custom-rounded" width="120" height="120">
-                                    @else
-                                        <img src="{{ asset('images/icons/user.svg') }}" alt="{{ $trainer->name }}"
-                                            class="custom-rounded" width="120" height="120">
-                                    @endif
-                                </div>
-                                <div class="text-start align-self-center">
-                                    <h5 class="trainer-name mb-1">{{ $trainer->getTranslation('name', 'ar') }}
-                                        {{ $trainer->trainer?->getTranslation('last_name', 'ar') }}</h5>
-                                    <p class="trainer-position mb-2">{{ $trainer->trainer?->headline ?? '' }}</p>
+                                <a href="{{ route('show_trainer_profile', ['id' => $program->user_id]) }}"
+                                    style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
 
-                                    <div class="trainer-rating mb-2">
-                                        @for ($i = 1; $i <= 5; $i++)
-                                            @if ($i <= floor($averageTrainerRating))
-                                                <img src="{{ asset('images/cources/Star.svg') }}" alt="نجمة">
-                                            @elseif ($i - $averageTrainerRating < 1)
-                                                <img src="{{ asset('images/cources/Star-half.svg') }}" alt="نصف نجمة">
-                                            @else
-                                                <img src="{{ asset('images/cources/Star-gray.svg') }}" alt="نجمة رمادية">
-                                            @endif
-                                        @endfor
+                                    <div class="trainer-image text-center">
+                                        @if ($trainer->photo)
+                                            <img src="{{ asset('storage/' . $trainer->photo) }}"
+                                                alt="{{ $trainer->name }}" class="custom-rounded" width="120"
+                                                height="120">
+                                        @else
+                                            <img src="{{ asset('images/icons/user.svg') }}" alt="{{ $trainer->name }}"
+                                                class="custom-rounded" width="120" height="120">
+                                        @endif
                                     </div>
-                                </div>
+
+                                    <div class="text-start align-self-center">
+                                        <h5 class="trainer-name mb-1">{{ $trainer->getTranslation('name', 'ar') }}
+                                            {{ $trainer->trainer?->getTranslation('last_name', 'ar') }}</h5>
+                                        <p class="trainer-position mb-2">{{ $trainer->trainer?->headline ?? '' }}</p>
+
+                                        <div class="trainer-rating mb-2">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if ($i <= floor($averageTrainerRating))
+                                                    <img src="{{ asset('images/cources/Star.svg') }}" alt="نجمة">
+                                                @elseif ($i - $averageTrainerRating < 1)
+                                                    <img src="{{ asset('images/cources/Star-half.svg') }}"
+                                                        alt="نصف نجمة">
+                                                @else
+                                                    <img src="{{ asset('images/cources/Star-gray.svg') }}"
+                                                        alt="نجمة رمادية">
+                                                @endif
+                                            @endfor
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
-                            <p class="trainer-bio mt-3">{{ $trainer->bio ?? 'لا يوجد سيرة ذاتية متاحة' }}</p>
+                            <p class="trainer-bio mt-3">{{ $trainer->bio ?? 'لا يوجد نبذة متاحة' }}</p>
 
                             @if (count($assistantUsers) > 0)
                                 <h5 class="section-title mt-5">ميسرو التدريب</h5>
@@ -386,22 +409,40 @@
                     </p>
                     <div class="social-share">
                         <div class="d-flex justify-content-start flex-wrap gap-3 mb-4">
-                            <a href="#" class="btn btn-social btn-facebook p-2">
-                                <img src="{{ asset('images/cources/facebook.svg') }}" alt="فيسبوك">
-                            </a>
-                            <a href="#" class="btn btn-social btn-twitter p-2">
-                                <img src="{{ asset('images/cources/twitter.svg') }}" alt="فيسبوك">
-                            </a>
-                            <a href="#" class="btn btn-social btn-linkedin p-2">
-                                <img src="{{ asset('images/cources/linkedin.svg') }}" alt="لينكدان">
-                            </a>
-                            <a href="#" class="btn btn-social btn-email p-2">
-                                <img src="{{ asset('images/cources/email.svg') }}" alt="ايميل">
-                            </a>
-                            <a href="#" class="btn btn-social btn-whatsapp p-2">
-                                <img src="{{ asset('images/cources/SMS.svg') }}" alt="رسالة">
-                            </a>
-                        </div>
+  <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" 
+     target="_blank" 
+     class="btn btn-social btn-facebook p-2" 
+     title="شارك على فيسبوك">
+    <img src="{{ asset('images/cources/facebook.svg') }}" alt="فيسبوك">
+  </a>
+
+  <a href="https://twitter.com/intent/tweet?text={{ urlencode('تعالوا شاركوا هذا التدريب الرائع!') }}&url={{ urlencode(url()->current()) }}" 
+     target="_blank" 
+     class="btn btn-social btn-twitter p-2" 
+     title="شارك على تويتر">
+    <img src="{{ asset('images/cources/twitter.svg') }}" alt="تويتر">
+  </a>
+
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}" 
+     target="_blank" 
+     class="btn btn-social btn-linkedin p-2" 
+     title="شارك على لينكدإن">
+    <img src="{{ asset('images/cources/linkedin.svg') }}" alt="لينكدإن">
+  </a>
+
+  <a href="mailto:?subject={{ urlencode('دعوة للمشاركة في تدريب') }}&body={{ urlencode('شاركونا هذا التدريب الرائع: ' . url()->current()) }}" 
+     class="btn btn-social btn-email p-2" 
+     title="شارك عبر الإيميل">
+    <img src="{{ asset('images/cources/email.svg') }}" alt="إيميل">
+  </a>
+
+  <a href="https://wa.me/?text={{ urlencode('تعالوا شاركوا هذا التدريب الرائع: ' . url()->current()) }}" 
+     target="_blank" 
+     class="btn btn-social btn-whatsapp p-2" 
+     title="شارك على واتساب">
+    <img src="{{ asset('images/cources/SMS.svg') }}" alt="واتساب">
+  </a>
+</div>
                     </div>
                     <div class="share-section mb-4">
                         <div class="row align-items-center g-2">

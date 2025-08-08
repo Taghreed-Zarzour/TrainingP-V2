@@ -37,10 +37,25 @@
                     توفّر بيئة احترافية تجمع المدربين، المتدربين، المساعدين، والمؤسسات التدريبية
                     في مكان واحد. اختر المسار الذي يناسبك للانطلاق في رحلتك معنا.
                 </p>
-                <div class="d-flex flex-column flex-sm-row justify-content-center gap-4 mb-5">
-                    <button onclick="window.location='{{ route('homePage') }}'"  class="intro-btn-custom animate-btn-1 mx-auto mx-sm-2" aria-label="أنا فرد">أنا فرد</button>
-                    <button onclick="window.location='{{ route('homePageOrganization') }}'"  class="intro-btn-custom intro-btn-custom-2 animate-btn-2 mx-auto mx-sm-2" aria-label="أنا مؤسسة">أنا مؤسسة</button>
-                </div>
+                <div class="btn-a d-flex flex-column flex-sm-row justify-content-center gap-4 mb-5">
+                  <style>
+.btn-a a{
+  text-decoration:none;
+  text-align: center
+}
+</style>
+<a href="{{ route('homePage') }}?type=individual" 
+   class="intro-btn-custom animate-btn-1 mx-auto mx-sm-2" 
+   aria-label="أنا فرد">
+   أنا فرد
+</a>
+
+<a href="{{ route('homePageOrganization') }}?type=organization" 
+   class="intro-btn-custom intro-btn-custom-2 animate-btn-2 mx-auto mx-sm-2" 
+   aria-label="أنا مؤسسة">
+   أنا مؤسسة
+</a>
+                  </div>
             </section>
 
             <!-- Decorative and Hero Section -->

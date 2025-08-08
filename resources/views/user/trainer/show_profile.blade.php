@@ -195,6 +195,27 @@
             border-radius: 4px;
             transition: width 0.3s ease;
         }
+        /* زر الحذف بلون الأحمر، بحجم مناسب مع زر التحميل */
+.delete-btn {
+  border: 1.5px solid #dc3545;
+  color: #dc3545;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s, color 0.3s;
+  width: fit-content;
+}
+
+.delete-btn:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
     </style>
 
     <main>
@@ -228,27 +249,29 @@
                             </div>
                         </div>
                         <div class="card-body">
-<div class="bi-image-wrap">
-    @if ($user->photo)
-        <div class="image-container">
-            <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المدرب" class="square-img" />
-        </div>
-    @else
-        <div class="image-container">
-            <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" class="square-img" />
-        </div>
-    @endif
+                            <div class="bi-image-wrap">
+                                @if ($user->photo)
+                                    <div class="image-container">
+                                        <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المدرب"
+                                            class="square-img" />
+                                    </div>
+                                @else
+                                    <div class="image-container">
+                                        <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية"
+                                            class="square-img" />
+                                    </div>
+                                @endif
 
-    <div class="bi-flags">
-        @if ($user->nationalities && $user->nationalities->count())
-            @foreach ($user->nationalities->take(5) as $country)
-                <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
-                    alt="{{ $country->name }}" class="flag-img"
-                    title="{{ $country->name }}" />
-            @endforeach
-        @endif
-    </div>
-</div>
+                                <div class="bi-flags">
+                                    @if ($user->nationalities && $user->nationalities->count())
+                                        @foreach ($user->nationalities->take(5) as $country)
+                                            <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
+                                                alt="{{ $country->name }}" class="flag-img"
+                                                title="{{ $country->name }}" />
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
                             <div class="bi-title-wrap">
                                 <div class="bi-name-wrap">
                                     <div class="bi-name">{{ $user->getTranslation('name', 'ar') }}
@@ -269,21 +292,21 @@
                                         <img src="{{ asset('images/share.svg') }}" alt="مشاركة" />
                                     </a>
                                     <script>
-    function copyLink(event) {
-        event.preventDefault(); // منع الذهاب للرابط
+                                        function copyLink(event) {
+                                            event.preventDefault(); // منع الذهاب للرابط
 
-        // الحصول على الرابط الحالي
-        const currentUrl = window.location.href;
+                                            // الحصول على الرابط الحالي
+                                            const currentUrl = window.location.href;
 
-        // نسخ إلى الحافظة
-        navigator.clipboard.writeText(currentUrl).then(function () {
-            alert('تم نسخ الرابط بنجاح ✅');
-        }, function (err) {
-            alert('حدث خطأ أثناء نسخ الرابط ❌');
-            console.error('Clipboard error:', err);
-        });
-    }
-</script>
+                                            // نسخ إلى الحافظة
+                                            navigator.clipboard.writeText(currentUrl).then(function() {
+                                                alert('تم نسخ الرابط بنجاح ✅');
+                                            }, function(err) {
+                                                alert('حدث خطأ أثناء نسخ الرابط ❌');
+                                                console.error('Clipboard error:', err);
+                                            });
+                                        }
+                                    </script>
 
                                 </div>
                             </div>
@@ -420,32 +443,27 @@
                     </div>
 
                     @if ($user->userCv)
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <a class="upload-cv" href="{{ route('download.cv', $user->id) }}">
-                                <img src="{{ asset('images/cloud.svg') }}" alt="" />
-                                <span>تحميل السيرة الذاتية</span>
-                            </a>
+                    <div style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; align-items: center;">
+  <!-- زر تحميل السيرة كما هو -->
+  <a class="upload-cv" href="{{ route('download.cv', $user->id) }}">
+    <img src="{{ asset('images/cloud.svg') }}" alt="" />
+    تحميل السيرة الذاتية
+  </a>
 
+  <!-- زر حذف -->
+  <form method="POST" class="p-0" action="{{ route('delete_cv') }}" onsubmit="return confirm('هل أنت متأكد من حذف السيرة الذاتية؟');" style="margin:0;">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="delete-btn" title="حذف السيرة الذاتية">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M5.5 5.5v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-1 0zm4 0v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-1 0z"/>
+        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3a.5.5 0 0 0 0 1H13.5a.5.5 0 0 0 0-1H10.5a.5.5 0 0 1-.5-.5h-3a.5.5 0 0 1-.5.5H2.5z"/>
+      </svg>
+      حذف
+    </button>
+  </form>
+</div>
 
-                            <div class="edit-button-container">
-                                <form method="POST" action="{{ route('delete_cv') }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        style="background: none; border: none; cursor: pointer; padding: 4px;"
-                                        title="حذف السيرة الذاتية"
-                                        onclick="return confirm('هل أنت متأكد من حذف السيرة الذاتية؟')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            fill="#dc3545" viewBox="0 0 16 16">
-                                            <path
-                                                d="M5.5 5.5v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-1 0zm4 0v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-1 0z" />
-                                            <path fill-rule="evenodd"
-                                                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3a.5.5 0 0 0 0 1H13.5a.5.5 0 0 0 0-1H10.5a.5.5 0 0 1-.5-.5h-3a.5.5 0 0 1-.5.5H2.5z" />
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
                     @endif
                 </div>
 
@@ -475,12 +493,12 @@
                                     <div class="circular-progress">
                                         <svg viewBox="0 0 36 36" class="circular-chart">
                                             <path class="circle-bg" d="M18 2.0845
-                                                        a 15.9155 15.9155 0 0 1 0 31.831
-                                                        a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                                            a 15.9155 15.9155 0 0 1 0 -31.831" />
                                             <path class="circle_percentage"
                                                 stroke-dasharray="{{ $profileCompletion ?? 30 }}, 100" d="M18 2.0845
-                                                        a 15.9155 15.9155 0 0 1 0 31.831
-                                                        a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                                            a 15.9155 15.9155 0 0 1 0 -31.831" />
                                             <text x="18" y="20.35" class="percentage">
                                                 {{ $profileCompletion ?? 30 }}%
                                             </text>
@@ -490,7 +508,7 @@
                             </div>
                         @endif
                     </div>
-                    <div class="add-item-block prev-training">
+                    <div class="add-item-block prev-training ">
                         <div class="title-wrap pt-title-wrap">
                             <div class="title">مقطع من تدريب سابق</div>
                             @if ($trainer->previousTraining)
@@ -509,7 +527,7 @@
                             @endif
                         </div>
                         <div class="card-block">
-                            <div class="card-body">
+                            <div class="card-body align-content-center">
                                 @if ($trainer->previousTraining)
                                     <div class="card-block prev-training-item">
                                         <div class="card-body">
@@ -588,7 +606,7 @@
                                 </div>
                             </div>
                             <div class="card-block">
-                                <div class="card-body">
+                                <div class="card-body align-content-center">
                                     <div class="content">
                                         <img src="{{ asset('images/trainer-account/cv.svg') }}" alt="سيرة ذاتية" />
                                         <div class="desc">
@@ -651,7 +669,7 @@
                                 </div>
                             </div>
                             <div class="card-block">
-                                <div class="card-body">
+                                <div class="card-body align-content-center">
                                     <div class="general-rating">
                                         <div class="ratings-details">
 
@@ -852,7 +870,7 @@
                     @else
                         <div class="add-item-block">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="title h5 mb-0">
+                                <div class="reviews-title mb-0">
                                     تقييمات المتدربين والمؤسسات
                                 </div>
                                 @if (auth()->user() && auth()->user()->userType?->type === 'متدرب')
@@ -867,7 +885,7 @@
                                 @endif
                             </div>
                             <div class="card-block">
-                                <div class="card-body">
+                                <div class="card-body align-content-center">
                                     <div class="content d-flex align-items-center gap-3">
                                         <img src="{{ asset('images/trainer-account/reviews.svg') }}" alt="تقييمات" />
                                         <div class="desc">
@@ -901,85 +919,95 @@
                             </div>
                         </div>
 
-                    <div class="carousel-wrapper position-relative">
-    <div class="overflow-hidden w-100">
-        <div class="d-flex flex-nowrap gap-3 custom-carousel" id="cardCarousel">
-            @foreach ($tariningPrograms as $tariningProgram)
-                <div class="carousel-card flex-shrink-0">
-                    <a href="{{ route('show_trainings_announcements', $tariningProgram->id) }}" class="text-decoration-none text-dark">
-                        <div class="h-100 border rounded-4 position-relative">
-                            <div class="d-flex flex-column justify-content-between image-custom">
-                                @if ($tariningProgram->AdditionalSetting && $tariningProgram->AdditionalSetting->profile_image)
-                                    <img src="{{ asset('storage/' . $tariningProgram->AdditionalSetting->profile_image) }}"
-                                        class="card-img-top" alt="صورة التدريب">
-                                @else
-                                    <img src="{{ asset('images/cources/sample-course.jpg') }}"
-                                        alt="صورة افتراضية" class="card-img-top">
-                                @endif
-                            </div>
-                            @php
-                                $trainer = $tariningProgram->trainer;
-                                $trainerPhoto = $trainer && $trainer->photo
-                                    ? asset('storage/' . $trainer->photo)
-                                    : asset('images/icons/user.svg');
-                            @endphp
-                            <div class="card-body d-flex flex-column justify-content-between gap-1 p-3">
-                                <h6 class="fw-bold">{{ $tariningProgram->title }}</h6>
-                                <div class="trainer-info mt-2 mb-2">
-                                    <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
-                                        style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
-                                        <img class="trainer-img" src="{{ $trainerPhoto }}"
-                                            alt="صورة المدرب" />
-                                        <span>{{ $trainer->getTranslation('name', 'ar') }}
-                                            {{ $trainer->trainer->getTranslation('last_name', 'ar') }}</span>
-                                    </a>
-                                </div>
-                                <ul class="list-unstyled d-flex flex-wrap gap-3 text-muted small mb-2">
-                                    <li class="d-flex align-items-center gap-2">
-                                        <img src="{{ asset('images/cources/clock.svg') }}"
-                                            alt="المدة">
-                                        @php
-                                            $hours = floor($tariningProgram->total_duration_hours);
-                                            $minutes = round(($tariningProgram->total_duration_hours - $hours) * 60);
-                                        @endphp
-                                        @if ($hours > 0 && $minutes > 0)
-                                            {{ $hours }} ساعة و {{ $minutes }} دقيقة
-                                        @elseif($hours > 0)
-                                            {{ $hours }} ساعة
-                                        @else
-                                            {{ $minutes }} دقيقة
-                                        @endif
-                                    </li>
+                        <div class="carousel-wrapper position-relative">
+                            <div class="overflow-hidden w-100">
+                                <div class="d-flex flex-nowrap gap-3 custom-carousel" id="cardCarousel">
+                                    @foreach ($tariningPrograms as $tariningProgram)
+                                        <div class="carousel-card flex-shrink-0">
+                                            <a href="{{ route('show_trainings_announcements', $tariningProgram->id) }}"
+                                                class="text-decoration-none text-dark">
+                                                <div class="h-100 border rounded-4 position-relative">
+                                                    <div class="d-flex flex-column justify-content-between image-custom">
+                                                        @if ($tariningProgram->AdditionalSetting && $tariningProgram->AdditionalSetting->profile_image)
+                                                            <img src="{{ asset('storage/' . $tariningProgram->AdditionalSetting->profile_image) }}"
+                                                                class="card-img-top" alt="صورة التدريب">
+                                                        @else
+                                                            <img src="{{ asset('images/cources/training-default-img.svg') }}"
+                                                                alt="صورة افتراضية" class="card-img-top">
+                                                        @endif
+                                                    </div>
+                                                    @php
+                                                        $trainer = $tariningProgram->trainer;
+                                                        $trainerPhoto =
+                                                            $trainer && $trainer->photo
+                                                                ? asset('storage/' . $trainer->photo)
+                                                                : asset('images/icons/user.svg');
+                                                    @endphp
+                                                    <div
+                                                        class="card-body d-flex flex-column justify-content-between gap-1 p-3">
+                                                        <h6 class="fw-bold">{{ $tariningProgram->title }}</h6>
+                                                        <div class="trainer-info mt-2 mb-2">
+                                                            <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
+                                                                style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
+                                                                <img class="trainer-img" src="{{ $trainerPhoto }}"
+                                                                    alt="صورة المدرب" />
+                                                                <span>{{ $trainer->getTranslation('name', 'ar') }}
+                                                                    {{ $trainer->trainer->getTranslation('last_name', 'ar') }}</span>
+                                                            </a>
+                                                        </div>
+                                                        <ul
+                                                            class="list-unstyled d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                            <li class="d-flex align-items-center gap-2">
+                                                                <img src="{{ asset('images/cources/clock.svg') }}"
+                                                                    alt="المدة">
+                                                                @php
+                                                                    $hours = floor(
+                                                                        $tariningProgram->total_duration_hours,
+                                                                    );
+                                                                    $minutes = round(
+                                                                        ($tariningProgram->total_duration_hours -
+                                                                            $hours) *
+                                                                            60,
+                                                                    );
+                                                                @endphp
+                                                                @if ($hours > 0 && $minutes > 0)
+                                                                    {{ $hours }} ساعة و {{ $minutes }} دقيقة
+                                                                @elseif($hours > 0)
+                                                                    {{ $hours }} ساعة
+                                                                @else
+                                                                    {{ $minutes }} دقيقة
+                                                                @endif
+                                                            </li>
 
-                                    @if (
-                                        $tariningProgram->program_presentation_method_id === \App\Enums\TrainingAttendanceType::ONLINE->value ||
-                                        $tariningProgram->program_presentation_method_id === \App\Enums\TrainingAttendanceType::REMOTE->value)
-                                        <li class="d-flex align-items-center gap-2">
-                                            <img src="{{ asset('images/cources/online.svg') }}"
-                                                alt="نوع الدورة">
-                                            أونلاين
-                                        </li>
-                                    @else
-                                        <li class="d-flex align-items-center gap-2">
-                                            <img src="{{ asset('images/cources/location.svg') }}"
-                                                alt="الموقع">
-                                            @if($tariningProgram->AdditionalSetting)
-                                                {{ $tariningProgram->AdditionalSetting->city }},
-                                                {{ $tariningProgram->AdditionalSetting->country->name ?? '---' }}
-                                            @else
-                                                ---
-                                            @endif
-                                        </li>
-                                    @endif
-                                </ul>
+                                                            @if (
+                                                                $tariningProgram->program_presentation_method_id === \App\Enums\TrainingAttendanceType::HYBRID->value ||
+                                                                    $tariningProgram->program_presentation_method_id === \App\Enums\TrainingAttendanceType::REMOTE->value)
+                                                                <li class="d-flex align-items-center gap-2">
+                                                                    <img src="{{ asset('images/cources/online.svg') }}"
+                                                                        alt="نوع الدورة">
+                                                                    أونلاين
+                                                                </li>
+                                                            @else
+                                                                <li class="d-flex align-items-center gap-2">
+                                                                    <img src="{{ asset('images/cources/location.svg') }}"
+                                                                        alt="الموقع">
+                                                                    @if ($tariningProgram->AdditionalSetting)
+                                                                        {{ $tariningProgram->AdditionalSetting->city }},
+                                                                        {{ $tariningProgram->AdditionalSetting->country->name ?? '---' }}
+                                                                    @else
+                                                                        ---
+                                                                    @endif
+                                                                </li>
+                                                            @endif
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</div>
 
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
@@ -1087,15 +1115,15 @@
                     <label class="profile-image-label">
                         <input type="file" accept="image/png, image/jpeg" id="profileImageInput" name="photo"
                             hidden />
-                            <div class="profile-image-preview-container">
+                        <div class="profile-image-preview-container">
 
-                        <div class="profile-image-preview" id="profileImagePreview">
-                            @if ($user->photo)
-                                <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المدرب" />
-                            @else
-                                <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" />
-                            @endif
-                        </div>
+                            <div class="profile-image-preview" id="profileImagePreview">
+                                @if ($user->photo)
+                                    <img src="{{ asset('storage/' . $user->photo) }}" alt="صورة المدرب" />
+                                @else
+                                    <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية" />
+                                @endif
+                            </div>
                         </div>
                     </label>
                     <div class="profile-upload-desc">

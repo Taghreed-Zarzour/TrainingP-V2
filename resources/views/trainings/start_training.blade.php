@@ -17,7 +17,7 @@
                             <div class="indicator"></div>
                             <div class="indicator"></div>
                         </div>
-<a href="{{ route('BasicTrainingInformationView.create') }}" class="piconed pbtn pbtn-main lets-start">
+<a href="{{ route('training.create') }}" class="piconed pbtn pbtn-main lets-start">
     <span>دعنا نبدأ الآن</span>
     <img src="{{ asset('images/arrow-left.svg') }}" />
 </a>

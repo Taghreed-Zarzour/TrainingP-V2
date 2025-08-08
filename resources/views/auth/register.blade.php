@@ -21,19 +21,21 @@
 
 
             <div class="role-options text-center">
-                <label class="role-option">
-                    <input type="radio" name="role" class="role-checkbox" value="1" onclick="setUserType(1)">
-                    <span class="role-label">مدرب</span>
-                </label>
-                <label class="role-option">
-                    <input type="radio" name="role" class="role-checkbox" value="2" onclick="setUserType(2)">
-                    <span class="role-label">مساعد مدرب</span>
-                </label>
-                <label class="role-option">
-                    <input type="radio" name="role" class="role-checkbox" value="3" onclick="setUserType(3)">
-                    <span class="role-label">متدرب</span>
-                </label>
-            </div>
+    <label class="role-option">
+        <input type="radio" name="role" class="role-checkbox" value="1" onclick="setUserType(1)">
+        <span class="role-label">مدرب</span>
+    </label>
+    <label class="role-option">
+        <input type="radio" name="role" class="role-checkbox" value="2" onclick="setUserType(2)">
+        <span class="role-label">مساعد مدرب</span>
+    </label>
+    <label class="role-option">
+        <input type="radio" name="role" class="role-checkbox" value="3" onclick="setUserType(3)">
+        <span class="role-label">متدرب</span>
+    </label>
+</div>
+
+<input type="hidden" id="user_type_id" name="user_type_id" value="">
 
             <form method="POST" action="{{ route('register') }}" id="registerForm">
                 @csrf
@@ -153,6 +155,32 @@
         function setUserType(typeId) {
             document.getElementById('user_type_id').value = typeId;
         }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // تحديد نوع المستخدم من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const userType = urlParams.get('user_type');
+    
+    if (userType) {
+        // تحويل القيمة إلى رقم للتأكد من المطابقة
+        const roleValue = parseInt(userType);
+        
+        // تحديد الراديو المناسب
+        const radioBtn = document.querySelector(`input[type="radio"][value="${roleValue}"]`);
+        
+        if (radioBtn) {
+            radioBtn.checked = true;
+            document.getElementById('user_type_id').value = roleValue;
+        } else {
+            console.error('لم يتم العثور على زر الراديو المطابق للقيمة:', roleValue);
+        }
+    }
+});
+
+function setUserType(typeId) {
+    document.getElementById('user_type_id').value = typeId;
+}
 </script>
   </body>
 </html>

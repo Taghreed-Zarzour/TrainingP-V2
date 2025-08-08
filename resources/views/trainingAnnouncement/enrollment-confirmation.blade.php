@@ -36,7 +36,7 @@
         <div class="training-finished-page" style="margin-top: 0px; padding: 20px; background-color:#D9E6FF;">
            @if (!empty($program) && $program->AdditionalSetting)
             @if ($program->AdditionalSetting->is_free)
-          {{  dd($program->AdditionalSetting)}}
+  
                 <div class="alert alert-warning text-center w-100 m-0">
                     التدريب مجاني تم ارسال الطلب الى المدرب
                 </div>

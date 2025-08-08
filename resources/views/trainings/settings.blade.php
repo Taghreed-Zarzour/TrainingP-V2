@@ -161,7 +161,7 @@
                             $presentation_method_name = $training->program_presentation_method_id;
                         @endphp
                         
-                        @unless ($presentation_method_name === TrainingAttendanceType::ONLINE->value || $presentation_method_name === TrainingAttendanceType::REMOTE->value)
+                        @unless ($presentation_method_name === TrainingAttendanceType::HYBRID->value || $presentation_method_name === TrainingAttendanceType::REMOTE->value)
                             <div class="input-group location-group">
                                 <label>مكان انعقاد الدورة <span class="required">*</span></label>
                                 <div class="sub-label">
@@ -241,7 +241,7 @@
 </div>
                         
                         <div class="input-group">
-                            <label>الصورة التعريفية للتدريب <span class="required">*</span></label>
+                            <label>الصورة التعريفية للتدريب</label>
                             <div class="sub-label">
                                 تنبيه: يُفضل أن تكون الصورة مربعة (بنسبة 1:1) لضمان عرضها بشكل مناسب في جميع أجزاء المنصة.
                             </div>

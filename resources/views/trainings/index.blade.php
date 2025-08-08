@@ -72,9 +72,7 @@
                         التدريبات المعلنة
                         <span class="section-count">({{ count($announced) }})</span>
                     </span>
-                    @if (empty($announced))
-                        <a href="{{ route('training.create') }}" class="custom-btn btn-sm">إنشاء تدريب جديد</a>
-                    @endif
+
                 </div>
 
                 <div class="row">
@@ -94,7 +92,7 @@
                                             <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
                                                 class="card-img-top" alt="صورة التدريب">
                                         @else
-                                            <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
+                                            <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
                                                 alt="صورة التدريب">
                                         @endif
                                     </div>
@@ -239,7 +237,7 @@
                                             <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
                                                 class="card-img-top" alt="صورة التدريب">
                                         @else
-                                            <img src="{{ asset('images/cources/sample-course.jpg') }}"
+                                            <img src="{{ asset('images/cources/training-default-img.svg') }}"
                                                 class="card-img-top" alt="صورة التدريب">
                                         @endif
                                     </div>
@@ -377,7 +375,7 @@
                                         <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
                                             class="card-img-top">
                                     @else
-                                        <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top">
+                                        <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top">
                                     @endif
                                         </div>
                                     <div class="card-body">
@@ -471,7 +469,7 @@
                                             <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
                                                 class="card-img-top" alt="صورة التدريب">
                                         @else
-                                            <img src="{{ asset('images/cources/sample-course.jpg') }}"
+                                            <img src="{{ asset('images/cources/training-default-img.svg') }}"
                                                 class="card-img-top" alt="صورة التدريب">
                                         @endif
                                     </div>
@@ -546,7 +544,7 @@
                                             <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
                                                 class="card-img-top" alt="صورة التدريب">
                                         @else
-                                            <img src="{{ asset('images/cources/sample-course.jpg') }}"
+                                            <img src="{{ asset('images/cources/training-default-img.svg') }}"
                                                 class="card-img-top" alt="صورة التدريب">
                                         @endif
                                     </div>
@@ -606,7 +604,6 @@
     </div>
 @endsection
 @section('scripts')
-    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // حفظ واستعادة التبويب النشط

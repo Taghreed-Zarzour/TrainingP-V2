@@ -7,7 +7,7 @@ use App\Enums\TrainingAttendanceType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 use App\Models\WorkField;
-
+use App\Enums\JobPositionEnum;
 class completeRegisterRequest extends FormRequest
 {
   /**
@@ -55,7 +55,7 @@ public function rules(): array
     }
 
     if ($this->input('is_working') == 1) {
-        $rules['job_position'] = ['required', 'string', 'max:100'];
+$rules['job_position'] = ['required', new Enum(JobPositionEnum::class)];
         $rules['work_sectors'] = ['required', 'exists:work_sectors,id'];
     }
 

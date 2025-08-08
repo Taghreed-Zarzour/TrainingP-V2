@@ -96,10 +96,10 @@
                                     </div>
                                 </div>
                                 <div class="links">
-                                    <a class="pbtn pbtn-main" href="#"
+                                    <a class="pbtn pbtn-main" href="{{ route('register') }}?user_type=3"
                                         >انضم كمتدرب</a
                                     >
-                                    <a class="pbtn pbtn-success" href="#"
+                                    <a class="pbtn pbtn-success" href="{{ route('register') }}?user_type=2"
                                         >سجّل كمساعد مدرب</a
                                     >
                                 </div>
@@ -107,18 +107,17 @@
                             <div class="offer-wrapper">
                                 <div class="offer pcard">
                                     <div class="title">
-                                        ابدأ الآن واحصل على رصيد 50$ - ينتهي
-                                        العرض في 31 آب 2025
+                                        ابدأ الآن… وأعلن عن تدريبك خلال دقائق.
                                     </div>
                                     <div>
-                                        <a class="pbtn pbtn-secondary" href="#"
-                                            >سجّل كمساعد مدرب</a
+                                        <a class="pbtn pbtn-secondary" href="{{ route('register') }}?user_type=1"
+                                            >سجّل كمدرب</a
                                         >
                                     </div>
                                 </div>
                                 <div class="change-future pcard">
                                     <div class="title">
-                                        غيّر مستقبلك اليوم مع
+                                        ضاعف دخلك اليوم مع
                                     </div>
                                     <div>
                                         <img src={{ url('images/logos/logo.svg') }} />
@@ -147,18 +146,18 @@
                         </div>
                         <div class="why-item-content">
                             <div class="title">
-                                مللت من التشتت في البحث عن الفرص؟
+                                أفكارك كثيرة ولا تعرف من أين تبدأ؟
                             </div>
-                            <div class="desc">نحن نجمعها لك في مكان واحد.</div>
+                            <div class="desc">منصتنا مخصصة للتدريب، ترتب لك أفكارك وتساعدك على البدء بإعلان تدريبك خلال دقائق.</div>
                         </div>
                     </div>
                     <div class="why-item reverse">
                         <div class="why-item-content">
                             <div class="title">
-                                سئمت من قلة العقود وانخفاض الدخل؟
+                                تبحث عن مصادر دخل إضافية؟
                             </div>
                             <div class="desc">
-                                أنشئ تدريباتك المدفوعة وحقق دخلاً مستقلاً.
+                                أنشئ تدريبك في المنصة وابدأ بتحقيق دخل إضافي مستقل.
                             </div>
                         </div>
                         <div class="why-item-top">
@@ -170,17 +169,17 @@
                             <img src="./images/why-items/3.svg" />
                         </div>
                         <div class="why-item-content">
-                            <div class="title">ترهقك الطلبات الإدارية؟</div>
+                            <div class="title">ترهقك الطلبات الإدارية كالتقارير وغيرها؟</div>
                             <div class="desc">
-                                استعِن بمساعدين متخصصين يدعمون نجاحك
+                                المنصة توفر لك أدوات ذكية تريحك من العبء الإداري وتختصر وقتك.
                             </div>
                         </div>
                     </div>
                     <div class="why-item reverse">
                         <div class="why-item-content">
-                            <div class="title">ليس لديك ملف مدرب احترافي؟</div>
+                            <div class="title">تجد صعوبة في الوصول لمتدربين مهتمين؟</div>
                             <div class="desc">
-                                أنشئ محفظة أعمال احترافية تزيد فرص تعاقدك.
+                                نظام ذكي يطابق مواضيع التدريب مع اهتمامات المتدربين وأوقاتهم المناسبة ويعرض إعلانك لهم مباشرة.
                             </div>
                         </div>
                         <div class="why-item-top">
@@ -215,41 +214,33 @@
                     <div class="pfeature-item">
                         <div class="pfeature-item-col1">01</div>
                         <div class="pfeature-item-col2">
-                            محفظة أعمال احترافية (Trainer Portfolio) جاهزة للعرض
-                            والتحميل.
-                        </div>
+ملف مدرب يُظهر معلوماتك، وخدماتك، وتدريباتك المنشورة                        </div>
                         <div class="pfeature-item-line-horizontal"></div>
                         <div class="pfeature-item-line-vertical"></div>
                     </div>
                     <div class="pfeature-item">
                         <div class="pfeature-item-col1">02</div>
                         <div class="pfeature-item-col2">
-                            فرصة لنشر تدريباتك المدفوعة والوصول لمتدربين جدد.
-                        </div>
+ فرصة لنشر تدريباتك المدفوعة والوصول لمتدربين جدد                        </div>
                         <div class="pfeature-item-line-horizontal"></div>
                     </div>
                     <div class="pfeature-item">
                         <div class="pfeature-item-col1">03</div>
                         <div class="pfeature-item-col2">
-                            وصول شامل إلى المناقصات والوظائف التدريبية من مختلف
-                            المؤسسات.
+                            لوحة تحكم لإدارة جلسات التدريب، والمتدربين، والحضور، وتفاصيل التدريب بسهولة
                         </div>
                         <div class="pfeature-item-line-vertical center"></div>
                     </div>
                     <div class="pfeature-item">
                         <div class="pfeature-item-col1">04</div>
                         <div class="pfeature-item-col2">
-                            قاعدة بيانات وفلاتر متقدمة للبحث عن مساعدين يخففوا
-                            عنك أعباء العمل.
-                        </div>
+نظام تقييمات من المتدربين يُعرض في ملفك التدريبي لتعزيز مصداقيتك                        </div>
                         <div class="pfeature-item-line-vertical top"></div>
                     </div>
                     <div class="pfeature-item">
                         <div class="pfeature-item-col1">05</div>
                         <div class="pfeature-item-col2">
-                            رصيد هدية بقيمة 50$ لاستخدامه مباشرة في خدمات
-                            المنصة.
-                        </div>
+أدوات تولّد لك جداول الحضور، والأجندة، وتقرير التدريب                        </div>
                     </div>
                 </div>
             </section>
@@ -295,8 +286,7 @@
                                 <div class="step-item-text">03</div>
                             </div>
                             <div class="step-item-bottom">
-                                ابدأ بتقديم طلباتك، أو أنشئ تدريباتك الخاصة وحقق
-                                دخلك
+                                أنشئ تدريباتك الخاصة وابدأ بتحقيق دخل إضافي
                             </div>
                         </div>
                     </div>
@@ -310,7 +300,7 @@
                     </div>
                 </div>
             </section>
-            <section class="reviews-section">
+            <section class="reviews-section" style="display: none;">
                 <div class="title-wrapper">
                     <div class="title">
                         شهادات

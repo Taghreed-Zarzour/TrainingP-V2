@@ -61,7 +61,7 @@
                         <!-- كارت 1 -->
                         <div class="col-xl-4 col-lg-6 col-md-6">
                             <div class="card p-3">
-                                <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
+                                <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
                                     alt="صورة التدريب">
                                 <div class="card-body">
                                     <h5 class="card-title">تدريب إحراك تصميم العروض التقليدية</h5>
@@ -123,7 +123,7 @@
                         <!-- كارت 1 -->
                         <div class="col-xl-4 col-lg-6 col-md-6">
                             <div class="card p-3">
-                                <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
+                                <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
                                     alt="صورة التدريب">
 
                                 <div class="card-body">
@@ -169,7 +169,7 @@
                         <!-- كارت 1 -->
                         <div class="col-xl-4 col-lg-6 col-md-6">
                             <div class="card p-3">
-                                <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
+                                <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
                                     alt="صورة التدريب">
                                 <div class="card-body">
                                     <h5 class="card-title">تدريب إحراك تصميم العروض التقليدية</h5>
@@ -215,7 +215,7 @@
                         <!-- كارت 1 -->
                         <div class="col-xl-4 col-lg-6 col-md-6">
                             <div class="card p-3">
-                                <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
+                                <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
                                     alt="صورة التدريب">
                                 <div class="card-body">
                                     <h5 class="card-title">تدريب إحراك تصميم العروض التقليدية</h5>

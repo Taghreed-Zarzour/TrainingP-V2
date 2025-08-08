@@ -13,22 +13,24 @@ class programTypeSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
-    {
-        
-        $now = Carbon::now();
-        $programTypes = [
-            ['name' => 'برنامج تدريبي', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'ورشة عمل', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'دورة قصيرة', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'محاضرة', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'ندوة', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'برنامج تأهيلي', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'برنامج استشاري', 'created_at' => $now, 'updated_at' => $now],
-        ];
-        
-        foreach ($programTypes as $type) {
-            programType::create($type);
-        }  
-    }
+  public function run(): void
+{
+    $now = Carbon::now();
+    $programTypes = [
+        ['name' => 'تدريب مكثف', 'created_at' => $now, 'updated_at' => $now],
+        ['name' => 'دورة تدريبية قصيرة', 'created_at' => $now, 'updated_at' => $now],
+        ['name' => 'برنامج تدريبي طويل المدى', 'created_at' => $now, 'updated_at' => $now],
+        ['name' => 'برنامج تدريبي فردي', 'created_at' => $now, 'updated_at' => $now],
+        ['name' => 'برنامج تدريبي جماعي', 'created_at' => $now, 'updated_at' => $now],
+        ['name' => 'معسكر تدريبي', 'created_at' => $now, 'updated_at' => $now],
+        ['name' => 'ورشة عمل', 'created_at' => $now, 'updated_at' => $now],
+        ['name' => 'دبلوم', 'created_at' => $now, 'updated_at' => $now],
+        ['name' => 'محاضرة/ويبنار', 'created_at' => $now, 'updated_at' => $now],
+    ];
+    
+    foreach ($programTypes as $type) {
+        programType::create($type);
+    }  
+}
+
 }

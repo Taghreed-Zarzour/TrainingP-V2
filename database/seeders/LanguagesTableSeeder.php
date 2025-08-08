@@ -8,19 +8,35 @@ use Illuminate\Support\Facades\DB;
 
 class LanguagesTableSeeder extends Seeder
 {
-    public function run()
-    {
-        DB::table('languages')->insert([
-            [
-                'name' => 'العربية',
-                'created_at' => now(),
-                'updated_at' =>now(),
-            ],
-            [
-                'name' => 'الإنجليزية',
-                'created_at' =>now(),
-                'updated_at' =>now(),
-            ],
-        ]);
-    }
+public function run()
+{
+    DB::table('languages')->insert([
+        [
+            'name' => 'العربية',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ],
+        [
+            'name' => 'الإنجليزية',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ],
+        [
+            'name' => 'التركية',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ],
+        [
+            'name' => 'الألمانية',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ],
+        [
+            'name' => 'الفرنسية',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ],
+    ]);
+}
+
 }

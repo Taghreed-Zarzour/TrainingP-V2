@@ -22,6 +22,60 @@
 </head>
 
 <body>
+  <style>
+    /* تنسيق عداد الأحرف */
+.char-counter-badge {
+    position: absolute;
+    top: 40px;
+    left: 10px;
+
+    border-radius: 12px;
+    padding: 0 8px;
+    font-size: 0.75rem;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+/* تنسيق رسائل التحقق */
+.validation-feedback {
+    margin-top: 4px;
+}
+
+.error-message {
+    display: none;
+    align-items: center;
+    color: #dc3545;
+    font-size: 0.8rem;
+    gap: 5px;
+}
+
+.error-message i {
+    font-size: 1rem;
+}
+
+/* حالات مختلفة للعداد */
+.char-counter-warning {
+    color: #fd7e14;
+  
+}
+
+.char-counter-danger {
+    color: #dc3545;
+    background-color: #fce8e8;
+    border-color: #dc3545;
+}
+
+/* تأثيرات للحقل عند الخطأ */
+.is-invalid {
+    border-color: #dc3545 !important;
+    padding-right: 2.5rem !important;
+    background-image: none !important;
+}
+
+.is-invalid:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+  </style>
     <div class="verify-bg mb-5">
         <!-- العنوان الرئيسي -->
         <div class="header">
@@ -70,38 +124,22 @@
                                 <label class="form-label">الاسم (بالعربية)</label>
                                 <input type="text" id="name_ar" name="name_ar" class="form-control" required
                                     placeholder="مثال: أحمد" pattern="[\u0600-\u06FF\s]+"
-                                    title="يجب أن يحتوي على حروف عربية فقط">
+                                    title="يجب أن يحتوي على حروف عربية فقط" value="{{ old('name_ar') }}">
                                 <div class="error-message" id="name_ar_error">يجب إدخال الاسم بالعربية بشكل صحيح</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">الكنية (بالعربية)</label>
                                 <input type="text" id="last_name_ar" name="last_name_ar" class="form-control"
                                     required placeholder="مثال: العلي" pattern="[\u0600-\u06FF\s]+"
-                                    title="يجب أن يحتوي على حروف عربية فقط">
+                                    title="يجب أن يحتوي على حروف عربية فقط" value="{{ old('last_name_ar') }}">
                                 <div class="error-message" id="last_name_ar_error">يجب إدخال الكنية بالعربية بشكل صحيح
                                 </div>
                             </div>
-                            {{-- <div class="col-md-6">
-                                <label class="form-label">الاسم (بالإنجليزية)</label>
-                                <input type="text" id="name_en" name="name_en" required style="direction: ltr"
-                                    class="form-control" placeholder="Example: Ahmad" pattern="[A-Za-z\s]+"
-                                    title="يجب أن يحتوي على حروف إنجليزية فقط">
-                                <div class="error-message" id="name_en_error">يجب إدخال الاسم بالإنجليزية بشكل صحيح
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">الكنية (بالإنجليزية)</label>
-                                <input type="text" id="last_name_en" name="last_name_en" required
-                                    style="direction: ltr" class="form-control" placeholder="Example: Alali"
-                                    pattern="[A-Za-z\s]+" title="يجب أن يحتوي على حروف إنجليزية فقط">
-                                <div class="error-message" id="last_name_en_error">يجب إدخال الكنية بالإنجليزية بشكل
-                                    صحيح</div>
-                            </div> --}}
                             <div class="col-md-6">
                                 <label class="form-label">العنوان Headline ( بالعربية)</label>
                                 <input type="text" id="headline" name="headline" required class="form-control"
                                     placeholder="مثال: مدرب مهارات رقمية" pattern="[\u0600-\u06FF\s]+"
-                                    title="يجب أن يحتوي على حروف عربية فقط">
+                                    title="يجب أن يحتوي على حروف عربية فقط" value="{{ old('headline') }}">
                                 <div class="error-message" id="headline_error">يجب إدخال العنوان بالعربية بشكل صحيح
                                 </div>
                             </div>
@@ -110,12 +148,13 @@
                                 <select id="nationality" class="form-select select2" name="nationality[]"
                                     data-placeholder="اختر واحدة أو أكثر" multiple required>
                                     @foreach ($countries as $nationality)
-                                        <option value="{{ $nationality->id }}">{{ $nationality->name }}</option>
+                                        <option value="{{ $nationality->id }}"
+                                            {{ in_array($nationality->id, old('nationality', [])) ? 'selected' : '' }}>
+                                            {{ $nationality->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="nationality_error">يجب اختيار الجنسية</div>
                             </div>
-
                             <div class="col-md-12 d-flex gap-3 align-items-center mt-4">
                                 @foreach ($sexs as $sex)
                                     <div class="form-check">
@@ -125,15 +164,11 @@
                                         <label class="form-check-label" for="gender_{{ $sex->value }}">
                                             {{ $sex->value }}
                                         </label>
-
                                     </div>
                                 @endforeach
-
-
                             </div>
                             <div class="error-message" id="gender_error">يجب اختيار الجنس</div>
                         </div>
-
                         <button type="button" class="btn btn-primary w-100 mt-4" onclick="validateStep1()">أدخل
                             خبراتك
                             التدريبية
@@ -149,7 +184,6 @@
                         </button>
                     </div>
 
-
                     <!-- الخطوة 2: الخبرات التدريبية -->
                     <div class="step-form" id="step2">
                         <div class="row g-3">
@@ -158,30 +192,34 @@
                                 <select class="form-select select2" id="work_sectors" name="work_sectors[]" multiple
                                     data-placeholder="اختر واحد أو أكثر" required>
                                     @foreach ($work_sectors as $sector)
-                                        <option value="{{ $sector->id }}">{{ $sector->name }}</option>
+                                        <option value="{{ $sector->id }}"
+                                            {{ in_array($sector->id, old('work_sectors', [])) ? 'selected' : '' }}>
+                                            {{ $sector->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="work_sectors_error">يجب اختيار قطاع العمل</div>
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label">الخدمات المقدمة</label>
                                 <select class="form-select select2" id="provided_services" name="provided_services[]"
                                     multiple data-placeholder="اختر واحدة أو أكثر" required>
                                     @foreach ($provided_services as $service)
-                                        <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                        <option value="{{ $service->id }}"
+                                            {{ in_array($service->id, old('provided_services', [])) ? 'selected' : '' }}>
+                                            {{ $service->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="provided_services_error">يجب اختيار الخدمات المقدمة
                                 </div>
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label">مجالات العمل</label>
                                 <select class="form-select select2" id="work_fields" name="work_fields[]" multiple
                                     data-placeholder="اختر أهم مجالات العمل" required>
                                     @foreach ($work_fields as $field)
-                                        <option value="{{ $field->id }}">{{ $field->name }}</option>
+                                        <option value="{{ $field->id }}"
+                                            {{ in_array($field->id, old('work_fields', [])) ? 'selected' : '' }}>
+                                            {{ $field->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="work_fields_error">يجب اختيار مجالات العمل</div>
@@ -199,12 +237,11 @@
                                     multiple data-placeholder="اختر المواضيع المهمة" required>
                                     @foreach (\App\Enums\ImportantTopicsType::cases() as $topic)
                                         <option value="{{ $topic->value }}"
-                                            {{ in_array($topic->value, old('important_topics', $trainer->important_topics ?? [])) ? 'selected' : '' }}>
+                                            {{ in_array($topic->value, old('important_topics', [])) ? 'selected' : '' }}>
                                             {{ $topic->value }}
                                         </option>
                                     @endforeach
                                 </select>
-
                                 <div class="error-message" id="important_topics_error">يجب إدخال المواضيع المهمة</div>
                             </div>
                             <div class="col-md-6">
@@ -212,18 +249,27 @@
                                 <select id="international_exp" class="form-select select2" name="international_exp[]"
                                     data-placeholder="اختر واحدة أو أكثر" multiple required>
                                     @foreach ($countries as $nationality)
-                                        <option value="{{ $nationality->id }}">{{ $nationality->name }}</option>
+                                        <option value="{{ $nationality->id }}"
+                                            {{ in_array($nationality->id, old('international_exp', [])) ? 'selected' : '' }}>
+                                            {{ $nationality->name }}</option>
                                     @endforeach
                                 </select>
-                                <div class="error-message" id="nationality_error">يجب اختيار الجنسية</div>
+                                <div class="error-message" id="international_exp_error">يجب اختيار الخبرات الدولية
+                                </div>
                             </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label">نبذة عن المدرب/المستشار</label>
-                                <textarea class="form-control" id="bio" name="bio" style="min-height: 112px;"
-                                    placeholder="شارك نبذة مختصرة تبرز خبرتك وهويتك المهنية" required minlength="50"></textarea>
-                                <div class="error-message" id="bio_error">يجب كتابة نبذة لا تقل عن 50 حرفاً</div>
-                            </div>
+<div class="col-md-12 position-relative">
+    <label class="form-label">نبذة عن المدرب/المستشار</label>
+    <textarea class="form-control pe-5" id="bio" name="bio" style="min-height: 112px;"
+        placeholder="شارك نبذة مختصرة تبرز خبرتك وهويتك المهنية" 
+        required minlength="50" maxlength="255">{{ old('bio') }}</textarea>
+    
+    <!-- عداد الأحرف المدمج -->
+    <div class="char-counter-badge" id="charCounter">255</div>
+      <div class="error-message" id="bio_error">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>يجب كتابة نبذة لا تقل عن 50 حرفاً ولا تزيد عن 255 حرفاً</span>
+    </div>  
+</div>
                         </div>
                         <button type="button" class="btn btn-primary w-100 mt-4" onclick="validateStep2()">
                             أدخل معلومات التواصل
@@ -242,7 +288,6 @@
                     <!-- الخطوة 3: معلومات التواصل -->
                     <div class="step-form" id="step3">
                         <div class="row g-3">
-
                             <div class="col-md-6">
                                 <label class="form-label">رقم الهاتف</label>
                                 <div class="form-control p-0" dir="ltr">
@@ -251,8 +296,8 @@
                                         <div class="dropdown position-relative" id="flagDropdown" dir="rtl">
                                             <div class="selected-flag d-flex align-items-center gap-1">
                                                 <span class="dropdown-arrow">🞃</span>
-                                                <img src="{{ asset('flags/tr.svg') }}" id="selectedFlag"
-                                                    class="flag-img" alt="flag">
+                                                <img src="{{ asset('flags/' . old('country_code', 'tr') . '.svg') }}"
+                                                    id="selectedFlag" class="flag-img" alt="flag">
                                             </div>
                                             <div class="flag-options" id="flagOptions">
                                                 <input type="text" id="searchBox" class="search-box"
@@ -267,25 +312,23 @@
                                                 @endforeach
                                             </div>
                                         </div>
-
                                         <!-- Divider -->
                                         <div class="divider-line"></div>
-
                                         <!-- رمز الدولة -->
-                                        <div class="code-box" id="phoneCode" dir="ltr">+90</div>
-
+                                        <div class="code-box" id="phoneCode" dir="ltr">
+                                            +{{ old('phone_code', '90') }}</div>
                                         <!-- حقل الإدخال -->
                                         <input type="text" id="phone_number" name="phone_number" required
                                             class="flex-grow-1 border-0 ps-2 phone-input" pattern="[0-9]{6,15}"
-                                            title="يجب أن يحتوي على أرقام فقط (6-15 رقم)">
-
+                                            title="يجب أن يحتوي على أرقام فقط (6-15 رقم)"
+                                            value="{{ old('phone_number') }}">
                                         <!-- حقل مخفي لرمز الدولة -->
-                                        <input type="hidden" id="phone_code" name="phone_code" value="+90">
+                                        <input type="hidden" id="phone_code" name="phone_code"
+                                            value="{{ old('phone_code', '+90') }}">
                                     </div>
                                 </div>
                                 <div class="error-message" id="phone_number_error">يجب إدخال رقم هاتف صحيح</div>
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label">البريد الإلكتروني</label>
                                 <input type="email" class="form-control" value="{{ $user->email }}" disabled>
@@ -295,7 +338,9 @@
                                 <select id="country_id" name="country_id" class="form-select" required>
                                     <option value="" selected disabled>اختر الدولة</option>
                                     @foreach ($countries as $country)
-                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                        <option value="{{ $country->id }}"
+                                            {{ old('country_id') == $country->id ? 'selected' : '' }}>
+                                            {{ $country->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="country_id_error">يجب اختيار الدولة</div>
@@ -304,6 +349,9 @@
                                 <label class="form-label">المدينة</label>
                                 <select id="city" name="city" class="form-select" required>
                                     <option value="" selected disabled>اختر المدينة</option>
+                                    @if (old('city'))
+                                        <option value="{{ old('city') }}" selected>{{ old('city') }}</option>
+                                    @endif
                                 </select>
                                 <div class="error-message" id="city_error">يجب اختيار المدينة</div>
                             </div>
@@ -555,13 +603,26 @@
                     errorMessage: 'يجب إدخال المواضيع المهمة',
                     isSelect2: false
                 },
-                {
-                    id: 'bio',
-                    errorId: 'bio_error',
-                    validation: (value) => value && value.length >= 50,
-                    errorMessage: 'يجب كتابة نبذة لا تقل عن 50 حرفاً',
-                    isSelect2: false
-                }
+
+                      
+        {
+            id: 'international_exp',
+            errorId: 'international_exp_error',
+            validation: (value) => value && value.length > 0,
+            errorMessage: 'يجب اختيار الخبرات الدولية',
+            isSelect2: true
+        },
+{
+    id: 'bio',
+    errorId: 'bio_error',
+    validation: (value) => {
+        if (!value) return false;
+        const len = value.length;
+        return len >= 50 && len <= 255;
+    },
+    errorMessage: 'يجب كتابة نبذة لا تقل عن 50 حرفاً ولا تزيد عن 255 حرفاً',
+    isSelect2: false
+}
             ];
 
             const isValid = validateFields(fields);
@@ -573,6 +634,10 @@
 
         // تحقق نهائي قبل الإرسال
         function validateForm() {
+           // التحقق من صحة جميع الخطوات
+    const step1Valid = validateStep1();
+    const step2Valid = validateStep2();
+    
             const fields = [{
                     id: 'phone_number',
                     errorId: 'phone_number_error',
@@ -699,6 +764,141 @@
             flagOptions.style.display = "flex";
             isDropdownOpen = true;
         });
+
+
+        //حفظ البيانات عند الرفرشة
+        // حفظ البيانات عند كل تغيير
+        $(document).ready(function() {
+            // استعادة البيانات المحفوظة
+            // const savedStep = localStorage.getItem('currentStep') || 1;
+            // goToStep(savedStep);
+
+            // حفظ البيانات عند تغيير الحقول
+            $('input, select, textarea').on('change', function() {
+                saveFormState();
+            });
+
+            // حفظ الخطوة الحالية
+            $('[onclick^="validateStep"]').on('click', function() {
+                const step = $(this).closest('.step-form').attr('id').replace('step', '');
+                localStorage.setItem('currentStep', step);
+            });
+        });
+
+        function saveFormState() {
+            const formData = {};
+
+            // حفظ حقول النموذج
+            $('#multiStepForm').find('input, select, textarea').each(function() {
+                const $el = $(this);
+                const id = $el.attr('id');
+
+                if (id) {
+                    if ($el.attr('type') === 'radio' || $el.attr('type') === 'checkbox') {
+                        if ($el.is(':checked')) {
+                            formData[id] = $el.val();
+                        }
+                    } else if ($el.is('select[multiple]')) {
+                        formData[id] = $el.val() || [];
+                    } else {
+                        formData[id] = $el.val();
+                    }
+                }
+            });
+
+            localStorage.setItem('trainerFormData', JSON.stringify(formData));
+        }
+
+        function loadFormState() {
+            const savedData = localStorage.getItem('trainerFormData');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+
+                for (const id in formData) {
+                    const $el = $('#' + id);
+                    if ($el.length) {
+                        if ($el.attr('type') === 'radio' || $el.attr('type') === 'checkbox') {
+                            $el.prop('checked', $el.val() == formData[id]);
+                        } else if ($el.is('select[multiple]')) {
+                            $el.val(formData[id]).trigger('change');
+                        } else {
+                            $el.val(formData[id]);
+                        }
+                    }
+                }
+
+                // تحديث select2 إذا كان مستخدماً
+                if ($.fn.select2) {
+                    $('.select2').each(function() {
+                        const $select = $(this);
+                        if ($select.val()) {
+                            $select.trigger('change');
+                        }
+                    });
+                }
+            }
+        }
+
+        // استدعاء دالة التحميل عند بدء الصفحة
+        $(window).on('load', function() {
+            loadFormState();
+        });
+
+        // تنظيف البيانات عند إرسال النموذج بنجاح
+        $('#multiStepForm').on('submit', function() {
+            localStorage.removeItem('trainerFormData');
+            localStorage.removeItem('currentStep');
+        });
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const bioTextarea = document.getElementById('bio');
+    const charCounter = document.getElementById('charCounter');
+    const bioError = document.getElementById('bio_error');
+    const maxLength = 255;
+    const minLength = 50;
+
+    // تحديث العداد عند الكتابة
+    bioTextarea.addEventListener('input', function() {
+        const currentLength = this.value.length;
+        const remaining = maxLength - currentLength;
+        
+        // تحديث العداد
+        charCounter.textContent = remaining;
+        
+        // تغيير مظهر العداد حسب الحالة
+        if (currentLength > maxLength) {
+            charCounter.classList.add('char-counter-danger');
+            charCounter.classList.remove('char-counter-warning');
+            bioError.querySelector('span').textContent = 'لقد تجاوزت الحد الأقصى لعدد الأحرف (255)';
+            bioError.style.display = 'flex';
+            this.classList.add('is-invalid');
+        } 
+        else if (currentLength < minLength) {
+            charCounter.classList.remove('char-counter-danger', 'char-counter-warning');
+            bioError.querySelector('span').textContent = 'يجب كتابة نبذة لا تقل عن 50 حرفاً';
+            bioError.style.display = 'flex';
+            this.classList.add('is-invalid');
+        } 
+        else if (remaining < 30) {
+            charCounter.classList.add('char-counter-warning');
+            charCounter.classList.remove('char-counter-danger');
+            bioError.style.display = 'none';
+            this.classList.remove('is-invalid');
+        }
+        else {
+            charCounter.classList.remove('char-counter-danger', 'char-counter-warning');
+            bioError.style.display = 'none';
+            this.classList.remove('is-invalid');
+        }
+    });
+
+    // التحقق الأولي عند تحميل الصفحة
+    if (bioTextarea.value) {
+        bioTextarea.dispatchEvent(new Event('input'));
+    }
+});
     </script>
 </body>
 

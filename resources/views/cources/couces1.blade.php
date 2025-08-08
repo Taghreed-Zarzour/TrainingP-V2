@@ -440,7 +440,7 @@ push('css')
 
                                 <div class="d-flex flex-column justify-content-between image-custom">
                                     <span class="badge-position">تصميم</span>
-                                    <img src="{{ asset('images/cources/sample-course.jpg') }}" class="card-img-top"
+                                    <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
                                         alt="صورة التدريب">
 
                                 </div>

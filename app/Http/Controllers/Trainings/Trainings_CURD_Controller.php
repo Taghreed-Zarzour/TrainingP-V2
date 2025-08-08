@@ -9,12 +9,12 @@ use App\Http\Requests\TrainingCreate\StoreTrainingGoalsRequest;
 use App\Models\AdditionalSetting;
 use App\Models\Country;
 use App\Models\Language;
-use App\Models\ProgramType;
-use App\Models\SchedulingTrainingSessions;
+use App\Models\programType;
+use App\Models\schedulingTrainingSessions;
 use App\Models\TrainingAssistantManagement;
 use App\Models\TrainingClassification;
 use App\Models\TrainingDetail;
-use App\Models\TrainingLevel;
+use App\Models\trainingLevel;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Enums\TrainingAttendanceType;
@@ -28,8 +28,8 @@ class Trainings_CURD_Controller extends Controller
   {
     $training = $trainingId ? TrainingProgram::with('detail', 'assistants', 'sessions', 'AdditionalSetting')->findOrFail($trainingId) : null;
     return view('trainings.basic-information', [
-      'types' => ProgramType::all(),
-      'levels' => TrainingLevel::all(),
+      'types' => programType::all(),
+      'levels' => trainingLevel::all(),
       'languages' => Language::all(),
       'classifications' => TrainingClassification::all(),
       'training' => $training,
@@ -256,7 +256,7 @@ public function storeSchedule(StoreSchedulingRequest $request, $trainingId)
             // إضافة الجدول الجديد إذا كانت هناك جلسات
             if ($request->filled('schedules')) {
                 foreach ($request->schedules as $schedule) {
-                    SchedulingTrainingSessions::create([
+                    schedulingTrainingSessions::create([
                         'training_program_id' => $training->id,
                         'session_date' => $schedule['session_date'],
                         'session_start_time' => $schedule['session_start_time'],

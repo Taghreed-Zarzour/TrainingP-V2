@@ -41,19 +41,22 @@ class TrainerController extends Controller
 
   }
 
-  public function completeRegister(completeRegisterRequest $request, $id)
-  {
+public function completeRegister(completeRegisterRequest $request, $id)
+{
     $validated = $request->validated();
-
+    
     $response = $this->trainerService->completeRegister($validated, $id);
 
-    if ($response['success'] == true) {
-      return redirect()->route('homePage', ['id' => $id])->with('success', $response['msg']);
+    if ($response['success']) {
+        return redirect()->route('homePage', ['id' => $id])
+               ->with('success', $response['msg']);
     } else {
-      return back()->withErrors(['error' => $response['msg']]);
+        // إرجاع كل البيانات مع الخطأ
+        return redirect()->back()
+               ->withInput()
+               ->withErrors(['error' => $response['msg']]);
     }
-  }
-  
+}
   
 
 }

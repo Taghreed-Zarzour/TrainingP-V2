@@ -1,4 +1,4 @@
-@extends('frontend.layouts.master_organization')
+@extends('frontend.layouts.master')
 
 
 @section('title', 'الرئيسية')
@@ -181,7 +181,7 @@
           </div>
         </div>
       </section>
-      <section class="reviews-section">
+      <section class="reviews-section" style="display: none;">
         <div class="title-wrapper">
           <div class="title">
             شهادات

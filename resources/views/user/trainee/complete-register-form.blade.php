@@ -24,7 +24,6 @@
     .table-responsive {
         width: 100%;
     }
-
   table {
     width: 100%;
     background-color: #fff;
@@ -322,10 +321,12 @@ tbody td:first-child {
                                     <select class="form-select select2" id="fields_of_interest"
                                         name="fields_of_interest[]" data-placeholder="اختر مجالات اهتمامك" multiple
                                         required>
-                                    <option value="مقدمة البرمجة">مقدمة البرمجة</option>
-                                    <option value="تطوير الويب">تطوير الويب</option>
-                                    <option value="تحليل البيانات">تحليل البيانات</option>
-                                    <option value="ذكاء صناعي">ذكاء صناعي</option>
+                                    @foreach (\App\Enums\ImportantTopicsType::cases() as $topic)
+                                        <option value="{{ $topic->value }}"
+                                            {{ in_array($topic->value, old('fields_of_interest', [])) ? 'selected' : '' }}>
+                                            {{ $topic->value }}
+                                        </option>
+                                    @endforeach
                                     </select>
                                     <div class="error-message" id="fields_of_interest_error">يجب اختيار مجالات
                                         الاهتمام
@@ -361,13 +362,17 @@ tbody td:first-child {
                                 </div>
 
 
-                                <div class="col-md-12" style="display: none;">
-                                    <label class="form-label">المنصب الوظيفي</label>
-                                    <input type="text" id="job_position" name="job_position" class="form-control"
-                                        placeholder="مثال: مطور ويب">
-                                            <div class="error-message" id="job_position_error">يجب إدخال المنصب الوظيفي</div>
+<div class="col-md-12" style="display: none;">
+    <label class="form-label">المنصب الوظيفي</label>
+    <select id="job_position" name="job_position" class="form-control">
+        <option value="" selected disabled>اختر المنصب الوظيفي</option>
+        @foreach(App\Enums\JobPositionEnum::values() as $position)
+            <option value="{{ $position }}">{{ $position }}</option>
+        @endforeach
+    </select>
+    <div class="error-message" id="job_position_error">يجب إدخال المنصب الوظيفي</div>
+</div>
 
-                                </div>
 
                                 <div class="col-md-12">
                                     <label class="form-label">الأوقات التي تناسبك لحضور التدريبات</label>

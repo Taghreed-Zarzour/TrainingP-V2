@@ -105,7 +105,7 @@
                         
                         <hr />
                         
-                        <div class="input-group mt-3">
+                        <div class="input-group mt-3 ">
                             <label>مساعد المدرب / الميسر</label>
                             <div class="trainers" name="assistant_ids[]">
                                 @foreach ($availableAssistants as $assistant)

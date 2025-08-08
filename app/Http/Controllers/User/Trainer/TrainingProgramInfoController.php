@@ -12,53 +12,88 @@ use Illuminate\Http\Request;
 class TrainingProgramInfoController extends Controller
 {
 
-    public function deleteTrainigFile($program_id, $file_index)
-    {
-        $program = TrainingProgram::findOrFail($program_id);
-        $files = $program->AdditionalSetting->training_files;
+public function deleteTrainingFile($program_id, $file_index)
+{
+    $program = TrainingProgram::findOrFail($program_id);
+    $files = $program->AdditionalSetting->training_files;
 
-        $filePath = $files[$file_index];
-        Storage::disk('public')->delete($filePath);
-        unset($files[$file_index]);
-        $program->AdditionalSetting->update([
-            'training_files' => array_values($files)
-        ]);
-
-        return back()->with('success', 'تم حذف الملف بنجاح');
+    // إذا كانت الملفات نص JSON (string)، فكها إلى مصفوفة
+    if (is_string($files)) {
+        $files = json_decode($files, true);
     }
 
-
- public function uploadTrainingFiles(Request $request, $program_id)
-    {
-        $request->validate([
-            'training_files.*' => 'required|file|max:10240', // 10MB كحد أقصى
-        ]);
-
-        $program = TrainingProgram::findOrFail($program_id);
-        $currentFiles = $program->AdditionalSetting->training_files ?? [];
-
-        $uploadedFiles = collect($request->file('training_files'))->map(function ($file) {
-            $originalName = $file->getClientOriginalName();
-            $path = 'training_files';
-            
-            // إنشاء اسم فريد للملف
-            $filename = pathinfo($originalName, PATHINFO_FILENAME);
-            $extension = $file->getClientOriginalExtension();
-            $uniqueName = $filename . '_' . time() . '.' . $extension;
-
-            $filePath = $file->storeAs($path, $uniqueName, 'public');
-            return $filePath;
-        })->toArray();
-
-        $updatedFiles = array_merge($currentFiles, $uploadedFiles);
-
-        $program->AdditionalSetting->update([
-            'training_files' => $updatedFiles
-        ]);
-
-        return back()->with('success', 'تم رفع الملفات بنجاح');
+    // إذا لم تكن مصفوفة بعد الفتح، عرّفها كمصفوفة فارغة
+    if (!is_array($files)) {
+        $files = [];
     }
 
+    // تحقق من وجود الملف المطلوب حذفه
+    if (!isset($files[$file_index])) {
+        return back()->withErrors('الملف المطلوب غير موجود');
+    }
+
+    // حذف الملف فعلياً من التخزين
+    $filePath = $files[$file_index];
+    Storage::disk('public')->delete($filePath);
+
+    // حذف الملف من المصفوفة
+    unset($files[$file_index]);
+
+    // إعادة ترتيب مفاتيح المصفوفة (حتى لا تبقى مفاتيح غير متسلسلة)
+    $files = array_values($files);
+
+    // تحديث الحقل مع ترميز المصفوفة كـ JSON
+    $program->AdditionalSetting->update([
+        'training_files' => json_encode($files),
+    ]);
+
+    return back()->with('success', 'تم حذف الملف بنجاح');
+}
+
+
+public function uploadTrainingFiles(Request $request, $program_id)
+{
+    $request->validate([
+        'training_files.*' => 'required|file|max:10240', // 10MB كحد أقصى
+    ]);
+
+    $program = TrainingProgram::findOrFail($program_id);
+
+    // جلب الملفات السابقة من قاعدة البيانات
+    $currentFiles = $program->AdditionalSetting->training_files ?? [];
+
+    // إذا كانت الملفات السابقة نص (مثلاً JSON)، حاول تحويلها لمصفوفة
+    if (is_string($currentFiles)) {
+        $currentFiles = json_decode($currentFiles, true);
+    }
+    // تأكد أنها مصفوفة بعد التحويل، إذا لا اجعلها مصفوفة فارغة
+    if (!is_array($currentFiles)) {
+        $currentFiles = [];
+    }
+
+    // رفع الملفات الجديدة مع إنشاء أسماء فريدة
+    $uploadedFiles = collect($request->file('training_files'))->map(function ($file) {
+        $originalName = $file->getClientOriginalName();
+        $path = 'training_files';
+
+        $filename = pathinfo($originalName, PATHINFO_FILENAME);
+        $extension = $file->getClientOriginalExtension();
+        $uniqueName = $filename . '_' . time() . '.' . $extension;
+
+        $filePath = $file->storeAs($path, $uniqueName, 'public');
+        return $filePath;
+    })->toArray();
+
+    // دمج الملفات القديمة مع الجديدة
+    $updatedFiles = array_merge($currentFiles, $uploadedFiles);
+
+    // تحديث قاعدة البيانات (يفضل تخزين ك JSON)
+    $program->AdditionalSetting->update([
+        'training_files' => json_encode($updatedFiles),
+    ]);
+
+    return back()->with('success', 'تم رفع الملفات بنجاح');
+}
 
 
 

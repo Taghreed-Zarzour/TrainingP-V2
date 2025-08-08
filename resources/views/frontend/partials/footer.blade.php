@@ -198,7 +198,7 @@
 
 
 <!-- Footer Section -->
-<footer class="py-5 border-top pt-3">
+<footer class="border-top pt-3">
     <div class="container pt-3">
         <div class="row g-4 justify-content-between"> <!-- استخدام g-4 لضبط المسافات بين الأعمدة -->
             <!-- Column 1: Logo and Description -->
@@ -247,7 +247,7 @@
             <img src="{{ asset('images/social/whatsapp.svg') }}" alt="WhatsApp Icon" />
             <span  dir="ltr">+90 531 497 70 81</span>
         </a>
-        <a href="https://facebook.com/TrainingP">
+        <a href="https://facebook.com/FollowTrainingP">
             <img src="{{ asset('images/social/facebook.svg') }}" alt="Facebook Icon" />
             <span  dir="ltr">@TrainingP</span>
         </a>

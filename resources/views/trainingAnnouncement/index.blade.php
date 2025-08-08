@@ -126,7 +126,7 @@
 <div class="container my-5" dir="rtl">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="fw-bold">البرامج التدريبية المتاحة</h4>
-        @if(!$programs->isEmpty())
+        @if (!empty($programs))
         <div class="d-flex gap-2">
             <button class="arrow-btn" id="carouselPrev">
                 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -141,7 +141,7 @@
         </div>
         @endif
     </div>
-    @if ($programs->isEmpty())
+  @if (empty($programs))
          <div class="empty-state text-center py-5 col-12" style="justify-self: center;">
             
             <h5 class="fw-bold mb-3">لا توجد برامج تدريبية متاحة حالياً</h5>
@@ -171,7 +171,7 @@
                 <img src="{{ 
                     $program->AdditionalSetting && $program->AdditionalSetting->profile_image 
                         ? asset('storage/' . $program->AdditionalSetting->profile_image) 
-                        : asset('images/training.jpg') 
+                        : asset('images/cources/training-default-img.svg') 
                 }}" class="card-img-top" alt="صورة التدريب">
             </div>
             <div class="card-body d-flex flex-column justify-content-between gap-1 align-items-start">
@@ -249,7 +249,7 @@
                         @endphp
                     </li>
                     @if (
-                        $program->program_presentation_method_id === \App\Enums\TrainingAttendanceType::ONLINE->value ||
+                        $program->program_presentation_method_id === \App\Enums\TrainingAttendanceType::HYBRID->value ||
                         $program->program_presentation_method_id === \App\Enums\TrainingAttendanceType::REMOTE->value)
                         <li class="d-flex align-items-center gap-2">
                             <img src="{{ asset('images/cources/online.svg') }}" alt="نوع الدورة">
@@ -308,7 +308,6 @@
 </div>
 @endsection
 @section('scripts')
-    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
     <script src="{{ asset('js/singleselect.js') }}"></script>
     <script>
         //التنقل بين الكروت عن طريق الأزرار

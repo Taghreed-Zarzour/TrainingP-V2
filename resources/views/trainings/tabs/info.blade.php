@@ -275,7 +275,7 @@
                             <div class="{{ $index < 2 ? 'input-without-remove' : 'input-with-remove' }}">
                                 <input type="text" name="learning_outcomes[]" 
                                        value="{{ is_array($outcome) ? '' : $outcome }}"
-                                       placeholder="مثال: تدريب أساسيات برمجة الأردوينو" />
+                                       placeholder="مثال: سيتمكّن المشاركون من تطوير خارطة طريق لمنتج رقمي بناءً على تحليل احتياجات السوق والمستخدمين." />
                                 @error('learning_outcomes.' . $index)
                                     <p class="error-msg">{{ $message }}</p>
                                 @enderror
@@ -295,7 +295,7 @@
                             <div class="{{ $index == 0 ? 'input-without-remove' : 'input-with-remove' }}">
                                 <input type="text" name="requirements[]" 
                                        value="{{ is_array($requirement) ? '' : $requirement }}"
-                                       placeholder="مثال: لا حاجة لوجود خبرات سابقة" />
+                                       placeholder="مثال: امتلاك جهاز حاسوب مع اتصال إنترنت مستقر." />
                                 @error('requirements.' . $index)
                                     <p class="error-msg">{{ $message }}</p>
                                 @enderror

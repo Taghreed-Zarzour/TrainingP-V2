@@ -33,7 +33,7 @@
                                     <img src="{{ asset('storage/' . $program->AdditionalSetting->profile_image) }}"
                                         class="training-image" alt="صورة التدريب">
                                 @else
-                                    <img src="{{ asset('images/cources/sample-course.jpg') }}" class="training-image"
+                                    <img src="{{ asset('images/cources/training-default-img.svg') }}" class="training-image"
                                         alt="صورة التدريب">
                                 @endif
 
@@ -254,7 +254,6 @@
 
 
 
-    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
