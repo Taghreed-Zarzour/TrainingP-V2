@@ -10,7 +10,7 @@ class OrgTrainingDetail extends Model
     use HasFactory;
 
     protected $fillable = [
-        'training_program_id',
+        'program_title',
         'org_training_program_id',
         'trainer_id',
         'session_date',
@@ -20,7 +20,11 @@ class OrgTrainingDetail extends Model
         'training_files',
     ];
 
-
+    protected $casts = [
+        'sessions' => 'array', 
+        'trainer_ids' => 'array', 
+    ];
+    
     public function trainingProgram()
     {
         return $this->belongsTo(OrgTrainingProgram::class);
