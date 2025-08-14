@@ -14,16 +14,13 @@ return new class extends Migration
         Schema::create('org_training_details', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('training_program_id')
-            ->references('id')
-            ->on('training_programs')
-            ->onDelete('cascade');
-
             $table->foreignId('org_training_program_id')
             ->references('id')
             ->on('org_training_programs')
             ->onDelete('cascade');
 
+            $table->longText('program_title');
+            
             $table->foreignId('trainer_id')
             ->nullable()
             ->constrained('users')
