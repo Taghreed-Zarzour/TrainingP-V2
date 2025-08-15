@@ -26,14 +26,15 @@ class StoreBasicInformationRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
-            'language_type_id' => 'required|exists:languages,id',
+            'language_id' => 'required|exists:languages,id',
             'country_id' => 'required|exists:countries,id',
             'city' => 'required',
             'address_in_detail' => 'required',
             'program_type' => ['required' , new Enum(programType::class)],
             'training_level_id' => 'required|exists:training_levels,id',
             'program_presentation_method' => ['required', new Enum(TrainingAttendanceType::class)],
-            'org_training_classification_id' => ['required', 'array', 'exists:training_classifications,id'],
+            'org_training_classification_id' => 'required|array',
+            'org_training_classification_id.*' => 'exists:training_classifications,id',
             'program_description' => 'required',
         ];
     }

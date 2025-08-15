@@ -46,5 +46,6 @@ class OrgTrainingProgram extends Model
     {
         return $this->hasOne(OrgRegistrationAndRequirement::class);
     }
+    
 
 }

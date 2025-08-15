@@ -13,6 +13,7 @@ use App\Http\Requests\orgTrainingProgram\StoreTrainingGoalsRequest;
 use App\Http\Requests\orgTrainingProgram\updateBasicInformationRequest;
 use App\Models\Country;
 use App\Models\Language;
+use App\Models\OrgTrainingClassification;
 use App\Models\OrgTrainingDetail;
 use App\Models\OrgTrainingProgram;
 use App\Models\TrainingClassification;
@@ -33,6 +34,7 @@ class OrgTrainingController extends Controller
         'programType' => programType::cases(),
         'programPresentationMethod' => TrainingAttendanceType::cases(),
         'levels' => trainingLevel::all(),
+        'countries' => Country::all(),
         'languages' => Language::all(),
         'classifications' => TrainingClassification::all(),
         'training' => $orgTraining,
@@ -51,7 +53,7 @@ public function storeBasicInformation(StoreBasicInformationRequest $request, $or
         $validatedData = $request->validated();
 
         $orgTraining->fill([
-            'title' => $validatedData,
+            'title' => $validatedData['title'],
             'language_id' => $validatedData['language_id'],
             'country_id' => $validatedData['country_id'],
             'city' => $validatedData['city'],
@@ -59,11 +61,10 @@ public function storeBasicInformation(StoreBasicInformationRequest $request, $or
             'program_type' => $validatedData['program_type'],
             'training_level_id' => $validatedData['training_level_id'],
             'program_presentation_method' => $validatedData['program_presentation_method'],
-            'org_training_classification_id' => $validatedData['org_training_classification_id'],
             'program_description' => $validatedData['program_description'],
+            'org_training_classification_id' =>(array) $validatedData['org_training_classification_id'] ?? [],
             'organization_id' => Auth::id(),
         ]);
-        
         $orgTraining->save();
         
         DB::commit();
@@ -117,34 +118,33 @@ public function updateBasicInformation(updateBasicInformationRequest $request, $
     public function showGoalsForm($orgTrainingId)
     {
         $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
-        $trainingDetail = $orgTraining->detail()->firstOrNew();
+        $trainingGoal = $orgTraining->goals()->firstOrNew();
 
         return view('orgTrainings.goals', [
             'training' => $orgTraining,
-            'learning_outcomes' => $trainingDetail->learning_outcomes ?? [],
-            'target_audience' => $trainingDetail->target_audience ?? [],
+            'learning_outcomes' => $trainingGoal->learning_outcomes ?? [],
+            'target_audience' => $trainingGoal->target_audience ?? [],
         ]);
     }
     public function storeGoals(StoreTrainingGoalsRequest $request, $orgTrainingId)
     {
-        $validatedData = $request->validated();
         DB::beginTransaction();
         try {
             $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
 
             // إنشاء أو تحديث سجل التفاصيل
-            $trainingDetail = $orgTraining->detail()->firstOrNew([
+            $trainingGoal = $orgTraining->goals()->firstOrNew([
             'org_training_program_id' => $orgTrainingId,
             ]);
 
-            $trainingDetail->fill([
+            $trainingGoal->fill([
             'learning_outcomes' => $request->learning_outcomes ?? [],
             'target_audience' => $request->target_audience ?? [],
             ]);
-            $trainingDetail->save();
+            $trainingGoal->save();
 
             DB::commit();
-            return redirect()->route('orgTraining.team', $orgTraining->id);
+            return redirect()->route('orgTraining.trainingDetail', $orgTraining->id);
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('فشل تخزين أهداف التدريب: ' . $e->getMessage());
@@ -155,32 +155,33 @@ public function updateBasicInformation(updateBasicInformationRequest $request, $
     // =======  الخطوة 3: إدارة الفريق و التوقيت و الملفات=======
     public function showtrainingDetailForm($orgTrainingId)
 {
-    // Get training program
-    $orgTrainingDetail = OrgTrainingDetail::where('org_training_program_id',$orgTrainingId)->first();
-    
-    // Prepare data for the schedule part
-    $schedulesLater = $orgTrainingDetail->schedule_later ? 1 : 0;
-    $sessions = $training->sessions ?? collect(); // Ensure it's a collection even if null
+   // Get training program details
+   $orgTrainingDetail = OrgTrainingDetail::where('org_training_program_id', $orgTrainingId)->first();
 
-    // Get organization training program for detail part
-    $orgTraining = OrgTrainingProgram::where('id', $orgTrainingId)->first(); // Assuming the same ID for simplicity
+   // Prepare data for the schedule part
+   $schedulesLater = $orgTrainingDetail ? ($orgTrainingDetail->schedule_later ? 1 : 0) : 0;
+   $sessions = $orgTrainingDetail ? ($orgTrainingDetail->sessions ?? collect()) : collect(); // Ensure it's a collection even if null
 
-    // Prepare available trainers
-    $availableTrainers = User::whereHas('userType', function ($query) {
-        $query->where('type', 'مدرب');
-    })->get();
+   // Get organization training program for detail part
+   $orgTraining = OrgTrainingProgram::find($orgTrainingId); // Simplified lookup
 
-    // Get current trainers and assistants
-    $currentTeam = $orgTraining ? $orgTraining->assistants()->get() : collect();
-    $currentTrainers = $currentTeam->whereNotNull('trainer_id')->pluck('trainer_id')->toArray();
+   // Prepare available trainers
+   $availableTrainers = User::whereHas('userType', function ($query) {
+       $query->where('type', 'مدرب');
+   })->get();
 
-    return view('orgTrainings.combined', [
-        'training' => $orgTraining,
-        'sessions' => $sessions,
-        'schedules_later' => $schedulesLater,
-        'availableTrainers' => $availableTrainers,
-        'currentTrainers' => $currentTrainers,
-    ]);
+   // Get current trainers and assistants
+   $currentTeam = $orgTraining ? $orgTraining->assistants()->get() : collect();
+   $currentTrainers = $currentTeam->whereNotNull('trainer_id')->pluck('trainer_id')->toArray();
+
+   return view('orgTrainings.training-detail', [
+       'training' => $orgTraining,
+       'sessions' => $sessions,
+       'schedules_later' => $schedulesLater,
+       'availableTrainers' => $availableTrainers,
+       'currentTrainers' => $currentTrainers,
+       'orgTrainingDetail' => $orgTrainingDetail, // Pass the detail to the view
+   ]);
 }
 
 public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingId)

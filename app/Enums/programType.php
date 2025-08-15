@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum programType
+enum programType: string
 {
     case CAMP = 'مخيم'; 
     case WORKSHOP = 'ورشة عمل'; 

@@ -46,10 +46,7 @@ return new class extends Migration
 
             $table->string('program_presentation_method')->nullable();
 
-            $table->foreignId('org_training_classification_id')
-            ->nullable()
-            ->constrained('training_classifications')
-            ->onDelete('cascade');
+            $table->json('org_training_classification_id')->nullable();
 
             $table->longText('program_description')->nullable();
 

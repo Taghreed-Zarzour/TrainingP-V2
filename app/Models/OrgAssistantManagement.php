@@ -9,6 +9,7 @@ class OrgAssistantManagement extends Model
 {
     use HasFactory;
 
+    protected $table = 'org_assistant_managements';
     protected $fillable = [
         'org_training_program_id',
         'assistant_id',
