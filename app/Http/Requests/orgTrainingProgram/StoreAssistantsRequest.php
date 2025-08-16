@@ -20,12 +20,14 @@ class StoreAssistantsRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'assistant_ids' => 'required|array',
-            'assistant_ids.*' => 'exists:users,id', // Ensure each ID exists in the users table
-        ];
-    }
+{
+    return [
+        'assistant_ids' => 'required|array',
+        'assistant_ids.*' => 'exists:users,id', // Ensure each ID exists in the users table
+        'additional_assistant_ids' => 'array', // Allow additional assistants
+        'additional_assistant_ids.*' => 'exists:users,id', // Ensure each additional ID exists
+    ];
+}
 
     public function messages(): array
     {

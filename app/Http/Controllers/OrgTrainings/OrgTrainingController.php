@@ -249,7 +249,7 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
         ]);
 
         DB::commit();
-        return redirect()->route('orgTraining.settings', $orgTraining->id);
+        return redirect()->route('orgTraining.assistants', $orgTraining->id);
     } catch (\Exception $e) {
         DB::rollBack();
         \Log::error('فشل تخزين تفاصيل التدريب: ' . $e->getMessage());
@@ -270,7 +270,6 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
         // الحصول على المساعدين الحاليين
         $currentTeam = $orgTraining->assistants()->get();
         $currentAssistants = $currentTeam->whereNotNull('assistant_id')->pluck('assistant_id')->toArray();
-
         return view('orgTrainings.assistants', [
             'training' => $orgTraining,
             'availableAssistants' => $availableAssistants,
@@ -278,63 +277,60 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
         ]);
     }
     public function storeAssistants(StoreAssistantsRequest $request, $orgTrainingId)
-{
-    $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
-
-    // Clear existing assistants
-    $orgTraining->assistants()->delete();
-
-    // Store new assistants with org_training_program_id
-    foreach ($request->assistant_ids as $assistantId) {
-        $orgTraining->assistants()->create([
-            'org_training_program_id' => $orgTraining->id, // Store the training program ID
-            'assistant_id' => $assistantId,
-        ]);
+    {
+        $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
+        $allAssistantIds = array_merge($request->input('assistant_ids', []), $request->input('additional_assistant_ids', []));
+    
+        foreach ($allAssistantIds as $assistantId) {
+            $orgTraining->assistants()->create([
+                'org_training_program_id' => $orgTraining->id,
+                'assistant_id' => $assistantId,
+            ]);
+        }
+    
+        return redirect()->route('orgTraining.settings', $orgTraining->id)
+            ->with('success', 'تم إضافة المساعدين بنجاح.');
     }
 
-    return redirect()->route('orgTraining.settings', $orgTraining->id)
-        ->with('success', 'تم إضافة المساعدين بنجاح.');
-}
-
 // ======= الخطوة 5: الإعدادات الإضافية =======
-public function showSettingsForm($orgTrainingId)
-{
-  $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
+    public function showSettingsForm($orgTrainingId)
+    {
+        $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
 
-  // استخدام firstOrNew بدلاً من firstOrCreate
-  // هذا لا ينشئ سجلاً في قاعدة البيانات، فقط يعد كائن للعرض
-  $settings = $orgTraining->registrationRequirements()->firstOrNew([
-    'org_training_program_id' => $orgTrainingId,
-  ]);
+        // استخدام firstOrNew بدلاً من firstOrCreate
+        // هذا لا ينشئ سجلاً في قاعدة البيانات، فقط يعد كائن للعرض
+        $settings = $orgTraining->registrationRequirements()->firstOrNew([
+            'org_training_program_id' => $orgTrainingId,
+        ]);
 
-  // تحويل صور التدريب إلى مصفوفة إذا كانت موجودة
-  $training_image = [];
-  if ($settings->training_image) {
-    $training_image = is_string($settings->training_image)
-      ? json_decode($settings->training_image, true)
-      : $settings->training_image;
-  }
+        // تحويل صور التدريب إلى مصفوفة إذا كانت موجودة
+        $training_image = [];
+        if ($settings->training_image) {
+            $training_image = is_string($settings->training_image)
+                ? json_decode($settings->training_image, true)
+                : $settings->training_image;
+        }
 
-  // التأكد من أن application_submission_method هي قيمة نصية
-  $submissionMethod = $settings->application_submission_method;
-  if (is_object($submissionMethod)) {
-    $submissionMethod = $submissionMethod->value;
-  }
+        // التأكد من أن application_submission_method هي قيمة نصية
+        $submissionMethod = $settings->application_submission_method;
+        if (is_object($submissionMethod)) {
+            $submissionMethod = $submissionMethod->value;
+        }
 
-  if (!$settings->welcome_message) {
-  $settings->welcome_message = "شكرًا لتسجيلك في التدريب. يسعدنا أن تكون/ي جزءًا من هذا البرنامج، ونتطلع إلى رحلة مليئة بالتعلّم  والتطوير.
-سيتم مراجعة طلبك وإشعارك بالقبول أو الاعتذار في أقرب وقت، لذا تأكد/ي من متابعة بريدك الإلكتروني أو الإشعارات داخل المنصة.";
-}
+        if (!$settings->welcome_message) {
+            $settings->welcome_message = "شكرًا لتسجيلك في التدريب. يسعدنا أن تكون/ي جزءًا من هذا البرنامج، ونتطلع إلى رحلة مليئة بالتعلّم  والتطوير.
+            سيتم مراجعة طلبك وإشعارك بالقبول أو الاعتذار في أقرب وقت، لذا تأكد/ي من متابعة بريدك الإلكتروني أو الإشعارات داخل المنصة.";
+        }
 
 
-  return view('orgTrainings.settings', [
-    'training' => $orgTraining,
-    'settings' => $settings,
-    'countries' => Country::all(),
-    'training_files' => $training_image,
-    'submissionMethod' => $submissionMethod,  
-    ]);
-}
+        return view('orgTrainings.settings', [
+            'training' => $orgTraining,
+            'settings' => $settings,
+            'countries' => Country::all(),
+            'training_files' => $training_image,
+            'submissionMethod' => $submissionMethod,  
+        ]);
+    }
 
 public function storeSettings(StoreAdditionalSettingsRequest $request, $orgTrainingId)
 {
@@ -343,13 +339,15 @@ public function storeSettings(StoreAdditionalSettingsRequest $request, $orgTrain
         $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
         
         // Use firstOrCreate to either find or create the settings
-        $settings = $orgTraining->additionalSetting()->firstOrCreate([
+        $settings = $orgTraining->registrationRequirements()->firstOrCreate([
             'org_training_program_id' => $orgTrainingId,
         ], [
             'is_free' => 0, // Default value
             'application_deadline' => now()->addDays(30),
             'application_submission_method' => 'inside_platform',
             'max_trainees' => 20,
+            'requirements' => "Student",
+            'benefits' => 'learning',
             'welcome_message' => "شكرًا لتسجيلك في التدريب. يسعدنا أن تكون/ي جزءًا من هذا البرنامج، ونتطلع إلى رحلة مليئة بالتعلم والتطوير.",
         ]);
         
@@ -370,10 +368,16 @@ public function storeSettings(StoreAdditionalSettingsRequest $request, $orgTrain
 
         // Handle the training image upload
         if ($request->hasFile('training_image')) {
+            // Get the original file name
+            $originalName = $request->file('training_image')->getClientOriginalName();
+            
+            // Define the path where you want to store the image
+            $path = 'training/training_image/' . $originalName;
+        
             // Store the uploaded image
-            $path = $request->file('training_image')->store('training/training_image', 'public');
+            $request->file('training_image')->storeAs('training/training_image', $originalName, 'public');
             $data['training_image'] = $path;
-
+        
             // Delete old image if exists
             if ($settings->training_image) {
                 Storage::disk('public')->delete($settings->training_image);
@@ -384,7 +388,7 @@ public function storeSettings(StoreAdditionalSettingsRequest $request, $orgTrain
         $settings->fill([
             'org_training_program_id' => $orgTrainingId,
             'cost' => $data['cost'],
-            'is_free' => $data['is_free'],
+            'is_free' => $data['is_free'] ,
             'currency' => $data['currency'],
             'payment_method' => $data['payment_method'],
             'application_deadline' => $data['application_deadline'],
@@ -407,6 +411,83 @@ public function storeSettings(StoreAdditionalSettingsRequest $request, $orgTrain
         \Log::error('فشل تخزين إعدادات التدريب: ' . $e->getMessage());
         return redirect()->back()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
     }
+}
+
+public function showReviewForm($orgTrainingId)
+{
+    // Retrieve the training program and related data
+    $orgTraining = OrgTrainingProgram::with([
+        'details',
+        'assistants',
+        'registrationRequirements',
+        'goals',
+        'language',
+        'trainingClassification',
+        'trainingLevel'
+    ])->findOrFail($orgTrainingId);
+    
+    // Prepare submission method label
+    $applicationSubmissionMethodLabel = null;
+    if (!empty($orgTraining->registrationRequirements) && !empty($orgTraining->registrationRequirements->application_submission_method)) {
+        if (is_object($orgTraining->registrationRequirements->application_submission_method)) {
+            $applicationSubmissionMethodLabel = $orgTraining->registrationRequirements->application_submission_method->label();
+        } else {
+            try {
+                $applicationSubmissionMethodLabel = \App\Enums\ApplicationSubmissionMethod::from($orgTraining->registrationRequirements->application_submission_method)->label();
+            } catch (\ValueError $e) {
+                $applicationSubmissionMethodLabel = 'غير محدد';
+            }
+        }
+    }
+    
+    // Prepare training files
+    $trainingFiles = [];
+    if (!empty($orgTraining->registrationRequirements) && !empty($orgTraining->registrationRequirements->training_image)) {
+        $trainingFiles = is_string($orgTraining->registrationRequirements->training_image)
+            ? json_decode($orgTraining->registrationRequirements->training_image, true) 
+            : $orgTraining->registrationRequirements->training_image;
+    }
+    
+    // Prepare learning outcomes
+    $learningOutcomes = [];
+    if (!empty($orgTraining->goals) && !empty($orgTraining->goals->learning_outcomes)) {
+        $learningOutcomes = json_decode($orgTraining->goals->learning_outcomes ?? '[]', true);
+    }
+    
+    // Prepare requirements
+    $requirements = [];
+    if (!empty($orgTraining->registrationRequirements) && !empty($orgTraining->registrationRequirements->requirements)) {
+        $requirements = json_decode($orgTraining->registrationRequirements->requirements ?? '[]', true);
+    }
+    
+    // Prepare target audience
+    $targetAudience = [];
+    if (!empty($orgTraining->goals) && !empty($orgTraining->goals->target_audience)) {
+        $targetAudience = json_decode($orgTraining->goals->target_audience ?? '[]', true);
+    }
+    
+    // Prepare benefits
+    $benefits = [];
+    if (!empty($orgTraining->registrationRequirements) && !empty($orgTraining->registrationRequirements->benefits)) {
+        $benefits = json_decode($orgTraining->registrationRequirements->benefits ?? '[]', true);
+    }
+    
+    // Prepare welcome message
+    $welcomeMessage = 'مرحباً بكم في برنامجنا التدريبي! نحن سعداء بانضمامكم إلينا ونتطلع لتقديم تجربة تعليمية مميزة تلبي توقعاتكم وتساعدكم على تحقيق أهدافكم المهنية.';
+    if (!empty($orgTraining->registrationRequirements) && !empty($orgTraining->registrationRequirements->welcome_message)) {
+        $welcomeMessage = $orgTraining->registrationRequirements->welcome_message;
+    }
+    
+    return view('orgTrainings.review', [
+        'training' => $orgTraining,
+        'learning_outcomes' => $learningOutcomes,
+        'requirements' => $requirements,
+        'target_audience' => $targetAudience,
+        'benefits' => $benefits,
+        'training_files' => $trainingFiles,
+        'application_submission_method_label' => $applicationSubmissionMethodLabel,
+        'welcome_message' => $welcomeMessage,
+    ]);
 }
 
 }

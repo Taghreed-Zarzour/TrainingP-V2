@@ -46,6 +46,19 @@ class OrgTrainingProgram extends Model
     {
         return $this->hasOne(OrgRegistrationAndRequirement::class);
     }
-    
+    public function language()
+    {
+        return $this->belongsTo(Language::class, 'language_id');
+    }
+
+    public function trainingClassification()
+    {
+        return $this->belongsTo(TrainingClassification::class, 'org_training_classification_id');
+    }
+
+    public function trainingLevel()
+    {
+        return $this->belongsTo(TrainingLevel::class, 'training_level_id');
+    }
 
 }

@@ -23,7 +23,7 @@ class StoreAdditionalSettingsRequest extends FormRequest
 {
     return [
         'cost' => 'nullable|numeric',
-        'is_free' => 'required|boolean',
+        'is_free' => 'nullable|boolean',
         'currency' => 'nullable|string|max:10',
         'payment_method' => 'nullable|string|max:255',
         'application_deadline' => 'required|date',
@@ -40,8 +40,6 @@ public function messages(): array
     {
         return [
             'cost.numeric' => 'يجب أن تكون التكلفة رقمًا.',
-            'is_free.required' => 'يجب تحديد ما إذا كانت الدورة مجانية أم لا.',
-            'is_free.boolean' => 'يجب أن تكون القيمة صحيحة أو خاطئة.',
             'currency.string' => 'يجب أن تكون العملة نصًا.',
             'currency.max' => 'لا يمكن أن تتجاوز العملة 10 أحرف.',
             'payment_method.string' => 'يجب أن تكون طريقة الدفع نصًا.',

@@ -248,9 +248,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
     Route::post('/assistants/{orgTrainingId}', [OrgTrainingController::class, 'storeAssistants'])->name('orgTraining.storeAssistants');
 
     Route::get('/settings/{orgTrainingId}', [OrgTrainingController::class, 'showSettingsForm'])->name('orgTraining.settings');
-    Route::post('/settings', [OrgTrainingController::class, 'storeSettings'])->name('orgTraining.storeSettings');
+    Route::post('/settings/{orgTrainingId}', [OrgTrainingController::class, 'storeSettings'])->name('orgTraining.storeSettings');
 
-    Route::get('/review', [OrgTrainingController::class, 'showReviewForm'])->name('orgTraining.review');
+    Route::get('/review/{orgTrainingId}', [OrgTrainingController::class, 'showReviewForm'])->name('orgTraining.review');
 });
 });
 

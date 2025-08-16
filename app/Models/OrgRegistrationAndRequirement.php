@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrgRegistrationAndRequirement extends Model
 {
     use HasFactory;
-
+    protected $table = 'org_registeration_requirements';
     protected $fillable = [
         'org_training_program_id',
         'cost',
