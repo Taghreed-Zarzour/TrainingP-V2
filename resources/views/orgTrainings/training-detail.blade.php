@@ -28,7 +28,7 @@
             margin-top: 10px;
             margin-bottom: 5px;
         }
-        input[type="text"], input[type="file"] {
+        input[type="text"], input[type="file"], input[type="date"], select {
             width: 100%;
             padding: 12px;
             margin-bottom: 20px;
@@ -60,12 +60,24 @@
         .add-schedule-btn:hover, .add-title-btn:hover {
             background-color: #1e7e34;
         }
+        .text-danger {
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>تفاصيل التدريب</h1>
+    @if ($errors->any())
+        <div class="error">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form action="{{ route('orgTraining.storeTrainingDetails', $training->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
 
@@ -73,8 +85,22 @@
             <div class="training-title-group">
                 <label for="program_title">عنوان البرنامج</label>
                 <input type="text" name="program_title[]" required>
+                
+                @error('program_title.*')
+                <div class="text-danger">{{ $message }}</div>
+                @enderror
+
+                <label for="trainer_id">اختيار المدرب</label>
+                <select name="trainer_id[]" required>
+                    <option value="">اختر مدربًا</option>
+                    @foreach ($availableTrainers as $trainer)
+                        <option value="{{ $trainer->id }}">{{ $trainer->name }}</option>
+                    @endforeach
+                </select>
+
                 <div class="schedules-container"></div>
                 <button type="button" class="btn btn-success add-schedule-btn" onclick="addSchedule(this)">إضافة توقيت</button>
+                <button type="button" class="btn btn-info" onclick="toggleScheduleLater(this)">جدولة الجلسات لاحقًا</button>
             </div>
         </div>
 
@@ -82,6 +108,9 @@
 
         <label for="file">تحميل الملفات</label>
         <input type="file" name="file">
+        @error('file')
+        <div class="text-danger">{{ $message }}</div>
+        @enderror
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">حفظ</button>
@@ -90,17 +119,37 @@
 </div>
 
 <script>
-    function addSchedule(button) {
-        const schedulesContainer = button.previousElementSibling;
-        const scheduleGroup = document.createElement('div');
-        scheduleGroup.classList.add('schedule-group');
-        scheduleGroup.innerHTML = `
-            <label>أوقات الجلسات</label>
-            <input type="text" name="schedules[][date]" placeholder="تاريخ الجلسة" required>
-            <input type="text" name="schedules[][start_time]" placeholder="وقت بدء الجلسة" required>
-            <input type="text" name="schedules[][end_time]" placeholder="وقت انتهاء الجلسة" required>
-        `;
-        schedulesContainer.appendChild(scheduleGroup);
+   function addSchedule(button) {
+    const schedulesContainer = button.previousElementSibling;
+    const scheduleGroup = document.createElement('div');
+    scheduleGroup.classList.add('schedule-group');
+    scheduleGroup.innerHTML = `
+        <label>أوقات الجلسات</label>
+        <input type="date" name="schedules[][date]" required>
+        <label for="start_time">وقت بدء الجلسة</label>
+        <select name="schedules[][start_time]" required>
+            ${generateTimeOptions()}
+        </select>
+        <label for="end_time">وقت انتهاء الجلسة</label>
+        <select name="schedules[][end_time]" required>
+            ${generateTimeOptions()}
+        </select>
+        <button type="button" class="btn btn-danger" onclick="removeSchedule(this)">إزالة التوقيت</button>
+        <div class="text-danger"></div> <!-- Error display for this schedule -->
+    `;
+    schedulesContainer.appendChild(scheduleGroup);
+}
+
+    function generateTimeOptions() {
+        let options = '';
+        for (let hour = 0; hour < 24; hour++) {
+            for (let minute = 0; minute < 60; minute += 15) {
+                const formattedHour = hour.toString().padStart(2, '0');
+                const formattedMinute = minute.toString().padStart(2, '0');
+                options += `<option value="${formattedHour}:${formattedMinute}">${formattedHour}:${formattedMinute}</option>`;
+            }
+        }
+        return options;
     }
 
     function addTrainingTitle() {
@@ -110,10 +159,36 @@
         titleGroup.innerHTML = `
             <label for="program_title">عنوان البرنامج</label>
             <input type="text" name="program_title[]" required>
+            @error('program_title.*')
+            <div class="text-danger">{{ $message }}</div>
+            @enderror
+            <label for="trainer_id">اختيار المدرب</label>
+            <select name="trainer_id[]" required>
+                <option value="">اختر مدربًا</option>
+                @foreach ($availableTrainers as $trainer)
+                    <option value="{{ $trainer->id }}">{{ $trainer->name }}</option>
+                @endforeach
+            </select>
             <div class="schedules-container"></div>
             <button type="button" class="btn btn-success add-schedule-btn" onclick="addSchedule(this)">إضافة توقيت</button>
+            <button type="button" class="btn btn-info" onclick="toggleScheduleLater(this)">جدولة الجلسات لاحقًا</button>
         `;
         container.appendChild(titleGroup);
+    }
+
+    function removeSchedule(button) {
+        const scheduleGroup = button.parentElement;
+        scheduleGroup.remove();
+    }
+
+    function toggleScheduleLater(button) {
+        const titleGroup = button.parentElement;
+        const isChecked = button.classList.toggle('active');
+        if (isChecked) {
+            button.innerText = 'تم تحديد جدولة الجلسات لاحقًا';
+        } else {
+            button.innerText = 'جدولة الجلسات لاحقًا';
+        }
     }
 </script>
 

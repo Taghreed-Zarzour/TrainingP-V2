@@ -3,6 +3,8 @@
 namespace App\Http\Requests\orgTrainingProgram;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+
 
 class StoreSchedulingRequest extends FormRequest
 {
@@ -19,45 +21,58 @@ class StoreSchedulingRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
-        return [
-            'program_title' => 'required|string|max:255',
-            'schedules' => 'nullable|array',
-            'schedules.*.session_date' => 'required|date',
-            'schedules.*.session_start_time' => 'required|date_format:H:i',
-            'schedules.*.session_end_time' => 'required|date_format:H:i|after:schedules.*.session_start_time',
-            'trainer_id' => 'nullable|array',
-            'trainer_id.*' => 'exists:users,id',
-            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // Adjust file types and size as needed
-            'schedules_later' => 'boolean',
-        ];
-    }
+    public function rules()
+{
+    return [
+        'program_title' => 'required|array',
+        'program_title.*' => 'required|string|max:255',
+        'schedules' => 'nullable|array',
+        'schedules.*.date' => 'nullable|date_format:Y-m-d',
+        'schedules.*.start_time' => 'nullable|string|date_format:H:i',
+        'schedules.*.end_time' => 'nullable|string|date_format:H:i|after:schedules.*.start_time',
+        'trainer_id' => 'nullable|array',
+        'trainer_id.*' => 'exists:users,id',
+        'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        'schedules_later' => 'boolean',
+    ];
+}
+// protected function prepareForValidation()
+//     {
+//         // Log the incoming request data
+//         Log::info('Form Data Submitted:', $this->all());
+//     }
 
-    public function messages(): array
-    {
-        return [
-            'program_title.required' => 'عنوان البرنامج مطلوب.',
-            'program_title.string' => 'عنوان البرنامج يجب أن يكون نصًا.',
-            'program_title.max' => 'عنوان البرنامج لا يمكن أن يتجاوز 255 حرفًا.',
-            
-            'schedules.array' => 'يجب أن تكون الجداول على شكل مصفوفة.',
-            'schedules.*.session_date.required' => 'تاريخ الجلسة مطلوب.',
-            'schedules.*.session_date.date' => 'تاريخ الجلسة يجب أن يكون تاريخًا صحيحًا.',
-            'schedules.*.session_start_time.required' => 'وقت بدء الجلسة مطلوب.',
-            'schedules.*.session_start_time.date_format' => 'وقت بدء الجلسة يجب أن يكون بتنسيق HH:MM.',
-            'schedules.*.session_end_time.required' => 'وقت انتهاء الجلسة مطلوب.',
-            'schedules.*.session_end_time.date_format' => 'وقت انتهاء الجلسة يجب أن يكون بتنسيق HH:MM.',
-            'schedules.*.session_end_time.after' => 'وقت انتهاء الجلسة يجب أن يكون بعد وقت بدء الجلسة.',
-            
-            'trainer_id.array' => 'يجب أن يكون المدربون على شكل مصفوفة.',
-            'trainer_id.*.exists' => 'المدرب المحدد غير موجود في النظام.',
-            
-            'file.file' => 'يجب أن تكون الملف المحدد ملفًا.',
-            'file.mimes' => 'يجب أن يكون نوع الملف: pdf, jpg, jpeg, png.',
-            'file.max' => 'يجب ألا يتجاوز حجم الملف 2 ميجابايت.',
-            
-            'schedules_later.boolean' => 'يجب أن تكون القيمة صحيحة أو خاطئة.',
-        ];
-    }
+public function messages()
+{
+    return [
+        'program_title.required' => 'عنوان البرنامج مطلوب.',
+        'program_title.array' => 'يجب أن يكون عنوان البرنامج مصفوفة.',
+        'program_title.*.required' => 'كل عنوان برنامج مطلوب.',
+        'program_title.*.string' => 'يجب أن يكون عنوان البرنامج نصًا.',
+        'program_title.*.max' => 'عنوان البرنامج لا يمكن أن يتجاوز 255 حرفًا.',
+        
+        'schedules.array' => 'يجب أن يكون الجدول مصفوفة.',
+        
+        'schedules.*.date.required' => 'تاريخ الجلسة مطلوب.',
+        'schedules.*.date.date_format' => 'تاريخ الجلسة يجب أن يكون بتنسيق Y-m-d.',
+        
+        'schedules.*.start_time.required' => 'وقت بدء الجلسة مطلوب.',
+        'schedules.*.start_time.string' => 'وقت بدء الجلسة يجب أن يكون نصًا.',
+        'schedules.*.start_time.date_format' => 'وقت بدء الجلسة يجب أن يكون بتنسيق H:i.',
+        
+        'schedules.*.end_time.required' => 'وقت انتهاء الجلسة مطلوب.',
+        'schedules.*.end_time.string' => 'وقت انتهاء الجلسة يجب أن يكون نصًا.',
+        'schedules.*.end_time.date_format' => 'وقت انتهاء الجلسة يجب أن يكون بتنسيق H:i.',
+        'schedules.*.end_time.after' => 'وقت انتهاء الجلسة يجب أن يكون بعد وقت بدء الجلسة.',
+        
+        'trainer_id.array' => 'يجب أن تكون معرفات المدربين مصفوفة.',
+        'trainer_id.*.exists' => 'معرف المدرب غير موجود.',
+        
+        'file.file' => 'يجب أن يكون الملف ملفًا.',
+        'file.mimes' => 'يجب أن يكون الملف من نوع: pdf، jpg، jpeg، png.',
+        'file.max' => 'حجم الملف لا يمكن أن يتجاوز 2048 كيلوبايت.',
+        
+        'schedules_later.boolean' => 'يجب أن تكون القيمة صحيحة أو خاطئة.',
+    ];
+}
 }

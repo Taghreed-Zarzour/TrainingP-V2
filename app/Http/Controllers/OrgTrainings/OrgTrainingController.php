@@ -155,33 +155,33 @@ public function updateBasicInformation(updateBasicInformationRequest $request, $
     // =======  الخطوة 3: إدارة الفريق و التوقيت و الملفات=======
     public function showtrainingDetailForm($orgTrainingId)
 {
-   // Get training program details
-   $orgTrainingDetail = OrgTrainingDetail::where('org_training_program_id', $orgTrainingId)->first();
+    // Get training program details
+    $orgTrainingDetail = OrgTrainingDetail::where('org_training_program_id', $orgTrainingId)->first();
 
-   // Prepare data for the schedule part
-   $schedulesLater = $orgTrainingDetail ? ($orgTrainingDetail->schedule_later ? 1 : 0) : 0;
-   $sessions = $orgTrainingDetail ? ($orgTrainingDetail->sessions ?? collect()) : collect(); // Ensure it's a collection even if null
+    // Prepare data for the schedule part
+    $schedulesLater = $orgTrainingDetail ? ($orgTrainingDetail->schedule_later ? 1 : 0) : 0;
+    $sessions = $orgTrainingDetail ? ($orgTrainingDetail->sessions ?? collect()) : collect(); // Ensure it's a collection even if null
 
-   // Get organization training program for detail part
-   $orgTraining = OrgTrainingProgram::find($orgTrainingId); // Simplified lookup
+    // Get organization training program for detail part
+    $orgTraining = OrgTrainingProgram::find($orgTrainingId); // Simplified lookup
 
    // Prepare available trainers
-   $availableTrainers = User::whereHas('userType', function ($query) {
-       $query->where('type', 'مدرب');
-   })->get();
+    $availableTrainers = User::whereHas('userType', function ($query) {
+        $query->where('type', 'مدرب');
+    })->get();
 
    // Get current trainers and assistants
-   $currentTeam = $orgTraining ? $orgTraining->assistants()->get() : collect();
-   $currentTrainers = $currentTeam->whereNotNull('trainer_id')->pluck('trainer_id')->toArray();
+    $currentTeam = $orgTraining ? $orgTraining->assistants()->get() : collect();
+    $currentTrainers = $currentTeam->whereNotNull('trainer_id')->pluck('trainer_id')->toArray();
 
-   return view('orgTrainings.training-detail', [
-       'training' => $orgTraining,
-       'sessions' => $sessions,
-       'schedules_later' => $schedulesLater,
-       'availableTrainers' => $availableTrainers,
-       'currentTrainers' => $currentTrainers,
-       'orgTrainingDetail' => $orgTrainingDetail, // Pass the detail to the view
-   ]);
+    return view('orgTrainings.training-detail', [
+        'training' => $orgTraining,
+        'sessions' => $sessions,
+        'schedules_later' => $schedulesLater,
+        'availableTrainers' => $availableTrainers,
+        'currentTrainers' => $currentTrainers,
+        'orgTrainingDetail' => $orgTrainingDetail, // Pass the detail to the view
+    ]); 
 }
 
 public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingId)
@@ -192,26 +192,34 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
         $orgTraining = OrgTrainingProgram::findOrFail($trainingId);
         
         // Update schedules_later
-        $orgTraining->schedules_later = $request->boolean('schedules_later');
-        $orgTraining->save();
+        $orgTrainingDetail = $orgTraining->details()->first(); // Get the first detail entry
+        if ($orgTrainingDetail) {
+            $orgTrainingDetail->schedules_later = $request->boolean('schedules_later');
+            $orgTrainingDetail->save();
+        } else {
+            // Handle case where there are no existing details
+            $orgTrainingDetail = new OrgTrainingDetail();
+            $orgTrainingDetail->org_training_program_id = $orgTraining->id;
+            $orgTrainingDetail->schedules_later = $request->boolean('schedules_later');
+        }
 
         // Prepare data for a single entry
         $data = [
             'org_training_program_id' => $orgTraining->id,
             'program_title' => $request->program_title,
             'training_files' => null, // Initialize file path
-            'sessions' => [], // Initialize sessions
-            'trainer_ids' => [], // Initialize trainer IDs
+            'sessions' => $request->schedules ?? [], // Initialize sessions
+            'trainer_ids' => $request->trainer_id ?? [], // Initialize trainer IDs
         ];
 
         // Handle schedules
-        if (!$orgTraining->schedules_later && $request->filled('schedules')) {
+        if (!$orgTrainingDetail->schedules_later && $request->filled('schedules')) {
             foreach ($request->schedules as $schedule) {
                 // Collect session data
                 $data['sessions'][] = [
-                    'session_date' => $schedule['session_date'],
-                    'session_start_time' => $schedule['session_start_time'],
-                    'session_end_time' => $schedule['session_end_time'],
+                    'date' => $schedule['date'] ?? null,
+                    'start_time' => $schedule['start_time'] ?? null,
+                    'end_time' => $schedule['end_time'] ?? null,
                 ];
             }
         }
@@ -226,15 +234,17 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
         // Handle file upload if present
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $data['training_files'] = $file->store('orgTrainingProgram', 'public');
+            $originalName = $file->getClientOriginalName();
+            $data['training_files'] = $file->storeAs('orgTrainingProgram', $originalName, 'public');
         }
-
         // Create a single entry in OrgTrainingDetail
         OrgTrainingDetail::create([
             'org_training_program_id' => $data['org_training_program_id'],
             'program_title' => $data['program_title'],
             'training_files' => $data['training_files'],
-            'sessions' => $data['sessions'], // Store sessions as array
+            'session_start_time' => $data['sessions']['start_time'],
+            'session_end_time' => $data['sessions']['end_time'],
+            'session_date' => $data['sessions']['date'], // Store sessions as array
             'trainer_ids' => $data['trainer_ids'], // Store trainer IDs as array
         ]);
 
