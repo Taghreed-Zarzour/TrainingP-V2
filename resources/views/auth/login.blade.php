@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/individual-register.css') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('images/logos/logo.svg') }}">
+
 </head>
 
 <body class="login-container">

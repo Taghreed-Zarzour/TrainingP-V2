@@ -44,13 +44,13 @@
                                 <label class="form-label">اسم المؤسسة (بالعربية)</label>
                                 <input type="text" class="form-control" id="name_ar" name="name_ar"
                                     placeholder="مثال: مسك" pattern="[\u0600-\u06FF\s]+"
-                                    title="يجب أن يحتوي على حروف عربية فقط" required>
+                                    title="يجب أن يحتوي على حروف عربية فقط" required value="{{ old('name_ar') }}">
                                 <div class="error-message" id="name_ar_error">يجب إدخال اسم المؤسسة بالعربية</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">اسم المؤسسة بالإنجليزية (اختياري)</label>
                                 <input type="text" class="form-control" id="name_en" name="name_en"
-                                    placeholder="Example: Misk" style="direction: ltr">
+                                    placeholder="Example: Misk" style="direction: ltr" value="{{ old('name_en') }}">
                                 <div class="error-message" id="name_en_error">يجب إدخال اسم صحيح بالإنجليزية</div>
                             </div>
                             <div class="col-md-6">
@@ -59,7 +59,7 @@
                                     required>
                                     <option value="" selected disabled>اختر من القائمة نوع مؤسستك</option>
                                     @foreach ($organization_type as $type)
-                                        <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                        <option value="{{ $type->id }}" {{ old('organization_type_id') == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="organization_type_id_error">يجب اختيار نوع المؤسسة</div>
@@ -76,7 +76,7 @@
                                 <select class="form-select select2" id="organization_sectors"
                                     name="organization_sectors[]" multiple required>
                                     @foreach ($organization_sectors as $sector)
-                                        <option value="{{ $sector->id }}">{{ $sector->name }}</option>
+                                        <option value="{{ $sector->id }}" {{ in_array($sector->id, old('organization_sectors', [])) ? 'selected' : '' }}>{{ $sector->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="organization_sectors_error">يجب اختيار قطاع واحد على
@@ -88,7 +88,7 @@
                                     required>
                                     <option value="" selected disabled>اختر من القائمة مجال عدد الموظفين</option>
                                     @foreach ($employee_number as $number)
-                                        <option value="{{ $number->id }}">{{ $number->range }}</option>
+                                        <option value="{{ $number->id }}" {{ old('employee_numbers_id') == $number->id ? 'selected' : '' }}>{{ $number->range }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="employee_numbers_id_error">يجب اختيار عدد الموظفين</div>
@@ -99,7 +99,7 @@
                                     <option value="" selected disabled>اختر من القائمة مجال الموازنة السنوية
                                     </option>
                                     @foreach ($annual_budget as $budget)
-                                        <option value="{{ $budget->id }}">{{ $budget->name }}</option>
+                                        <option value="{{ $budget->id }}" {{ old('annual_budgets_id') == $budget->id ? 'selected' : '' }}>{{ $budget->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="annual_budgets_id_error">يجب اختيار الموازنة السنوية
@@ -110,16 +110,20 @@
                                 <select class="form-select" id="established_year" name="established_year" required>
                                     <option value="" selected disabled>اختر من القائمة عام تأسيس المؤسسة</option>
                                     @for ($year = date('Y'); $year >= 1900; $year--)
-                                        <option value="{{ $year }}">{{ $year }}</option>
+                                        <option value="{{ $year }}" {{ old('established_year') == $year ? 'selected' : '' }}>{{ $year }}</option>
                                     @endfor
                                 </select>
                                 <div class="error-message" id="established_year_error">يجب اختيار سنة التأسيس</div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12 position-relative">
                                 <label class="form-label">نبذة عن المؤسسة</label>
-                                <textarea class="form-control" style="min-height: 112px;" id="bio" name="bio"
-                                    placeholder="عرفنا بمؤسستك: نبذة مختصرة تعرف بالمؤسسة وتبرز مجالات عملها وأهدافها الرئيسية." required></textarea>
-                                <div class="error-message" id="bio_error">يجب كتابة نبذة عن المؤسسة</div>
+                                <textarea class="form-control pe-5" style="min-height: 112px;" id="bio" name="bio"
+                                    placeholder="عرفنا بمؤسستك: نبذة مختصرة تعرف بالمؤسسة وتبرز مجالات عملها وأهدافها الرئيسية." required minlength="50" maxlength="500">{{ old('bio') }}</textarea>
+                                <div class="char-counter-badge" id="charCounter">500</div>
+                                <div class="error-message" id="bio_error">
+                                    <i class="bi bi-exclamation-circle-fill"></i>
+                                    <span>يجب كتابة نبذة لا تقل عن 50 حرفاً ولا تزيد عن 500 حرفاً</span>
+                                </div>
                             </div>
                         </div>
                         <button type="button" class="btn btn-primary w-100 mt-4" onclick="validateStep1()">التالي
@@ -156,7 +160,7 @@
                                         <div class="dropdown position-relative" id="flagDropdown" dir="rtl">
                                             <div class="selected-flag d-flex align-items-center gap-1">
                                                 <span class="dropdown-arrow">🞃</span>
-                                                <img src="{{ asset('flags/tr.svg') }}" id="selectedFlag"
+                                                <img src="{{ asset('flags/' . old('country_code', 'tr') . '.svg') }}" id="selectedFlag"
                                                     class="flag-img" alt="flag">
                                             </div>
                                             <div class="flag-options" id="flagOptions">
@@ -177,15 +181,15 @@
                                         <div class="divider-line"></div>
 
                                         <!-- رمز الدولة -->
-                                        <div class="code-box" id="phoneCode" dir="ltr">+90</div>
+                                        <div class="code-box" id="phoneCode" dir="ltr">+{{ old('phone_code', '90') }}</div>
 
                                         <!-- حقل الإدخال -->
                                         <input type="text" id="phone_number" name="phone_number" required
                                             class="flex-grow-1 border-0 ps-2 phone-input" pattern="[0-9]{6,15}"
-                                            title="يجب أن يحتوي على أرقام فقط (6-15 رقم)">
+                                            title="يجب أن يحتوي على أرقام فقط (6-15 رقم)" value="{{ old('phone_number') }}">
 
                                         <!-- حقل مخفي لرمز الدولة -->
-                                        <input type="hidden" id="phone_code" name="phone_code" value="+90">
+                                        <input type="hidden" id="phone_code" name="phone_code" value="{{ old('phone_code', '+90') }}">
                                     </div>
                                 </div>
                                 <div class="error-message" id="phone_number_error">يجب إدخال رقم هاتف صحيح</div>
@@ -204,7 +208,7 @@
                                 <select class="form-select" id="country_id" name="country_id" required>
                                     <option value="" selected disabled>اختر الدولة</option>
                                     @foreach ($countries as $country)
-                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                        <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="country_id_error">يجب اختيار الدولة</div>
@@ -213,6 +217,9 @@
                                 <label class="form-label">المدينة</label>
                                 <select class="form-select" id="city" name="city" required>
                                     <option value="" selected disabled>اختر المدينة</option>
+                                    @if(old('city'))
+                                        <option value="{{ old('city') }}" selected>{{ old('city') }}</option>
+                                    @endif
                                 </select>
                                 <div class="error-message" id="city_error">يجب اختيار المدينة</div>
                             </div>
@@ -222,7 +229,7 @@
                                 <label class="form-label">الموقع الإلكتروني</label>
                                 <input type="url" class="form-control" id="website" name="website"
                                     placeholder="أدخل الموقع الإلكتروني الخاص بمؤسستك" style="direction: rtl;"
-                                    required>
+                                    required value="{{ old('website') }}">
                                 <div class="error-message" id="website_error">يجب إدخال موقع إلكتروني صحيح</div>
                             </div>
 
@@ -345,6 +352,12 @@
                     item.style.display = code.startsWith(value) ? "flex" : "none";
                 });
             });
+            
+            // تحميل البيانات المحفوظة
+            loadFormState();
+            
+            // تحديث عداد النبذة عند التحميل
+            updateBioCounter();
         });
 
         // دالة للتنقل بين الخطوات
@@ -472,8 +485,8 @@ if (!field.validation(value)) {
                 {
                     id: 'bio',
                     errorId: 'bio_error',
-                    validation: (value) => value && value.length >= 50,
-                    errorMessage: 'يجب كتابة نبذة لا تقل عن 50 حرفاً',
+                    validation: (value) => value && value.length >= 50 && value.length <= 500,
+                    errorMessage: 'يجب كتابة نبذة لا تقل عن 50 حرفاً ولا تزيد عن 500 حرفاً',
                     isSelect2: false
                 }
             ];
@@ -486,7 +499,7 @@ if (!field.validation(value)) {
         }
 
         // تحقق من صحة الخطوة 2
-        function validateForm() {
+        function validateStep2() {
             const fields = [{
                     id: 'phone_number',
                     errorId: 'phone_number_error',
@@ -582,72 +595,161 @@ if (!field.validation(value)) {
             }
         });
         
-        
+        // تحديث عداد النبذة
+        function updateBioCounter() {
+            const bioTextarea = document.getElementById('bio');
+            const charCounter = document.getElementById('charCounter');
+            const bioError = document.getElementById('bio_error');
+            const maxLength = 500;
+            const minLength = 50;
 
-
-
-        
-        // تهيئة اختيار رمز الدولة
-        const dropdown = document.getElementById("flagDropdown");
-        const flagOptions = document.getElementById("flagOptions");
-        const selectedFlag = document.getElementById("selectedFlag");
-        const phoneCode = document.getElementById("phoneCode");
-        const dropdownArrow = dropdown.querySelector(".dropdown-arrow");
-        const phoneCodeInput = document.getElementById("phone_code"); // الحقل المخفي
-
-        // متغير لتتبع حالة القائمة
-        let isDropdownOpen = false;
-
-        // حدث النقر على السهم أو المنطقة المحيطة به
-        dropdown.addEventListener("click", (e) => {
-            // إذا كان النقر على السهم تحديداً
-            if (e.target.classList.contains("dropdown-arrow")) {
-                isDropdownOpen = !isDropdownOpen;
-                flagOptions.style.display = isDropdownOpen ? "flex" : "none";
+            if (bioTextarea) {
+                const currentLength = bioTextarea.value.length;
+                const remaining = maxLength - currentLength;
+                
+                charCounter.textContent = remaining;
+                
+                if (currentLength > maxLength) {
+                    charCounter.classList.add('char-counter-danger');
+                    charCounter.classList.remove('char-counter-warning');
+                    bioError.querySelector('span').textContent = 'لقد تجاوزت الحد الأقصى لعدد الأحرف (500)';
+                    bioError.style.display = 'flex';
+                    bioTextarea.classList.add('is-invalid');
+                } 
+                else if (currentLength < minLength) {
+                    charCounter.classList.remove('char-counter-danger', 'char-counter-warning');
+                    bioError.querySelector('span').textContent = 'يجب كتابة نبذة لا تقل عن 50 حرفاً';
+                    bioError.style.display = 'flex';
+                    bioTextarea.classList.add('is-invalid');
+                } 
+                else if (remaining < 30) {
+                    charCounter.classList.add('char-counter-warning');
+                    charCounter.classList.remove('char-counter-danger');
+                    bioError.style.display = 'none';
+                    bioTextarea.classList.remove('is-invalid');
+                }
+                else {
+                    charCounter.classList.remove('char-counter-danger', 'char-counter-warning');
+                    bioError.style.display = 'none';
+                    bioTextarea.classList.remove('is-invalid');
+                }
             }
-            e.stopPropagation();
-        });
+        }
 
-        // حدث اختيار علم
-        document.querySelectorAll(".flag-item").forEach(item => {
-            item.addEventListener("click", () => {
-                const iso = item.getAttribute("data-iso");
-                const code = item.getAttribute("data-code");
-                selectedFlag.src = `/flags/${iso}.svg`;
-                phoneCode.textContent = `+${code}`;
-                phoneCodeInput.value = `+${code}`; // تحديث الحقل المخفي
-                flagOptions.style.display = "none";
-                isDropdownOpen = false;
-            });
-        });
-
-        // بحث رمز الدولة
-        const searchBox = document.getElementById("searchBox");
-        searchBox.addEventListener("input", function() {
-            const value = this.value.trim();
-            document.querySelectorAll(".flag-item").forEach(item => {
-                const code = item.getAttribute("data-code");
-                item.style.display = code.startsWith(value) ? "flex" : "none";
-            });
-        });
-
-        // إغلاق القائمة عند النقر خارجها
-        document.addEventListener("click", (e) => {
-            const isClickInside = dropdown.contains(e.target) ||
-                flagOptions.contains(e.target) ||
-                searchBox.contains(e.target);
-
-            if (!isClickInside) {
-                flagOptions.style.display = "none";
-                isDropdownOpen = false;
+        // استماع لتغييرات النبذة
+        document.getElementById('bio')?.addEventListener('input', updateBioCounter);
+        
+        // حفظ حالة النموذج
+      function saveFormState() {
+    const formData = {};
+    
+    // حفظ حقول النموذج الأساسية
+    $('#organizationForm').find('input, select, textarea').each(function() {
+        const $el = $(this);
+        const id = $el.attr('id');
+        
+        if (id) {
+            if ($el.attr('type') === 'radio' || $el.attr('type') === 'checkbox') {
+                if ($el.is(':checked')) {
+                    formData[id] = $el.val();
+                }
+            } else if ($el.is('select[multiple]')) {
+                formData[id] = $el.val() || [];
+            } else {
+                formData[id] = $el.val();
             }
+        }
+    });
+    
+    // حفظ بيانات الفروع
+    const branchesData = [];
+    $('.branch-item').each(function() {
+        const branchId = $(this).attr('id').replace('branch_', '');
+        const country = $(this).find('.branch-country').val();
+        const city = $(this).find('select[name="branch_city[]"]').val();
+        
+        branchesData.push({
+            id: branchId,
+            country: country,
+            city: city
         });
+    });
+    
+    formData.branches = branchesData;
+    
+    localStorage.setItem('organizationFormData', JSON.stringify(formData));
+}
+        // تحميل حالة النموذج
+    function loadFormState() {
+    const savedData = localStorage.getItem('organizationFormData');
+    if (savedData) {
+        const formData = JSON.parse(savedData);
+        
+        // تحميل الحقول الأساسية
+        for (const id in formData) {
+            if (id === 'branches') continue; // نتخطى بيانات الفروع مؤقتاً
+            
+            const $el = $('#' + id);
+            if ($el.length) {
+                if ($el.attr('type') === 'radio' || $el.attr('type') === 'checkbox') {
+                    $el.prop('checked', $el.val() == formData[id]);
+                } else if ($el.is('select[multiple]')) {
+                    $el.val(formData[id]).trigger('change');
+                } else {
+                    $el.val(formData[id]);
+                }
+            }
+        }
+        
+        // تحميل بيانات المدينة
+        if (formData.city) {
+            $('#city').val(formData.city);
+        }
+        
+        // تحميل بيانات الفروع
+        if (formData.branches && formData.branches.length > 0) {
+            formData.branches.forEach(branch => {
+                // إنشاء الفرع أولاً
+                addBranch();
+                
+                // تعبئة بيانات الفرع
+                const branchEl = $(`#branch_${branch.id}`);
+                if (branchEl.length) {
+                    // تعيين الدولة
+                    branchEl.find('.branch-country').val(branch.country).trigger('change');
+                    
+                    // بعد تأخير بسيط لضمان تحميل المدن
+                    setTimeout(() => {
+                        branchEl.find('select[name="branch_city[]"]').val(branch.city);
+                    }, 500);
+                }
+            });
+        }
+        
+        // تحديث select2 إذا كان مستخدماً
+        if ($.fn.select2) {
+            $('.select2').each(function() {
+                const $select = $(this);
+                if ($select.val()) {
+                    $select.trigger('change');
+                }
+            });
+        }
+        
+        // تحديث عداد النبذة
+        updateBioCounter();
+    }
+}
 
-        // منع إغلاق القائمة عند النقر داخل حقل البحث
-        searchBox.addEventListener("click", function(e) {
-            e.stopPropagation();
-            flagOptions.style.display = "flex";
-            isDropdownOpen = true;
+        
+        // استماع لتغييرات النموذج
+        $('#organizationForm').on('change', 'input, select, textarea', function() {
+            saveFormState();
+        });
+        
+        // تنظيف البيانات عند إرسال النموذج بنجاح
+        $('#organizationForm').on('submit', function() {
+            localStorage.removeItem('organizationFormData');
         });
     </script>
 </body>

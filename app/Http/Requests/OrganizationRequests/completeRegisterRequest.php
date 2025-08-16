@@ -37,7 +37,7 @@ class completeRegisterRequest extends FormRequest
         'organization_sectors.*' => 'exists:organization_sectors,id',
         'established_year' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
 
-        'bio' => 'required|string|min:10|max:2000',
+        'bio' => 'required|string|min:50|max:500',
 
         'branch_country_id' => 'nullable|array',
         'branch_country_id.*' => 'required|exists:countries,id',
@@ -86,8 +86,8 @@ public function messages(): array
 
 
         'bio.required' => 'النبذة مطلوبة',
-        'bio.min' => 'يجب ألا تقل النبذة عن 10 أحرف',
-        'bio.max' => 'يجب ألا تزيد النبذة عن 2000 حرف',
+        'bio.min' => 'يجب ألا تقل النبذة عن 50 أحرف',
+        'bio.max' => 'يجب ألا تزيد النبذة عن 500 حرف',
 
         'branch_country_id.array' => 'يجب أن تكون الدول في صيغة مصفوفة.',
         'branch_country_id.*.required' => 'يرجى اختيار الدولة لكل فرع.',

@@ -129,20 +129,20 @@
         <span class="error-message">{{ $message }}</span>
     @enderror
 </div>
-                                <div style="width: 100%;">
-                                    <select class="custom-singleselect @error('currency') error-border @enderror" name="currency">
-                                        <option value="USD" {{ old('currency', $settings->currency ?? '') == 'USD' ? 'selected' : '' }}>دولار أمريكي</option>
-                                        <option value="EUR" {{ old('currency', $settings->currency ?? '') == 'EUR' ? 'selected' : '' }}>يورو</option>
-                                        <option value="GBP" {{ old('currency', $settings->currency ?? '') == 'GBP' ? 'selected' : '' }}>جنيه إسترليني</option>
-                                        <option value="JPY" {{ old('currency', $settings->currency ?? '') == 'JPY' ? 'selected' : '' }}>ين ياباني</option>
-                                        <option value="KRW" {{ old('currency', $settings->currency ?? '') == 'KRW' ? 'selected' : '' }}>وون كوري</option>
-                                        <option value="CNY" {{ old('currency', $settings->currency ?? '') == 'CNY' ? 'selected' : '' }}>يوان ين</option>
-                                        <option value="SAR" {{ old('currency', $settings->currency ?? '') == 'SAR' ? 'selected' : '' }}>ريال سعودي</option>
-                                    </select>
-                                    @error('currency')
-                                        <span class="error-message">{{ $message }}</span>
-                                    @enderror
-                                </div>
+                              <div style="width: 100%;">
+    <select class="custom-singleselect @error('currency') error-border @enderror" name="currency">
+        @foreach(\App\Enums\Currency::cases() as $currency)
+            <option value="{{ $currency->value }}" 
+                {{ old('currency', $settings->currency ?? '') === $currency->value ? 'selected' : '' }}>
+                {{ $currency->label() }}
+            </option>
+        @endforeach
+    </select>
+    @error('currency')
+        <span class="error-message">{{ $message }}</span>
+    @enderror
+</div>
+
                             </div>
                             <div class="input-group mt-4">
                                 <label>آلية الدفع <span class="required">*</span></label>

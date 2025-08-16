@@ -31,7 +31,7 @@ class completeRegisterRequest extends FormRequest
 
       'country_id' => 'required|exists:countries,id',
 
-      'bio' => 'nullable|string',
+      'bio' => 'nullable|string|min:50|max:500',
 
       'name_en' => 'nullable|string|max:255',
       'name_ar' => 'required|string|max:255',
@@ -85,6 +85,8 @@ class completeRegisterRequest extends FormRequest
       'country_id.exists' => 'الدولة المحددة غير صحيحة.',
 
       'bio.string' => 'يجب أن يكون الوصف نصًا.',
+        'bio.min' => 'يجب ألا تقل النبذة عن 50 أحرف',
+        'bio.max' => 'يجب ألا تزيد النبذة عن 500 حرف',
 
       'name_en.string' => 'يجب أن يكون الاسم باللغة الإنجليزية نصًا.',
       'name_en.max' => 'يجب ألا يتجاوز الاسم باللغة الإنجليزية 255 حرفًا.',

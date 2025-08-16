@@ -1,17 +1,15 @@
-<?php
-
-namespace Database\Seeders;
-
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-
-class CountrySeeder extends Seeder
-{
-    public function run()
-    {
-        try {
-
-            $sql = "INSERT INTO `countries` VALUES (3041565,'AD','ca','Andorra','اندورا','اندورا','+376',42.535,1.55903),
+CREATE TABLE IF NOT EXISTS `countries` (
+    `id` INT,
+    `iso2` VARCHAR(2) CHARACTER SET utf8,
+    `Languages` VARCHAR(92) CHARACTER SET utf8,
+    `Name_EN` VARCHAR(44) CHARACTER SET utf8,
+    `Name_FA` VARCHAR(35) CHARACTER SET utf8,
+    `name` VARCHAR(38) CHARACTER SET utf8,
+    `phonecode` VARCHAR(16) CHARACTER SET utf8,
+    `Latitude` NUMERIC(7, 5),
+    `Longitude` NUMERIC(8, 5)
+);
+INSERT INTO `countries` VALUES (3041565,'AD','ca','Andorra','اندورا','اندورا','+376',42.535,1.55903),
 	(290557,'AE','ar-AE,fa,en,hi,ur','United Arab Emirates','امارات متحده عربی','الامارات العربية المتحدة','+971',25.05543,55.37373),
 	(1149361,'AF','fa-AF,ps,uz-AF,tk','Afghanistan','افغانستان','افغانستان','+93',34.61548,67.53237),
 	(3576396,'AG','en-AG','Antigua and Barbuda','انتیگوا و باربودا','انتيغوا وبربودا','+1-268',17.10227,-61.80866),
@@ -262,11 +260,4 @@ class CountrySeeder extends Seeder
 	(895949,'ZM','en-ZM,bem,loz,lun,lue,ny,toi','Zambia','زامبیا','زامبيا','+260',-13.55052,28.12245),
 	(878675,'ZW','en-ZW,sn,nr,nd','Zimbabwe','زیمبابوه','زيمبابوي','+263',-18.49415,30.35458);
 INSERT INTO `countries` VALUES (8505033,'cs','cu,hu,sq,sr','Serbia and Montenegro',NULL,'صربيا والجبل الاسود','+381',0,0),
-	(8505032,'AN','nl-AN,en,es','Netherlands Antilles',NULL,'الانتيل الهولندية','+599',0,0);";
-
-            DB::statement($sql);
-        } catch (\Throwable $th) {
-            
-        }
-    }
-}
+	(8505032,'AN','nl-AN,en,es','Netherlands Antilles',NULL,'الانتيل الهولندية','+599',0,0);

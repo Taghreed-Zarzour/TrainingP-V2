@@ -35,13 +35,10 @@
     </label>
 </div>
 
-<input type="hidden" id="user_type_id" name="user_type_id" value="">
 
             <form method="POST" action="{{ route('register') }}" id="registerForm">
                 @csrf
-                <input type="hidden" id="user_type_id" name="user_type_id" value="{{ old('user_type_id') }}" required>
-
-                <div class="form-group">
+    <input type="hidden" id="user_type_id" name="user_type_id" value="{{ old('user_type_id', $settings->user_type_id ?? '') }}">                <div class="form-group">
                     <label class="form-label">البريد الإلكتروني</label>
                                       <div class="input-wrapper">
                         <span class="input-icon">
@@ -150,12 +147,6 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('/js/eye-password.js') }}"></script>
-
-    <script>
-        function setUserType(typeId) {
-            document.getElementById('user_type_id').value = typeId;
-        }
-</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // تحديد نوع المستخدم من الرابط
@@ -163,24 +154,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const userType = urlParams.get('user_type');
     
     if (userType) {
-        // تحويل القيمة إلى رقم للتأكد من المطابقة
         const roleValue = parseInt(userType);
-        
-        // تحديد الراديو المناسب
         const radioBtn = document.querySelector(`input[type="radio"][value="${roleValue}"]`);
         
         if (radioBtn) {
             radioBtn.checked = true;
             document.getElementById('user_type_id').value = roleValue;
-        } else {
-            console.error('لم يتم العثور على زر الراديو المطابق للقيمة:', roleValue);
+        }
+    }
+
+    // تعيين القيمة الافتراضية إذا كانت موجودة
+    const defaultUserType = "{{ old('user_type_id', $settings->user_type_id ?? '') }}";
+    if (defaultUserType) {
+        const radioBtn = document.querySelector(`input[type="radio"][value="${defaultUserType}"]`);
+        if (radioBtn) {
+            radioBtn.checked = true;
+            document.getElementById('user_type_id').value = defaultUserType;
         }
     }
 });
 
+// استخدم نفس اسم الحقل كما في الكود القديم
 function setUserType(typeId) {
     document.getElementById('user_type_id').value = typeId;
+    console.log('تم تعيين نوع المستخدم إلى:', typeId); // لأغراض التصحيح
 }
 </script>
+    <script>
+        function setUserType(typeId) {
+            document.getElementById('user_type_id').value = typeId;
+        }
+</script>
+
   </body>
 </html>

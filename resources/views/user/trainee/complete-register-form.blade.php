@@ -185,116 +185,321 @@ tbody td:first-child {
                                 <label class="form-label">الاسم (بالعربية)</label>
                                 <input type="text" id="name_ar" name="name_ar" class="form-control" required
                                     placeholder="مثال: أحمد" pattern="[\u0600-\u06FF\s]+"
-                                    title="يجب أن يحتوي على حروف عربية فقط">
+                                    title="يجب أن يحتوي على حروف عربية فقط" value="{{ old('name_ar') }}">
                                 <div class="error-message" id="name_ar_error">يجب إدخال الاسم بالعربية بشكل صحيح</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">الكنية (بالعربية)</label>
                                 <input type="text" id="last_name_ar" name="last_name_ar" class="form-control"
                                     required placeholder="مثال: العلي" pattern="[\u0600-\u06FF\s]+"
-                                    title="يجب أن يحتوي على حروف عربية فقط">
+                                    title="يجب أن يحتوي على حروف عربية فقط" value="{{ old('last_name_ar') }}">
                                 <div class="error-message" id="last_name_ar_error">يجب إدخال الكنية بالعربية بشكل صحيح
                                 </div>
                             </div>
-                            {{-- <div class="col-md-6">
-                                <label class="form-label">الاسم (بالإنجليزية)</label>
-                                <input type="text" id="name_en" name="name_en" required style="direction: ltr"
-                                    class="form-control" placeholder="Example: Ali" pattern="[A-Za-z\s]+"
-                                    title="يجب أن يحتوي على حروف إنجليزية فقط">
-                                <div class="error-message" id="name_en_error">يجب إدخال الاسم بالإنجليزية بشكل صحيح</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">الكنية (بالإنجليزية)</label>
-                                <input type="text" id="last_name_en" name="last_name_en" required style="direction: ltr"
-                                    class="form-control" placeholder="Example: Alali" pattern="[A-Za-z\s]+"
-                                    title="يجب أن يحتوي على حروف إنجليزية فقط">
-                                <div class="error-message" id="last_name_en_error">يجب إدخال الكنية بالإنجليزية بشكل صحيح
-                                </div>
-                            </div> --}}
                             <div class="col-md-6">
                                 <label class="form-label">مستوى التعليم</label>
                                 <select id="education_levels" name="education_levels_id" class="form-select" required>
                                     <option value="" selected disabled>اختر آخر مؤهل دراسي حصلت عليه</option>
                                     @foreach ($educatuin_levels as $education_level)
-                                        <option value="{{ $education_level->id }}">{{ $education_level->name }}</option>
+                                        <option value="{{ $education_level->id }}" {{ old('education_levels_id') == $education_level->id ? 'selected' : '' }}>
+                                            {{ $education_level->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 <div class="error-message" id="education_levels_error">يجب اختيار مستوى التعليم</div>
-
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">مجالات العمل</label>
                                 <select class="form-select select2" id="work_fields" name="work_fields[]" multiple
                                     data-placeholder="اختر من القائمة أو أضف مجالًا جديدًا" required>
-
                                     @foreach ($work_fields as $work_field)
-                                        <option value="{{ $work_field->id }}">{{ $work_field->name }}</option>
+                                        <option value="{{ $work_field->id }}" {{ in_array($work_field->id, old('work_fields', [])) ? 'selected' : '' }}>
+                                            {{ $work_field->name }}
+                                        </option>
                                     @endforeach
-                                    <option value="other">أخرى (حدد في الأسفل)</option>
+                                    <option value="other" {{ in_array('other', old('work_fields', [])) ? 'selected' : '' }}>أخرى (حدد في الأسفل)</option>
                                 </select>
-            
-    </div>
-                                <div class="col-md-12" id="extra_work_field_container" style="display: none;">
+                            </div>
+                            
+                            <div class="col-md-12" id="extra_work_field_container" style="display: none;">
                                 <label class="form-label">مجال عمل إضافي</label>
                                 <input type="text" id="extra_work_field" name="extra_work_field"
-                                    class="form-control" placeholder="أدخل مجال العمل الإضافي">
+                                    class="form-control" placeholder="أدخل مجال العمل الإضافي" value="{{ old('extra_work_field') }}">
                                 <div class="error-message" id="extra_work_field_error">يجب إدخال مجال العمل الإضافي
                                 </div>
                             </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label">رقم الهاتف</label>
-                                    <input type="text" id="phone_number" name="phone_number" required
-                                        class="form-control phone-ltr" pattern="\+?[0-9]{6,20}"
-                                        title="يجب أن يحتوي على أرقام فقط (6-20 رقم)"
-                                        placeholder="مثال: 00963xxxxxxxxx">
-                                    <div class="error-message" id="phone_number_error">يجب إدخال رقم هاتف صحيح</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">الجنسية</label>
-                                    <select id="nationality" class="form-select select2" name="nationality[]"
-                                        multiple data-placeholder="اختر من القائمة الدولة التي تحمل جنسيتها" required>
-                                        @foreach ($nationalities as $nationality)
-                                            <option value="{{ $nationality->id }}">{{ $nationality->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <div class="error-message" id="nationality_error">يجب اختيار الجنسية</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">الدولة</label>
-                                    <select id="country_id" name="country_id" class="form-select" required>
-                                        <option value="" selected disabled>اختر دولتك</option>
-                                        @foreach ($countries as $country)
-                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <div class="error-message" id="country_id_error">يجب اختيار الدولة</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">المدينة</label>
-                                    <select id="city" name="city" class="form-select" required>
-                                        <option value="" selected disabled>اختر المدينة</option>
-                                    </select>
-                                    <div class="error-message" id="city_error">يجب اختيار المدينة</div>
-                                </div>
-                                <div class="col-md-12 d-flex gap-3 align-items-center mt-4">
-                                    @foreach ($sexs as $sex)
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="sex"
-                                                id="sex_{{ $sex->value }}" value="{{ $sex->value }}"
-                                                {{ old('sex') == $sex->value ? 'checked' : '' }} required>
-                                            <label class="form-check-label" for="gender_{{ $sex->value }}">
-                                                {{ $sex->value }}
-                                            </label>
+                            <div class="col-md-6">
+                                <label class="form-label">رقم الهاتف</label>
+                                <div class="form-control p-0" dir="ltr">
+                                    <div class="d-flex align-items-center w-100 ps-3 pe-3 gap-2"
+                                        style="min-height: 48px;" id="phoneWrapper">
+                                        <div class="dropdown position-relative" id="flagDropdown" dir="rtl">
+                                            <div class="selected-flag d-flex align-items-center gap-1">
+                                                <span class="dropdown-arrow">🞃</span>
+                                                <img src="{{ asset('flags/' . old('country_code', 'tr') . '.svg') }}"
+                                                    id="selectedFlag" class="flag-img" alt="flag">
+                                            </div>
+                                            <div class="flag-options" id="flagOptions">
+                                                <input type="text" id="searchBox" class="search-box"
+                                                    placeholder="اكتب رمز الدولة...">
+                                                @foreach ($countries as $country)
+                                                    <div class="flag-item" data-code="{{ $country->phonecode }}"
+                                                        data-iso="{{ strtolower($country->iso2) }}">
+                                                        <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
+                                                            class="flag-img">
+                                                        <span class="flag-code">{{ $country->phonecode }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                    @endforeach
+                                        <!-- Divider -->
+                                        <div class="divider-line"></div>
+                                        <!-- رمز الدولة -->
+                                        <div class="code-box" id="phoneCode" dir="ltr">
+                                            {{ old('phone_code', '+90') }}</div>
+                                        <!-- حقل الإدخال -->
+                                        <input type="text" id="phone_number" name="phone_number" required
+                                            class="flex-grow-1 border-0 ps-2 phone-input" pattern="[0-9]{6,15}"
+                                            title="يجب أن يحتوي على أرقام فقط (6-15 رقم)"
+                                            value="{{ old('phone_number') }}">
+                                        <!-- حقل مخفي لرمز الدولة -->
+                                        <input type="hidden" id="phone_code" name="phone_code"
+                                            value="{{ old('phone_code', '+90') }}">
+                                    </div>
                                 </div>
-                                <div class="error-message" id="gender_error">يجب اختيار الجنس</div>
+                                <div class="error-message" id="phone_number_error">يجب إدخال رقم هاتف صحيح</div>
                             </div>
 
-                            <button type="button" class="btn btn-primary w-100 mt-4" onclick="validateStep1()">
-                                احفظ وتابع
+                            <div class="col-md-6">
+                                <label class="form-label">الجنسية</label>
+                                <select id="nationality" class="form-select select2" name="nationality[]"
+                                    multiple data-placeholder="اختر من القائمة الدولة التي تحمل جنسيتها" required>
+                                    @foreach ($nationalities as $nationality)
+                                        <option value="{{ $nationality->id }}" {{ in_array($nationality->id, old('nationality', [])) ? 'selected' : '' }}>
+                                            {{ $nationality->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="error-message" id="nationality_error">يجب اختيار الجنسية</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">الدولة</label>
+                                <select id="country_id" name="country_id" class="form-select" required>
+                                    <option value="" selected disabled>اختر دولتك</option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>
+                                            {{ $country->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="error-message" id="country_id_error">يجب اختيار الدولة</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">المدينة</label>
+                                <select id="city" name="city" class="form-select" required>
+                                    <option value="" selected disabled>اختر المدينة</option>
+                                    @if(old('city'))
+                                        <option value="{{ old('city') }}" selected>{{ old('city') }}</option>
+                                    @endif
+                                </select>
+                                <div class="error-message" id="city_error">يجب اختيار المدينة</div>
+                            </div>
+                            <div class="col-md-12 d-flex gap-3 align-items-center mt-4">
+                                @foreach ($sexs as $sex)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sex"
+                                            id="sex_{{ $sex->value }}" value="{{ $sex->value }}"
+                                            {{ old('sex') == $sex->value ? 'checked' : '' }} required>
+                                        <label class="form-check-label" for="gender_{{ $sex->value }}">
+                                            {{ $sex->value }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="error-message" id="gender_error">يجب اختيار الجنس</div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary w-100 mt-4" onclick="validateStep1()">
+                            احفظ وتابع
+                            <svg width="25" height="24" viewBox="0 0 25 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M10.0706 18.819C9.97208 18.8194 9.87448 18.8001 9.78348 18.7623C9.69248 18.7246 9.60992 18.669 9.54061 18.599L3.47161 12.529C3.33213 12.3879 3.25391 12.1975 3.25391 11.999C3.25391 11.8006 3.33213 11.6102 3.47161 11.469L9.54061 5.40002C9.68278 5.26754 9.87083 5.19542 10.0651 5.19885C10.2594 5.20228 10.4448 5.28099 10.5822 5.4184C10.7196 5.55581 10.7984 5.7412 10.8018 5.9355C10.8052 6.1298 10.7331 6.31785 10.6006 6.46002L5.06061 12L10.6006 17.54C10.7401 17.6812 10.8183 17.8716 10.8183 18.07C10.8183 18.2685 10.7401 18.4589 10.6006 18.6C10.5318 18.6706 10.4493 18.7265 10.3582 18.7642C10.2671 18.8018 10.1692 18.8205 10.0706 18.819Z"
+                                    fill="white" />
+                                <path
+                                    d="M20.9999 12.75H4.16992C3.97141 12.7487 3.78141 12.6693 3.64104 12.5289C3.50067 12.3885 3.42123 12.1985 3.41992 12C3.42123 11.8015 3.50067 11.6115 3.64104 11.4711C3.78141 11.3307 3.97141 11.2513 4.16992 11.25H20.9999C21.1984 11.2513 21.3884 11.3307 21.5288 11.4711C21.6692 11.6115 21.7486 11.8015 21.7499 12C21.7486 12.1985 21.6692 12.3885 21.5288 12.5289C21.3884 12.6693 21.1984 12.7487 20.9999 12.75Z"
+                                    fill="white" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- الخطوة 2: البيانات المهنية -->
+                    <div class="step-form" id="step2">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">المجالات التي تهمك</label>
+                                <select class="form-select select2" id="fields_of_interest"
+                                    name="fields_of_interest[]" data-placeholder="اختر مجالات اهتمامك" multiple
+                                    required>
+                                    @foreach (\App\Enums\ImportantTopicsType::cases() as $topic)
+                                        <option value="{{ $topic->value }}"
+                                            {{ in_array($topic->value, old('fields_of_interest', [])) ? 'selected' : '' }}>
+                                            {{ $topic->value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="error-message" id="fields_of_interest_error">يجب اختيار مجالات الاهتمام
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">هل تعمل حالياً؟</label>
+                                <div class="d-flex gap-3 align-items-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="is_working"
+                                            id="is_working_yes" value="1" {{ old('is_working') == '1' ? 'checked' : '' }} required>
+                                        <label class="form-check-label" for="is_working_yes">نعم</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="is_working"
+                                            id="is_working_no" value="0" {{ old('is_working') == '0' ? 'checked' : (!old('is_working') ? 'checked' : '') }} required>
+                                        <label class="form-check-label" for="is_working_no">لا</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12" style="display: none;">
+                                <label class="form-label">القطاع الذي تعمل به</label>
+                                <select class="form-select" id="work_sectors" name="work_sectors">
+                                    <option value="" selected disabled>اختر القطاع</option>
+                                    @foreach ($work_sectors as $sector)
+                                        <option value="{{ $sector->id }}" {{ old('work_sectors') == $sector->id ? 'selected' : '' }}>
+                                            {{ $sector->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="error-message" id="work_sectors_error">يجب اختيار القطاع</div>
+                            </div>
+
+                            <div class="col-md-12" style="display: none;">
+                                <label class="form-label">المنصب الوظيفي</label>
+                                <select id="job_position" name="job_position" class="form-control">
+                                    <option value="" selected disabled>اختر المنصب الوظيفي</option>
+                                    @foreach(App\Enums\JobPositionEnum::values() as $position)
+                                        <option value="{{ $position }}" {{ old('job_position') == $position ? 'selected' : '' }}>
+                                            {{ $position }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="error-message" id="job_position_error">يجب إدخال المنصب الوظيفي</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">الأوقات التي تناسبك لحضور التدريبات</label>
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>اليوم</th>
+                                                <th>6 - 9 صباحًا</th>
+                                                <th>9 - 12 صباحًا</th>
+                                                <th>12 - 3 ظهرًا</th>
+                                                <th>3 - 6 عصرًا</th>
+                                                <th>6 - 9 مساءً</th>
+                                                <th>9 - 12 ليلًا</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php
+                                                $preferredTimes = old('preferred_times', []);
+                                            @endphp
+                                            <tr>
+                                                <td data-label="اليوم">السبت</td>
+                                                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="sat_6_9_am" {{ in_array('sat_6_9_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="sat_9_12_am" {{ in_array('sat_9_12_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="sat_12_3_pm" {{ in_array('sat_12_3_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="sat_3_6_pm" {{ in_array('sat_3_6_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="sat_6_9_pm" {{ in_array('sat_6_9_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="sat_9_12_pm" {{ in_array('sat_9_12_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                            </tr>
+                                            <tr>
+                                                <td data-label="اليوم">الأحد</td>
+                                                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="sun_6_9_am" {{ in_array('sun_6_9_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="sun_9_12_am" {{ in_array('sun_9_12_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="sun_12_3_pm" {{ in_array('sun_12_3_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="sun_3_6_pm" {{ in_array('sun_3_6_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="sun_6_9_pm" {{ in_array('sun_6_9_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="sun_9_12_pm" {{ in_array('sun_9_12_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                            </tr>
+                                            <tr>
+                                                <td data-label="اليوم">الإثنين</td>
+                                                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="mon_6_9_am" {{ in_array('mon_6_9_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="mon_9_12_am" {{ in_array('mon_9_12_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="mon_12_3_pm" {{ in_array('mon_12_3_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="mon_3_6_pm" {{ in_array('mon_3_6_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="mon_6_9_pm" {{ in_array('mon_6_9_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="mon_9_12_pm" {{ in_array('mon_9_12_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                            </tr>
+                                            <tr>
+                                                <td data-label="اليوم">الثلاثاء</td>
+                                                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="tue_6_9_am" {{ in_array('tue_6_9_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="tue_9_12_am" {{ in_array('tue_9_12_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="tue_12_3_pm" {{ in_array('tue_12_3_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="tue_3_6_pm" {{ in_array('tue_3_6_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="tue_6_9_pm" {{ in_array('tue_6_9_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="tue_9_12_pm" {{ in_array('tue_9_12_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                            </tr>
+                                            <tr>
+                                                <td data-label="اليوم">الأربعاء</td>
+                                                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="wed_6_9_am" {{ in_array('wed_6_9_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="wed_9_12_am" {{ in_array('wed_9_12_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="wed_12_3_pm" {{ in_array('wed_12_3_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="wed_3_6_pm" {{ in_array('wed_3_6_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="wed_6_9_pm" {{ in_array('wed_6_9_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="wed_9_12_pm" {{ in_array('wed_9_12_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                            </tr>
+                                            <tr>
+                                                <td data-label="اليوم">الخميس</td>
+                                                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="thu_6_9_am" {{ in_array('thu_6_9_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="thu_9_12_am" {{ in_array('thu_9_12_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="thu_12_3_pm" {{ in_array('thu_12_3_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="thu_3_6_pm" {{ in_array('thu_3_6_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="thu_6_9_pm" {{ in_array('thu_6_9_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="thu_9_12_pm" {{ in_array('thu_9_12_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                            </tr>
+                                            <tr>
+                                                <td data-label="اليوم">الجمعة</td>
+                                                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="fri_6_9_am" {{ in_array('fri_6_9_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="fri_9_12_am" {{ in_array('fri_9_12_am', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="fri_12_3_pm" {{ in_array('fri_12_3_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="fri_3_6_pm" {{ in_array('fri_3_6_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="fri_6_9_pm" {{ in_array('fri_6_9_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="fri_9_12_pm" {{ in_array('fri_9_12_pm', $preferredTimes) ? 'checked' : '' }}></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="error-message" id="preferred_times_error">يجب اختيار الأوقات المناسبة على الأقل في يومين</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">كيف تفضل حضور التدريب؟</label>
+                                <select class="form-select" id="training_attendance" name="training_attendance" required>
+                                    <option value="" selected disabled>اختر طريقة التدريب المفضلة</option>
+                                    @foreach (\App\Enums\TrainingAttendanceType::cases() as $attendanceType)
+                                        <option value="{{ $attendanceType->value }}" {{ old('training_attendance') == $attendanceType->value ? 'selected' : '' }}>
+                                            {{ $attendanceType->value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="error-message" id="training_attendance_error">يجب اختيار طريقة الحضور</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4 ">
+                            <button type="submit" onclick="return validateForm(event)" class="btn btn-primary w-100 mt-4">إنهاء التسجيل وإنشاء الحساب
                                 <svg width="25" height="24" viewBox="0 0 25 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -306,197 +511,8 @@ tbody td:first-child {
                                 </svg>
                             </button>
                         </div>
-
-
-
-
-
-
-                        <!-- الخطوة 2: البيانات المهنية -->
-                        <div class="step-form" id="step2">
-                            <div class="row g-3">
-
-                                <div class="col-md-12">
-                                    <label class="form-label">المجالات التي تهمك</label>
-                                    <select class="form-select select2" id="fields_of_interest"
-                                        name="fields_of_interest[]" data-placeholder="اختر مجالات اهتمامك" multiple
-                                        required>
-                                    @foreach (\App\Enums\ImportantTopicsType::cases() as $topic)
-                                        <option value="{{ $topic->value }}"
-                                            {{ in_array($topic->value, old('fields_of_interest', [])) ? 'selected' : '' }}>
-                                            {{ $topic->value }}
-                                        </option>
-                                    @endforeach
-                                    </select>
-                                    <div class="error-message" id="fields_of_interest_error">يجب اختيار مجالات
-                                        الاهتمام
-                                    </div>
-                                </div>
-
-                                <div class="col-md-12">
-                                    <label class="form-label">هل تعمل حالياً؟</label>
-                                    <div class="d-flex gap-3 align-items-center">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="is_working"
-                                                id="is_working_yes" value="1" required>
-                                            <label class="form-check-label" for="is_working_yes">نعم</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="is_working"
-                                                id="is_working_no" value="0" required checked>
-                                            <label class="form-check-label" for="is_working_no">لا</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-12" style="display: none;">
-                                    <label class="form-label">القطاع الذي تعمل به</label>
-                                    <select class="form-select" id="work_sectors" name="work_sectors">
-                                        <option value="" selected disabled>اختر القطاع</option>
-                                        @foreach ($work_sectors as $sector)
-                                            <option value="{{ $sector->id }}">{{ $sector->name }}</option>
-                                        @endforeach
-                                    </select>
-                                        <div class="error-message" id="work_sectors_error">يجب اختيار القطاع</div>
-
-                                </div>
-
-
-<div class="col-md-12" style="display: none;">
-    <label class="form-label">المنصب الوظيفي</label>
-    <select id="job_position" name="job_position" class="form-control">
-        <option value="" selected disabled>اختر المنصب الوظيفي</option>
-        @foreach(App\Enums\JobPositionEnum::values() as $position)
-            <option value="{{ $position }}">{{ $position }}</option>
-        @endforeach
-    </select>
-    <div class="error-message" id="job_position_error">يجب إدخال المنصب الوظيفي</div>
-</div>
-
-
-                                <div class="col-md-12">
-                                    <label class="form-label">الأوقات التي تناسبك لحضور التدريبات</label>
-
-
-<div class="table-responsive">
-    <table>
-        <thead>
-            <tr>
-                <th>اليوم</th>
-                <th>6 - 9 صباحًا</th>
-                <th>9 - 12 صباحًا</th>
-                <th>12 - 3 ظهرًا</th>
-                <th>3 - 6 عصرًا</th>
-                <th>6 - 9 مساءً</th>
-                <th>9 - 12 ليلًا</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td data-label="اليوم">السبت</td>
-                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="sat_6_9_am"></td>
-                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="sat_9_12_am"></td>
-                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="sat_12_3_pm"></td>
-                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="sat_3_6_pm"></td>
-                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="sat_6_9_pm"></td>
-                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="sat_9_12_pm"></td>
-            </tr>
-            <tr>
-                <td data-label="اليوم">الأحد</td>
-                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="sun_6_9_am"></td>
-                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="sun_9_12_am"></td>
-                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="sun_12_3_pm"></td>
-                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="sun_3_6_pm"></td>
-                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="sun_6_9_pm"></td>
-                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="sun_9_12_pm"></td>
-            </tr>
-            <tr>
-                <td data-label="اليوم">الإثنين</td>
-                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="mon_6_9_am"></td>
-                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="mon_9_12_am"></td>
-                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="mon_12_3_pm"></td>
-                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="mon_3_6_pm"></td>
-                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="mon_6_9_pm"></td>
-                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="mon_9_12_pm"></td>
-            </tr>
-            <tr>
-                <td data-label="اليوم">الثلاثاء</td>
-                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="tue_6_9_am"></td>
-                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="tue_9_12_am"></td>
-                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="tue_12_3_pm"></td>
-                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="tue_3_6_pm"></td>
-                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="tue_6_9_pm"></td>
-                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="tue_9_12_pm"></td>
-            </tr>
-            <tr>
-                <td data-label="اليوم">الأربعاء</td>
-                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="wed_6_9_am"></td>
-                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="wed_9_12_am"></td>
-                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="wed_12_3_pm"></td>
-                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="wed_3_6_pm"></td>
-                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="wed_6_9_pm"></td>
-                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="wed_9_12_pm"></td>
-            </tr>
-            <tr>
-                <td data-label="اليوم">الخميس</td>
-                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="thu_6_9_am"></td>
-                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="thu_9_12_am"></td>
-                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="thu_12_3_pm"></td>
-                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="thu_3_6_pm"></td>
-                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="thu_6_9_pm"></td>
-                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="thu_9_12_pm"></td>
-            </tr>
-            <tr>
-                <td data-label="اليوم">الجمعة</td>
-                <td data-label="6 - 9 صباحًا"><input type="checkbox" name="preferred_times[]" value="fri_6_9_am"></td>
-                <td data-label="9 - 12 صباحًا"><input type="checkbox" name="preferred_times[]" value="fri_9_12_am"></td>
-                <td data-label="12 - 3 ظهرًا"><input type="checkbox" name="preferred_times[]" value="fri_12_3_pm"></td>
-                <td data-label="3 - 6 عصرًا"><input type="checkbox" name="preferred_times[]" value="fri_3_6_pm"></td>
-                <td data-label="6 - 9 مساءً"><input type="checkbox" name="preferred_times[]" value="fri_6_9_pm"></td>
-                <td data-label="9 - 12 ليلًا"><input type="checkbox" name="preferred_times[]" value="fri_9_12_pm"></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-                                    <div class="error-message" id="preferred_times_error">يجب اختيار الأوقات المناسبة
-                                        على
-                                        الأقل في يومين</div>
-                                </div>
-
-                                <div class="col-md-12">
-                                    <label class="form-label">كيف تفضل حضور التدريب؟</label>
-                                    <select class="form-select" id="training_attendance" name="training_attendance"
-                                        required>
-                                        <option value="" selected disabled>اختر طريقة التدريب المفضلة</option>
-                                        @foreach (\App\Enums\TrainingAttendanceType::cases() as $attendanceType)
-                                            <option value="{{ $attendanceType->value }}">{{ $attendanceType->value }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="error-message" id="training_attendance_error">يجب اختيار طريقة الحضور
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between mt-4 ">
-                                <button type="submit" onclick="return validateForm(event)" class="btn btn-primary w-100 mt-4">إنهاء التسجيل وإنشاء
-                                    الحساب
-                                    <svg width="25" height="24" viewBox="0 0 25 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M10.0706 18.819C9.97208 18.8194 9.87448 18.8001 9.78348 18.7623C9.69248 18.7246 9.60992 18.669 9.54061 18.599L3.47161 12.529C3.33213 12.3879 3.25391 12.1975 3.25391 11.999C3.25391 11.8006 3.33213 11.6102 3.47161 11.469L9.54061 5.40002C9.68278 5.26754 9.87083 5.19542 10.0651 5.19885C10.2594 5.20228 10.4448 5.28099 10.5822 5.4184C10.7196 5.55581 10.7984 5.7412 10.8018 5.9355C10.8052 6.1298 10.7331 6.31785 10.6006 6.46002L5.06061 12L10.6006 17.54C10.7401 17.6812 10.8183 17.8716 10.8183 18.07C10.8183 18.2685 10.7401 18.4589 10.6006 18.6C10.5318 18.6706 10.4493 18.7265 10.3582 18.7642C10.2671 18.8018 10.1692 18.8205 10.0706 18.819Z"
-                                            fill="white" />
-                                        <path
-                                            d="M20.9999 12.75H4.16992C3.97141 12.7487 3.78141 12.6693 3.64104 12.5289C3.50067 12.3885 3.42123 12.1985 3.41992 12C3.42123 11.8015 3.50067 11.6115 3.64104 11.4711C3.78141 11.3307 3.97141 11.2513 4.16992 11.25H20.9999C21.1984 11.2513 21.3884 11.3307 21.5288 11.4711C21.6692 11.6115 21.7486 11.8015 21.7499 12C21.7486 12.1985 21.6692 12.3885 21.5288 12.5289C21.3884 12.6693 21.1984 12.7487 20.9999 12.75Z"
-                                            fill="white" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                    </div>
                 </form>
-
-
 
                 <!-- عرض الأخطاء والرسائل -->
                 @if ($errors->any())
@@ -566,24 +582,24 @@ tbody td:first-child {
             progressLine.style.width = percent + '%';
         }
 
-      function showError(elementId, errorId, message) {
-    const element = document.getElementById(elementId);
-    const errorElement = document.getElementById(errorId);
-    
-    if (element) element.classList.add('is-invalid');
-    if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
-    }
-}
+        function showError(elementId, errorId, message) {
+            const element = document.getElementById(elementId);
+            const errorElement = document.getElementById(errorId);
+            
+            if (element) element.classList.add('is-invalid');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
 
-function hideError(elementId, errorId) {
-    const element = document.getElementById(elementId);
-    const errorElement = document.getElementById(errorId);
-    
-    if (element) element.classList.remove('is-invalid');
-    if (errorElement) errorElement.style.display = 'none';
-}
+        function hideError(elementId, errorId) {
+            const element = document.getElementById(elementId);
+            const errorElement = document.getElementById(errorId);
+            
+            if (element) element.classList.remove('is-invalid');
+            if (errorElement) errorElement.style.display = 'none';
+        }
 
         function handleSelect2Validation(id, isValid) {
             const container = $('#' + id).next('.select2-container');
@@ -655,7 +671,7 @@ function hideError(elementId, errorId) {
                 {
                     id: 'phone_number',
                     errorId: 'phone_number_error',
-                    validation: (value) => value && /^\+?[0-9]{6,20}$/.test(value),
+                    validation: (value) => value && /^[0-9]{6,15}$/.test(value),
                     errorMessage: 'يجب إدخال رقم هاتف صحيح',
                     isSelect2: false
                 },
@@ -700,77 +716,76 @@ function hideError(elementId, errorId) {
             return isValid; // إرجاع قيمة صواب/خطأ
         }
 
-function validateStep2() {
-    const fields = [
-        {
-            id: 'fields_of_interest',
-            errorId: 'fields_of_interest_error',
-            validation: (value) => value && value.length > 0,
-            errorMessage: 'يجب اختيار مجالات الاهتمام',
-            isSelect2: true
-        },
-        {
-            id: 'training_attendance',
-            errorId: 'training_attendance_error',
-            validation: (value) => value && value !== '',
-            errorMessage: 'يجب اختيار طريقة الحضور',
-            isSelect2: false
-        }
-    ];
+        function validateStep2() {
+            const fields = [
+                {
+                    id: 'fields_of_interest',
+                    errorId: 'fields_of_interest_error',
+                    validation: (value) => value && value.length > 0,
+                    errorMessage: 'يجب اختيار مجالات الاهتمام',
+                    isSelect2: true
+                },
+                {
+                    id: 'training_attendance',
+                    errorId: 'training_attendance_error',
+                    validation: (value) => value && value !== '',
+                    errorMessage: 'يجب اختيار طريقة الحضور',
+                    isSelect2: false
+                }
+            ];
 
-    let isValid = validateFields(fields);
+            let isValid = validateFields(fields);
 
-    // التحقق من الأوقات المفضلة
-    const preferredTimes = $('input[name="preferred_times[]"]:checked').length;
-    if (preferredTimes < 2) {
-        document.getElementById('preferred_times_error').style.display = 'block';
-        isValid = false;
-    } else {
-        document.getElementById('preferred_times_error').style.display = 'none';
-    }
-
-    // التحقق من حقول العمل إذا كان يعمل
-    if ($('#is_working_yes').is(':checked')) {
-        const workFields = [
-            {
-                id: 'work_sectors',
-                errorId: 'work_sectors_error',
-                validation: (value) => value && value !== '',
-                errorMessage: 'يجب اختيار القطاع',
-                isSelect2: false
-            },
-            {
-                id: 'job_position',
-                errorId: 'job_position_error',
-                validation: (value) => value && value.trim() !== '',
-                errorMessage: 'يجب إدخال المنصب الوظيفي',
-                isSelect2: false
+            // التحقق من الأوقات المفضلة
+            const preferredTimes = $('input[name="preferred_times[]"]:checked').length;
+            if (preferredTimes < 2) {
+                document.getElementById('preferred_times_error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('preferred_times_error').style.display = 'none';
             }
-        ];
-        isValid = validateFields(workFields) && isValid;
-    }
 
-    return isValid;
-}
+            // التحقق من حقول العمل إذا كان يعمل
+            if ($('#is_working_yes').is(':checked')) {
+                const workFields = [
+                    {
+                        id: 'work_sectors',
+                        errorId: 'work_sectors_error',
+                        validation: (value) => value && value !== '',
+                        errorMessage: 'يجب اختيار القطاع',
+                        isSelect2: false
+                    },
+                    {
+                        id: 'job_position',
+                        errorId: 'job_position_error',
+                        validation: (value) => value && value.trim() !== '',
+                        errorMessage: 'يجب إدخال المنصب الوظيفي',
+                        isSelect2: false
+                    }
+                ];
+                isValid = validateFields(workFields) && isValid;
+            }
 
-// تحقق نهائي قبل الإرسال
-function validateForm(event) {
-    
-    
-    // تحقق من الخطوة 1
-    const isStep1Valid = validateStep1();
-    
-    // تحقق من الخطوة 2
-    const isStep2Valid = validateStep2();
-    
-    // إذا كانت أي خطوة غير صالحة، امنع الإرسال
-    if (!isStep1Valid || !isStep2Valid) {
-        return false;
-    }
-    
-    // إذا كانت كل الخطوات صالحة، أرسل النموذج
-    this.submit(); // ⚠ أرسل النموذج يدويًا
-}
+            return isValid;
+        }
+
+        // تحقق نهائي قبل الإرسال
+        function validateForm(event) {
+            // تحقق من الخطوة 1
+            const isStep1Valid = validateStep1();
+            
+            // تحقق من الخطوة 2
+            const isStep2Valid = validateStep2();
+            
+            // إذا كانت أي خطوة غير صالحة، امنع الإرسال
+            if (!isStep1Valid || !isStep2Valid) {
+                return false;
+            }
+            
+            // إذا كانت كل الخطوات صالحة، أرسل النموذج
+            return true;
+        }
+
         // تهيئة الصفحة عند التحميل
         window.addEventListener('load', () => {
             document.querySelector('.step[data-step="1"] .step-circle').classList.add('active');
@@ -796,6 +811,12 @@ function validateForm(event) {
                             let option = new Option(city.name, city.name);
                             $('#city').append(option);
                         });
+                        
+                        // تحديد المدينة القديمة إذا كانت موجودة
+                        const oldCity = '{{ old("city") }}';
+                        if (oldCity) {
+                            $('#city').val(oldCity).trigger('change');
+                        }
                     })
                     .catch(error => {
                         console.error("Error fetching cities:", error);
@@ -823,9 +844,12 @@ function validateForm(event) {
                 }
             }).trigger('change');
 
+            // التحقق من حالة العمل عند التحميل
+            if ('{{ old("is_working") }}' === '1') {
+                $('#is_working_yes').trigger('click');
+            }
 
-        });
-        $(document).ready(function() {
+            // التحقق من حالة حقل العمل الإضافي
             $('#work_fields').on('change', function() {
                 const values = $(this).val() || [];
                 const hasOther = values.includes('other');
@@ -837,6 +861,178 @@ function validateForm(event) {
                     $('#extra_work_field').val('');
                 }
             }).trigger('change');
+
+            // تحميل المدن إذا كانت الدولة محددة مسبقاً
+            if ('{{ old("country_id") }}') {
+                $('#country_id').trigger('change');
+            }
+        });
+
+        // تهيئة اختيار رمز الدولة للمتدرب
+        const dropdown = document.getElementById("flagDropdown");
+        const flagOptions = document.getElementById("flagOptions");
+        const selectedFlag = document.getElementById("selectedFlag");
+        const phoneCode = document.getElementById("phoneCode");
+        const dropdownArrow = dropdown.querySelector(".dropdown-arrow");
+        const phoneCodeInput = document.getElementById("phone_code"); // الحقل المخفي
+
+        // متغير لتتبع حالة القائمة
+        let isDropdownOpen = false;
+
+        // حدث النقر على السهم أو المنطقة المحيطة به
+        dropdown.addEventListener("click", (e) => {
+            // إذا كان النقر على السهم تحديداً
+            if (e.target.classList.contains("dropdown-arrow")) {
+                isDropdownOpen = !isDropdownOpen;
+                flagOptions.style.display = isDropdownOpen ? "flex" : "none";
+            }
+            e.stopPropagation();
+        });
+
+        // حدث اختيار علم
+        document.querySelectorAll(".flag-item").forEach(item => {
+            item.addEventListener("click", () => {
+                const iso = item.getAttribute("data-iso");
+                const code = item.getAttribute("data-code");
+                selectedFlag.src = `/flags/${iso}.svg`;
+                phoneCode.textContent = `${code}`;
+                phoneCodeInput.value = `${code}`; // تحديث الحقل المخفي
+                flagOptions.style.display = "none";
+                isDropdownOpen = false;
+            });
+        });
+
+        // بحث رمز الدولة
+        const searchBox = document.getElementById("searchBox");
+        searchBox.addEventListener("input", function() {
+            const value = this.value.trim();
+            document.querySelectorAll(".flag-item").forEach(item => {
+                const code = item.getAttribute("data-code");
+                item.style.display = code.startsWith(value) ? "flex" : "none";
+            });
+        });
+
+        // إغلاق القائمة عند النقر خارجها
+        document.addEventListener("click", (e) => {
+            const isClickInside = dropdown.contains(e.target) ||
+                flagOptions.contains(e.target) ||
+                searchBox.contains(e.target);
+
+            if (!isClickInside) {
+                flagOptions.style.display = "none";
+                isDropdownOpen = false;
+            }
+        });
+
+        // منع إغلاق القائمة عند النقر داخل حقل البحث
+        searchBox.addEventListener("click", function(e) {
+            e.stopPropagation();
+            flagOptions.style.display = "flex";
+            isDropdownOpen = true;
+        });
+    </script>
+
+    <script>
+        // حفظ البيانات عند كل تغيير
+        $(document).ready(function() {
+            // استعادة البيانات المحفوظة
+            loadFormState();
+
+            // حفظ البيانات عند تغيير الحقول
+            $('input, select, textarea').on('change', function() {
+                saveFormState();
+            });
+
+            // حفظ الخطوة الحالية
+            $('[onclick^="validateStep"]').on('click', function() {
+                const step = $(this).closest('.step-form').attr('id').replace('step', '');
+                localStorage.setItem('currentStep', step);
+            });
+        });
+
+        function saveFormState() {
+            const formData = {};
+
+            // حفظ حقول النموذج
+            $('#multiStepForm').find('input, select, textarea').each(function() {
+                const $el = $(this);
+                const id = $el.attr('id');
+
+                if (id) {
+                    if ($el.attr('type') === 'radio' || $el.attr('type') === 'checkbox') {
+                        if ($el.is(':checked')) {
+                            formData[id] = $el.val();
+                        }
+                    } else if ($el.is('select[multiple]')) {
+                        formData[id] = $el.val() || [];
+                    } else {
+                        formData[id] = $el.val();
+                    }
+                }
+            });
+
+            // حفظ حالة checkboxes الأوقات المفضلة
+            const preferredTimes = [];
+            $('input[name="preferred_times[]"]:checked').each(function() {
+                preferredTimes.push($(this).val());
+            });
+            formData['preferred_times'] = preferredTimes;
+
+            localStorage.setItem('traineeFormData', JSON.stringify(formData));
+        }
+
+        function loadFormState() {
+            const savedData = localStorage.getItem('traineeFormData');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+
+                for (const id in formData) {
+                    if (id === 'preferred_times') {
+                        // معالجة الأوقات المفضلة
+                        $('input[name="preferred_times[]"]').prop('checked', false);
+                        formData[id].forEach(value => {
+                            $(`input[name="preferred_times[]"][value="${value}"]`).prop('checked', true);
+                        });
+                    } else {
+                        const $el = $('#' + id);
+                        if ($el.length) {
+                            if ($el.attr('type') === 'radio' || $el.attr('type') === 'checkbox') {
+                                $el.prop('checked', $el.val() == formData[id]);
+                            } else if ($el.is('select[multiple]')) {
+                                $el.val(formData[id]).trigger('change');
+                            } else {
+                                $el.val(formData[id]);
+                            }
+                        }
+                    }
+                }
+
+                // تحديث select2 إذا كان مستخدماً
+                if ($.fn.select2) {
+                    $('.select2').each(function() {
+                        const $select = $(this);
+                        if ($select.val()) {
+                            $select.trigger('change');
+                        }
+                    });
+                }
+
+                // تحديث حالة العمل إذا كانت محفوظة
+                if (formData['is_working'] === '1') {
+                    $('#work_sectors').closest('.col-md-12').show();
+                    $('#job_position').closest('.col-md-12').show();
+                }
+            }
+
+            // استعادة الخطوة الحالية
+            const savedStep = localStorage.getItem('currentStep') || 1;
+            goToStep(savedStep);
+        }
+
+        // تنظيف البيانات عند إرسال النموذج بنجاح
+        $('#multiStepForm').on('submit', function() {
+            localStorage.removeItem('traineeFormData');
+            localStorage.removeItem('currentStep');
         });
     </script>
 </body>

@@ -76,7 +76,7 @@ a {
 a.punderlined {
     font-family: IBM Plex Sans Arabic;
     font-weight: 500;
-    font-size: 18px;
+    font-size:1.3rem;
     letter-spacing: 0%;
     text-decoration: underline;
     text-underline-offset: 6px;
@@ -2044,7 +2044,7 @@ footer .absolute .terms-conditions a {
 }
 
 .card-block {
-    padding: 27px 38px;
+    padding: 20px 30px;
     border: 1px solid #d9d9d9;
     background-color: #ffffff;
     border-radius: 32px;
@@ -2200,6 +2200,8 @@ footer .absolute .terms-conditions a {
     letter-spacing: 0%;
     text-align: right;
     color: #5a5a5a;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 @media only screen and (max-width: 1000px) {
