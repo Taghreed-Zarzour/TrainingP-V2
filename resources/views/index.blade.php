@@ -63,7 +63,7 @@
                 <!-- Text Prompt -->
                 <div class="position-absolute text-center animate-bounce-in animate-delay-3 d-none d-lg-block" 
                     style="z-index: 100; left: 35%; bottom: -65px; font-weight: 500;">
-                    اختر المسار الذي يمثلك لتبدأ رحلتك معنا
+                  إدارة تدريبك من الإعلان حتى التقييم
                 </div>  
                 <!-- Profile SVG -->
                 <div class="circle profile-circle animate-swim">
@@ -75,15 +75,15 @@
             <!-- Discovery Banner -->
             <div class="position-absolute animate-slide-left animate-delay-1 d-none d-lg-block" style="left:10%; top:10%">
                 <div class="position-relative d-flex align-items-center justify-content-center">
-                    <div style="z-index:1000; font-weight:600;">اكتشف فرصك</div>
-                    <img src="{{ asset('images/mainpage-rectangle.png') }}" class="mainpage-rectangle-img position-absolute">
+                    <div style="z-index:1000; font-weight:600;">كل ما تحتاجه لإطلاق برنامج تدريبي ناجح</div>
+                    <img src="{{ asset('images/rectanglemainword.png') }}" class="mainpage-rectangle-img position-absolute">
                 </div>
             </div>
             <!-- Discovery Banner -->
             <div class="position-absolute animate-slide-right animate-delay-2 d-none d-lg-block" style="right:10%; bottom:5%">
                 <div class="position-relative d-flex align-items-center justify-content-center">
-                    <div style="z-index:1000; font-weight:600;">سجّل وابدأ رحلة التطوّر </div>
-                    <img src="{{ asset('images/rectangle-main-text2.png') }}" class="mainpage-rectangle-img position-absolute">
+                    <div style="z-index:1000; font-weight:600;">حلول احترافية للتدريبات المباشرة </div>
+                    <img src="{{ asset('images/rectanglemainword.png') }}" class="mainpage-rectangle-img position-absolute">
                 </div>
             </div>
             <!-- Discovery Banner -->
@@ -92,8 +92,8 @@
                 <div class="animate-float" style="top:-150%; right:-70%; position:absolute;z-index:120;">
                     <img src="{{ asset('images/person2.svg') }}" alt="Person" />
                 </div>
-                    <div style="z-index:100; font-weight:600;">ابدأ من هنا... </div>
-                    <img src="{{ asset('images/rectangle-main-text2.png') }}" class="mainpage-rectangle-img2 position-absolute">
+                    <div style="z-index:100; font-weight:600;">تسويق تلقائي لتدريباتك… بدون جهد إضافي </div>
+                    <img src="{{ asset('images/rectanglemainword.png') }}" class="mainpage-rectangle-img2 position-absolute">
                 </div>
             </div>
             <!-- Decorative Circles (left side) -->

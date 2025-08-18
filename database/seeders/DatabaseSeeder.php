@@ -49,9 +49,9 @@ class DatabaseSeeder extends Seeder
       UserTypeSeeder::class,
       OrganizationTypesTableSeeder::class,
       OrganizationSectorsTableSeeder::class,
-      ProgramTypeSeeder::class,
+      programTypeSeeder::class,
       TrainingClassificationSeeder::class,
-      TrainingLevelSeeder::class,
+      trainingLevelSeeder::class,
     ]);
   }
 }

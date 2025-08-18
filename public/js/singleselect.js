@@ -12,36 +12,37 @@ window.initCustomSelect = function (select) {
     if (next && next.classList.contains("custom-singleselect-wrapper")) {
         next.remove();
     }
-
+    
     const wrapper = document.createElement("div");
     wrapper.className = "custom-singleselect-wrapper";
     wrapper.tabIndex = 0;
-
+    
     const input = document.createElement("input");
     input.type = "text";
     input.className = "custom-singleselect-input";
     input.placeholder = select.getAttribute('data-placeholder') || "ابحث أو اختر...";
     input.autocomplete = "off";
-
+    
     const optionsList = document.createElement("div");
     optionsList.className = "options-list";
-
+    
     const arrow = document.createElement("span");
     arrow.className = "dropdown-arrow";
     arrow.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>`;
-
+    
     const options = Array.from(select.options).map((opt) => ({
         value: opt.value,
         text: opt.text,
         selected: opt.selected,
     }));
-
+    
     let selected = select.value || "";
-
+    let isOpen = false;
+    
     function renderOptions(filter = "") {
         optionsList.innerHTML = "";
         const filtered = options.filter((opt) =>
-            opt.text.includes(filter)
+            opt.text.toLowerCase().includes(filter.toLowerCase())
         );
         if (filtered.length === 0) {
             optionsList.innerHTML = `<div class="option-item" style="color:#aaa;cursor:default;">لا توجد نتائج</div>`;
@@ -51,43 +52,79 @@ window.initCustomSelect = function (select) {
             const div = document.createElement("div");
             div.className = "option-item";
             div.textContent = opt.text;
+            if (opt.value === selected) div.classList.add("active");
             div.onclick = () => {
                 selected = opt.value;
                 updateSelect();
                 renderSelected();
-                optionsList.style.display = "none";
-                wrapper.classList.remove("open");
+                closeDropdown();
             };
             optionsList.appendChild(div);
         });
     }
-
+    
     function renderSelected() {
         const opt = options.find((o) => o.value === selected);
         input.value = opt ? opt.text : "";
     }
-
+    
     function updateSelect() {
         select.value = selected;
         select.dispatchEvent(new Event("change"));
     }
-
+    
+    function openDropdown() {
+        if (!isOpen) {
+            renderOptions(input.value);
+            optionsList.style.display = "block";
+            wrapper.classList.add("open");
+            isOpen = true;
+        }
+    }
+    
+    function closeDropdown() {
+        if (isOpen) {
+            optionsList.style.display = "none";
+            wrapper.classList.remove("open");
+            isOpen = false;
+            renderSelected(); // استعادة النص المحدد بعد الإغلاق
+        }
+    }
+    
+    function toggleDropdown() {
+        if (isOpen) {
+            closeDropdown();
+        } else {
+            openDropdown();
+        }
+    }
+    
+    // فتح القائمة عند التركيز على الحقل
     input.addEventListener("focus", () => {
-        renderOptions("");
-        optionsList.style.display = "block";
-        wrapper.classList.add("open");
+        openDropdown();
     });
-
+    
+    // فتح القائمة عند النقر على الحقل
+    input.addEventListener("click", () => {
+        toggleDropdown();
+    });
+    
+    // البحث أثناء الكتابة
     input.addEventListener("input", () => {
-        renderOptions(input.value);
-        optionsList.style.display = "block";
+        if (!isOpen) {
+            openDropdown();
+        } else {
+            renderOptions(input.value);
+        }
     });
-
+    
+    // دعم لوحة المفاتيح
     input.addEventListener("keydown", (e) => {
         const items = Array.from(optionsList.querySelectorAll(".option-item"));
         let idx = items.findIndex((item) =>
             item.classList.contains("active")
         );
+        
         if (e.key === "ArrowDown") {
             e.preventDefault();
             if (idx < items.length - 1) {
@@ -106,23 +143,31 @@ window.initCustomSelect = function (select) {
         } else if (e.key === "Enter" && idx >= 0) {
             e.preventDefault();
             items[idx].click();
+        } else if (e.key === "Escape") {
+            closeDropdown();
         }
     });
-
+    
+    // إغلاق القائمة عند النقر خارجها
     document.addEventListener("click", (e) => {
         if (!wrapper.contains(e.target)) {
-            optionsList.style.display = "none";
-            wrapper.classList.remove("open");
+            closeDropdown();
         }
     });
-
+    
+    // فتح/إغلاق القائمة عند النقر على السهم
+    arrow.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleDropdown();
+        input.focus();
+    });
+    
     renderSelected();
-
     wrapper.appendChild(input);
     wrapper.appendChild(optionsList);
     wrapper.appendChild(arrow);
     select.parentNode.insertBefore(wrapper, select.nextSibling);
-
+    
     const observer = new MutationObserver(() => {
         if (select.classList.contains("error")) {
             wrapper.classList.add("error");
@@ -130,6 +175,7 @@ window.initCustomSelect = function (select) {
             wrapper.classList.remove("error");
         }
     });
+    
     observer.observe(select, {
         attributes: true,
         attributeFilter: ["class"],

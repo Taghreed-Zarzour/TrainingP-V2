@@ -47,9 +47,12 @@ class TraineeController extends Controller
         $response = $this->traineeService->completeRegister($validated, $id);
 
         if ($response['success'] == true) {
-            return redirect()->route('homePage', ['id' => $id])->with('success', $response['msg']);
+            return redirect()->route('homePage', ['id' => $id])
+            ->with('success', $response['msg']);
         } else {
-            return back()->withErrors(['error' => $response['msg']]);
+            return back()
+            ->withInput()
+            ->withErrors(['error' => $response['msg']]);
         }
     }
 

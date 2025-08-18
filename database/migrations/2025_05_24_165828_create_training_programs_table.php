@@ -13,14 +13,9 @@ return new class extends Migration
     {
         Schema::create('training_programs', function (Blueprint $table) {
             $table->id();
-
             $table->longText('title');
-            
-            $table->string('description')->nullable();
-
+            $table->text('description')->nullable();
             $table->unsignedBigInteger('views')->default(0);
-            
-            
             $table->timestamps();
         });
     }

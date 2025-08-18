@@ -23,7 +23,7 @@ class updateExperienceAndEducation extends FormRequest
     {
         return [
 
-            'bio' => 'required|string',
+            'bio' => 'required|string|min:50|max:500',
 
             'years_of_experience' => 'required|integer|min:0',
 
@@ -48,6 +48,8 @@ class updateExperienceAndEducation extends FormRequest
   {
     return [
       'bio.string' => 'يجب أن يكون الوصف نصًا.',
+        'bio.min' => 'يجب ألا تقل النبذة عن 50 أحرف',
+        'bio.max' => 'يجب ألا تزيد النبذة عن 500 حرف',
 
       'years_of_experience.required' => 'عدد سنوات الخبرة مطلوب.',
       'years_of_experience.integer' => 'يجب أن يكون عدد سنوات الخبرة رقمًا صحيحًا.',

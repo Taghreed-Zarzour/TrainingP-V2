@@ -2,21 +2,7 @@
 
 @section('title', 'حساب المدرب')
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap"
-        rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap"
-        rel="stylesheet" />
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.min.css" />
-    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logos/logo.svg') }}">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-@endsection
 
 @section('content')
     <style>
@@ -195,27 +181,27 @@
             border-radius: 4px;
             transition: width 0.3s ease;
         }
+
         /* زر الحذف بلون الأحمر، بحجم مناسب مع زر التحميل */
-.delete-btn {
-  border: 1.5px solid #dc3545;
-  color: #dc3545;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background-color 0.3s, color 0.3s;
-  width: fit-content;
-}
+        .delete-btn {
+            border: 1.5px solid #dc3545;
+            color: #dc3545;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.3s, color 0.3s;
+            width: fit-content;
+        }
 
-.delete-btn:hover {
-  background-color: #dc3545;
-  color: white;
-}
-
+        .delete-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
     </style>
 
     <main>
@@ -266,8 +252,7 @@
                                     @if ($user->nationalities && $user->nationalities->count())
                                         @foreach ($user->nationalities->take(5) as $country)
                                             <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
-                                                alt="{{ $country->name }}" class="flag-img"
-                                                title="{{ $country->name }}" />
+                                                alt="{{ $country->name }}" class="flag-img" title="{{ $country->name }}" />
                                         @endforeach
                                     @endif
                                 </div>
@@ -293,13 +278,27 @@
                                     </a>
                                     <script>
                                         function copyLink(event) {
-                                            event.preventDefault(); // منع الذهاب للرابط
+                                            event.preventDefault();
 
-                                            // الحصول على الرابط الحالي
-                                            const currentUrl = window.location.href;
+                                            // قراءة الاسم والكنية بالإنجليزي من الـ HTML
+                                            const nameEn = "{{ trim($user->getTranslation('name', 'en')) }}";
+                                            const lastNameEn = "{{ trim($user->trainer->getTranslation('last_name', 'en')) }}";
+                                            const userId = "{{ $user->id }}";
 
-                                            // نسخ إلى الحافظة
-                                            navigator.clipboard.writeText(currentUrl).then(function() {
+                                            let slugPart;
+
+                                            if (nameEn && lastNameEn) {
+                                                // تكوين الـ slug (صيغة URL آمنة)
+                                                slugPart = (nameEn + '-' + lastNameEn).toLowerCase().replace(/\s+/g, '-');
+                                                slugPart = slugPart.replace(/[^a-z0-9\-]/g, ''); // إزالة أي رموز غريبة
+                                                slugPart += '-' + userId;
+                                            } else {
+                                                slugPart = userId;
+                                            }
+
+                                            const fullUrl = `${window.location.origin}/show-trainer-profile/${slugPart}`;
+
+                                            navigator.clipboard.writeText(fullUrl).then(function() {
                                                 alert('تم نسخ الرابط بنجاح ✅');
                                             }, function(err) {
                                                 alert('حدث خطأ أثناء نسخ الرابط ❌');
@@ -310,6 +309,17 @@
 
                                 </div>
                             </div>
+
+                            <div class="bi-title-wrap" style="justify-content: end;">
+                                <div class="bi-name-wrap">
+                                    <div class="bi-name" style="text-transform: capitalize;">
+                                        {{ $user->getTranslation('name', 'en') }}
+                                        {{ $user->trainer->getTranslation('last_name', 'en') }}</div>
+
+                                </div>
+
+                            </div>
+
                             <div class="bi-branch">{{ $trainer->headline ?? '' }}</div>
                             <div class="bi-desc">
                                 {{ $user->bio }}
@@ -321,7 +331,15 @@
                                     </a>
                                 </div>
                             @else
-                                <div class="bi-price">الأجر في الساعة {{ $trainer->hourly_wage }}$</div>
+@php
+    $wage = $trainer->hourly_wage;
+    $formattedWage = is_numeric($wage) && floor($wage) == $wage ? number_format($wage, 0, '.', '') : $wage;
+@endphp
+
+<div class="bi-price">
+    الأجر في الساعة {{ $formattedWage }} {{ \App\Enums\Currency::tryFrom($trainer->currency)?->symbol() ?? '' }}
+</div>
+
                             @endif
                         </div>
                     </div>
@@ -443,33 +461,37 @@
                     </div>
 
                     @if ($user->userCv)
-                    <div style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; align-items: center;">
-  <!-- زر تحميل السيرة كما هو -->
-  <a class="upload-cv" href="{{ route('download.cv', $user->id) }}">
-    <img src="{{ asset('images/cloud.svg') }}" alt="" />
-    تحميل السيرة الذاتية
-  </a>
+                        <div
+                            style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; align-items: center;">
+                            <!-- زر تحميل السيرة كما هو -->
+                            <a class="upload-cv" href="{{ route('download.cv', $user->id) }}">
+                                <img src="{{ asset('images/cloud.svg') }}" alt="" />
+                                تحميل السيرة الذاتية
+                            </a>
 
-  <!-- زر حذف -->
-  <form method="POST" class="p-0" action="{{ route('delete_cv') }}" onsubmit="return confirm('هل أنت متأكد من حذف السيرة الذاتية؟');" style="margin:0;">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="delete-btn" title="حذف السيرة الذاتية">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M5.5 5.5v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-1 0zm4 0v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-1 0z"/>
-        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3a.5.5 0 0 0 0 1H13.5a.5.5 0 0 0 0-1H10.5a.5.5 0 0 1-.5-.5h-3a.5.5 0 0 1-.5.5H2.5z"/>
-      </svg>
-      حذف
-    </button>
-  </form>
-</div>
-
+                            <!-- زر حذف -->
+                            <form method="POST" class="p-0" action="{{ route('delete_cv') }}"
+                                onsubmit="return confirm('هل أنت متأكد من حذف السيرة الذاتية؟');" style="margin:0;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="delete-btn" title="حذف السيرة الذاتية">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                        fill="currentColor" viewBox="0 0 16 16">
+                                        <path
+                                            d="M5.5 5.5v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-1 0zm4 0v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-1 0z" />
+                                        <path fill-rule="evenodd"
+                                            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3a.5.5 0 0 0 0 1H13.5a.5.5 0 0 0 0-1H10.5a.5.5 0 0 1-.5-.5h-3a.5.5 0 0 1-.5.5H2.5z" />
+                                    </svg>
+                                    حذف
+                                </button>
+                            </form>
+                        </div>
                     @endif
                 </div>
 
                 <div class="left-col">
                     <div class="edit-button-container">
-                        @if ($profileCompletion == 100)
+                        @if ($profileCompletion == 100 && !$user->profile_message_shown)
                             <div class="success-message">
                                 <div class="sm-badge">
                                     <img src="{{ asset('images/icons/seal-check-fill-green.svg') }}" alt="نجاح" />
@@ -480,7 +502,12 @@
                                     المؤسسات والمتدربين
                                 </div>
                             </div>
-                        @else
+                            @php
+                                
+                                $user->update(['profile_message_shown' => true]);
+                            @endphp
+                            @endif
+                        @if ($profileCompletion < 100)
                             <div class="warning-message">
                                 <div class="sm-badge">
                                     <img src="{{ asset('images/icons/warning.svg') }}" alt="تحذير" />
@@ -493,12 +520,12 @@
                                     <div class="circular-progress">
                                         <svg viewBox="0 0 36 36" class="circular-chart">
                                             <path class="circle-bg" d="M18 2.0845
-                                                            a 15.9155 15.9155 0 0 1 0 31.831
-                                                            a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
                                             <path class="circle_percentage"
                                                 stroke-dasharray="{{ $profileCompletion ?? 30 }}, 100" d="M18 2.0845
-                                                            a 15.9155 15.9155 0 0 1 0 31.831
-                                                            a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
                                             <text x="18" y="20.35" class="percentage">
                                                 {{ $profileCompletion ?? 30 }}%
                                             </text>
@@ -508,91 +535,99 @@
                             </div>
                         @endif
                     </div>
-                    <div class="add-item-block prev-training ">
-                        <div class="title-wrap pt-title-wrap">
-                            <div class="title">مقطع من تدريب سابق</div>
-                            @if ($trainer->previousTraining)
-                                <div class="edit-button-container">
-                                    <a href="#" onclick="openModal('prev-training')">
-                                        <img src="../images/pencil-simple.svg" />
-                                    </a>
-                                </div>
+                    {{-- تحقق أولًا إذا كان المستخدم مسجل دخول وإذا كان صاحب الحساب --}}
+{{-- تحقق إذا كان صاحب الحساب أو إذا هناك فيديو --}}
+@if(($trainer->previousTraining) || (auth()->check() && auth()->id() == $trainer->id))
+    <div class="add-item-block prev-training">
+        <div class="title-wrap pt-title-wrap">
+            <div class="title">مقطع من تدريب سابق</div>
+
+            {{-- أزرار التعديل تظهر فقط لصاحب الحساب --}}
+            @if(auth()->check() && auth()->id() == $trainer->id)
+                @if ($trainer->previousTraining)
+                    <div class="edit-button-container">
+                        <a href="#" onclick="openModal('prev-training')">
+                            <img src="../images/pencil-simple.svg" />
+                        </a>
+                    </div>
+                @else
+                    <div class="edit-button-container">
+                        <button onclick="openModal('prev-training')"
+                            class="pbtn pbtn-main pbtn-small piconed">
+                            <img src="{{ asset('images/icons/plus.svg') }}" />
+                        </button>
+                    </div>
+                @endif
+            @endif
+        </div>
+
+        <div class="card-block">
+            <div class="card-body align-content-center">
+                @if ($trainer->previousTraining)
+                    <div class="prev-training-item w-100">
+                        <div class="card-body">
+                            @php
+                                $videoLink = $trainer->previousTraining->video_link;
+                            @endphp
+
+                            {{-- عرض الفيديو بناءً على المصدر --}}
+                            @if (Str::contains($videoLink, ['youtube.com', 'youtu.be']))
+                                <iframe class="vedio_profile"
+                                    src="{{ Str::contains($videoLink, 'watch?v=') ? str_replace('watch?v=', 'embed/', $videoLink) : str_replace('youtu.be/', 'www.youtube.com/embed/', $videoLink) }}"
+                                    frameborder="0" allowfullscreen>
+                                </iframe>
+                            @elseif (Str::contains($videoLink, 'vimeo.com'))
+                                <iframe class="vedio_profile"
+                                    src="https://player.vimeo.com/video/{{ basename($videoLink) }}"
+                                    frameborder="0" allowfullscreen>
+                                </iframe>
+                            @elseif (Str::contains($videoLink, 'drive.google.com'))
+                                <iframe class="vedio_profile"
+                                    src="https://drive.google.com/file/d/{{ getGoogleDriveId($videoLink) }}/preview"
+                                    frameborder="0" allowfullscreen>
+                                </iframe>
+                            @elseif (Str::contains($videoLink, ['dropbox.com']))
+                                <iframe class="vedio_profile"
+                                    src="{{ str_replace('?dl=0', '?raw=1', $videoLink) }}"
+                                    frameborder="0" allowfullscreen>
+                                </iframe>
                             @else
-                                <div class="edit-button-container">
-                                    <button onclick="openModal('prev-training')"
-                                        class="pbtn pbtn-main pbtn-small piconed">
-                                        <img src="{{ asset('images/icons/plus.svg') }}" />
-                                    </button>
-                                </div>
+                                <video width="100%" height="auto" controls>
+                                    <source src="{{ $videoLink }}" type="video/mp4">
+                                    المتصفح لا يدعم تشغيل الفيديو.
+                                </video>
                             @endif
-                        </div>
-                        <div class="card-block">
-                            <div class="card-body align-content-center">
-                                @if ($trainer->previousTraining)
-                                    <div class="card-block prev-training-item">
-                                        <div class="card-body">
-                                            @php
-                                                $videoLink = $trainer->previousTraining->video_link;
-                                            @endphp
 
-                                            @if (Str::contains($videoLink, ['youtube.com', 'youtu.be']))
-                                                <iframe class="vedio_profile"
-                                                    src="{{ Str::contains($videoLink, 'watch?v=') ? str_replace('watch?v=', 'embed/', $videoLink) : str_replace('youtu.be/', 'www.youtube.com/embed/', $videoLink) }}"
-                                                    frameborder="0" allowfullscreen>
-                                                </iframe>
-                                            @elseif (Str::contains($videoLink, 'vimeo.com'))
-                                                <iframe class="vedio_profile"
-                                                    src="https://player.vimeo.com/video/{{ basename($videoLink) }}"
-                                                    frameborder="0" allowfullscreen>
-                                                </iframe>
-                                            @elseif (Str::contains($videoLink, 'drive.google.com'))
-                                                <iframe class="vedio_profile"
-                                                    src="https://drive.google.com/file/d/{{ getGoogleDriveId($videoLink) }}/preview"
-                                                    frameborder="0" allowfullscreen>
-                                                </iframe>
-                                            @elseif (Str::contains($videoLink, ['dropbox.com']))
-                                                <iframe class="vedio_profile"
-                                                    src="{{ str_replace('?dl=0', '?raw=1', $videoLink) }}"
-                                                    frameborder="0" allowfullscreen>
-                                                </iframe>
-                                            @else
-                                                <video width="100%" height="auto" controls>
-                                                    <source src="{{ $videoLink }}" type="video/mp4">
-                                                    المتصفح لا يدعم تشغيل الفيديو.
-                                                </video>
-                                            @endif
-
-                                            <div class="pti-title">
-                                                {{ $trainer->previousTraining->training_title }}
-                                            </div>
-
-                                            <div class="pti-desc">
-                                                {{ $trainer->previousTraining->description }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="content">
-                                        <img src="{{ asset('images/trainer-account/prev-training.svg') }}"
-                                            alt="تدريب سابق" />
-                                        <div class="desc">
-                                            ارفع مقطع فيديو يبرز مهاراتك
-                                            التدريبية ويُظهر تميزك في تقديم
-                                            المحتوى. هذا يساعد المؤسسات
-                                            والمتدربين على التعرف عليك بشكل أفضل
-                                            وزيادة فرص اختيارك.
-                                        </div>
-                                        <div class="edit-button-container">
-                                            <button onclick="openModal('prev-training')">
-                                                <img src="{{ asset('images/icons/plus-dark.svg') }}" />
-                                                رفع مقطعًا من تدريب سابق
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endif
+                            <div class="pti-title">
+                                {{ $trainer->previousTraining->training_title }}
+                            </div>
+                            <div class="pti-desc">
+                                {{ $trainer->previousTraining->description }}
                             </div>
                         </div>
                     </div>
+                @elseif(auth()->check() && auth()->id() == $trainer->id)
+                    {{-- لا يوجد فيديو، يظهر فقط لصاحب الحساب --}}
+                    <div class="content">
+                        <img src="{{ asset('images/trainer-account/prev-training.svg') }}" alt="تدريب سابق" />
+                        <div class="desc">
+                            ارفع مقطع فيديو يبرز مهاراتك التدريبية ويُظهر تميزك في تقديم المحتوى.
+                            هذا يساعد المؤسسات والمتدربين على التعرف عليك بشكل أفضل وزيادة فرص اختيارك.
+                        </div>
+                        <div class="edit-button-container">
+                            <button onclick="openModal('prev-training')">
+                                <img src="{{ asset('images/icons/plus-dark.svg') }}" />
+                                رفع مقطعًا من تدريب سابق
+                            </button>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+@endif
+
+
 
                     @if (!$user->userCv && auth()->check() && auth()->id() == $user->id)
                         <div class="add-item-block">
@@ -1185,19 +1220,27 @@
                 <textarea name="bio" placeholder="شارك نبذة مختصرة تبرز خبرتك وهويتك المهنية" rows="5" required>{{ old('bio', $user->bio) }}</textarea>
             </div>
             <div class="input-group-2col">
-                <div class="input-group">
-                    <label>الأجر في الساعة</label>
-                    <input name="hourly_wage" type="number" value="{{ $trainer->hourly_wage ?? 0 }}"
-                        placeholder="مثال: 20" />
-                </div>
+@php
+    $wage = $trainer->hourly_wage ?? 0;
+    $formattedWage = is_numeric($wage) && floor($wage) == $wage ? number_format($wage, 0, '.', '') : $wage;
+@endphp
+
+<div class="input-group">
+    <label>الأجر في الساعة</label>
+    <input name="hourly_wage" type="number" value="{{ $formattedWage }}" placeholder="مثال: 20" />
+</div>
+
                 <div class="input-group">
                     <label>العملة</label>
-                    <select name="currency" class="custom-singleselect">
-                        <option value="USD" {{ ($trainer->currency ?? '') == 'USD' ? 'selected' : '' }}>الدولار
-                        </option>
-                        <option value="TRY" {{ ($trainer->currency ?? '') == 'TRY' ? 'selected' : '' }}>الليرة التركية
-                        </option>
-                    </select>
+<select name="currency" class="custom-singleselect">
+    @foreach(\App\Enums\Currency::cases() as $currency)
+        <option value="{{ $currency->value }}"
+            {{ ($trainer->currency ?? '') === $currency->value ? 'selected' : '' }}>
+            {{ $currency->label() }}
+        </option>
+    @endforeach
+</select>
+
                 </div>
             </div>
             <div class="input-group">
@@ -1260,7 +1303,7 @@
 
                 <div class="input-group">
                     <label>
-                        أهم المواضيع
+                        أهم المواضيع التدريبية
                         <span class="tooltip">
                             <img src="{{ asset('images/icons/tooltip.svg') }}" alt="" />
                             <div class="tooltip-desc">اختر أهم المواضيع التي تقدمها في تدريباتك</div>
@@ -1350,7 +1393,7 @@
                                     data-flag="{{ strtolower($country->iso2) }}">
                                     <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
                                         width="34" height="24">
-                                    <span>+{{ $country->phonecode }}</span>
+                                    <span>{{ $country->phonecode }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -1610,7 +1653,7 @@
 
             document.querySelectorAll('.country-option').forEach(option => {
                 option.addEventListener('click', function() {
-                    const code = '+' + this.getAttribute('data-code');
+                    const code = this.getAttribute('data-code');
                     const flag = this.getAttribute('data-flag');
 
                     selectedFlag.src = `/flags/${flag}.svg`;

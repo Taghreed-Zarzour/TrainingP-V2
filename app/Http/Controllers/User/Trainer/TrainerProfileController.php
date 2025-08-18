@@ -32,17 +32,29 @@ class TrainerProfileController extends Controller
     $this->trainerService = $trainerService;
   }
 
-    public function showProfile($id = null)
+    public function showProfile($userIdentifier = null)
 {
-    $id = $id ?? Auth::id();
-    $user = User::with('country',)->findOrFail($id);
-    $trainer = Trainer::where('id', $id)->firstOrFail();
+     // الحالة 1: إذا كان الرابط يحتوي على ID فقط (مثال: /show-profile/123)
+    if (is_numeric($userIdentifier)) {
+        $userId = $userIdentifier;
+    }
+    // الحالة 2: إذا كان الرابط يحتوي على Slug (مثال: /show-profile/john-doe-123)
+    elseif (strpos($userIdentifier, '-') !== false) {
+        $userId = (int) substr($userIdentifier, strrpos($userIdentifier, '-') + 1);
+    }
+    // الحالة 3: إذا لم يتم تمرير أي معرف، استخدم ID المستخدم الحالي
+    else {
+        $userId = Auth::id();
+    }
+
+    $user = User::with('country',)->findOrFail($userId);
+    $trainer = Trainer::where('id', $userId)->firstOrFail();
     $sexs = SexEnum::cases();
     $work_sectors = WorkSector::all();
     $provided_services = ProvidedService::all();
     $work_fields = WorkField::all();
     $countries = Country::all();
-    $profileCompletion = $this->getProfileCompletion($id);
+    $profileCompletion = $this->getProfileCompletion($userId);
     $trainer_providedServices = ProvidedService::whereIn('id', $trainer->provided_services ?? [])->get();
 
     $trainer_workSectors = WorkSector::whereIn('id', $trainer->work_sectors ?? [])->get();

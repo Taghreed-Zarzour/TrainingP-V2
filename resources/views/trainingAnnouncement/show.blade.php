@@ -11,7 +11,7 @@
                 <div class="title-wrapper">
                     <h1 class="d-inline-block lh-base">
                         {{ $program->title ?? 'التدريب' }}
-                        <span class="training-type ms-2">{{ $program->programType?->name ?? '' }}</span>
+                        <span class="training-type ms-2">{{ $program->trainingClassification?->name ?? '' }}</span>
                     </h1>
                 </div>
                 <div class="trainer-name">تم الإنشاء بواسطة:
@@ -57,7 +57,7 @@
                         <img src="{{ asset('storage/' . $program->AdditionalSetting->profile_image) }}"
                             class="square-image" alt="صورة التدريب">
                     @else
-                        <img src="{{ asset('images/training.jpg') }}" class="square-image" alt="صورة التدريب">
+                        <img src="{{ asset('images/cources/training-default-img.svg') }}" class="square-image" alt="صورة التدريب">
                     @endif
                     <div class="price-section mt-3">
                         <div class="price mb-3">
@@ -76,14 +76,26 @@
                                 مجاني
                             @endif
                         </div>
-                        <div class="time-left">
-                            <img class="pe-2" src="{{ asset('images/cources/calender-red.svg') }}" alt="سعر التسجيل">
-                            متبق {{ $remaining }} على انتهاء التسجيل
-                        </div>
+<div class="time-left">
+    <img class="pe-2" src="{{ asset('images/cources/calender-red.svg') }}" alt="سعر التسجيل">
+    {{ $remainingText }}
+</div>
+
                     </div>
                     <h5>تفاصيل التدريب</h5>
                     <div class="training-details">
                         <div>
+                                                      <div class="mb-3">
+                                  <img src="{{ asset('images/training-details/calendar.svg') }}" alt="">
+                                    تاريخ انتهاء التقديم: 
+                                    {{ $program?->AdditionalSetting?->application_deadline 
+    ? \Carbon\Carbon::parse($program->AdditionalSetting->application_deadline)
+        ->locale('ar')
+        ->translatedFormat('d F Y')
+    : 'غير معروف' }}
+                                </div>
+
+
                             @if ($program->programLevel)
                                 <div class="mb-3">
                                     <img class="pe-2" src="{{ asset('images/cources/level.svg') }}" alt="مستوى التدريب">
@@ -129,67 +141,73 @@
                         </div>
                     </div>
                     <div class="row g-2">
-                        @auth
-                            @if (auth()->user()->userType?->type === 'متدرب')
-                                @if (!$has_enrolled)
-                                    <div class="col-12 col-md-7">
-                                        <button type="button" class="custom-btn w-100" data-bs-toggle="modal"
-                                            data-bs-target="#confirmEnrollmentModal">
-                                            انضم الآن ←
-                                        </button>
-                                    </div>
-                                @else
-                                    @switch($enrollment?->status)
-                                        @case('pending')
-                                            <div class="col-12">
-                                                <div class="alert alert-warning text-center mb-0">
-                                                    تم إرسال طلبك مسبقًا، في انتظار الموافقة.
-                                                </div>
-                                            </div>
-                                        @break
+                      @auth
+    @if (auth()->user()->userType?->type === 'متدرب')
+        @if ($training_has_ended) <!-- تحقق إذا انتهى موعد التسجيل -->
+            <div class="col-12">
+                <div class="alert alert-danger text-center mb-0">
+                    انتهى موعد التسجيل في هذا التدريب
+                </div>
+            </div>
+        @elseif (!$has_enrolled)
+            <div class="col-12 col-md-7">
+                <button type="button" class="custom-btn w-100" data-bs-toggle="modal"
+                    data-bs-target="#confirmEnrollmentModal">
+                    انضم الآن ←
+                </button>
+            </div>
+        @else
+            @switch($enrollment?->status)
+                @case('pending')
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center mb-0">
+                            تم إرسال طلبك مسبقًا، في انتظار الموافقة.
+                        </div>
+                    </div>
+                @break
 
-                                        @case('accepted')
-                                            <div class="col-12">
-                                                <div class="alert alert-success text-center mb-0">
-                                                    تم قبولك في التدريب، بالتوفيق!
-                                                </div>
-                                            </div>
-                                        @break
+                @case('accepted')
+                    <div class="col-12">
+                        <div class="alert alert-success text-center mb-0">
+                            تم قبولك في التدريب، بالتوفيق!
+                        </div>
+                    </div>
+                @break
 
-                                        @case('rejected')
-                                            <div class="col-12">
-                                                <div class="alert alert-danger text-center mb-0">
-                                                    تم رفض طلبك للانضمام.
-                                                    @if (!empty($enrollment?->rejection_reason))
-                                                        <br>
-                                                        <strong>السبب:</strong> {{ $enrollment->rejection_reason }}
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        @break
-
-                                        @default
-                                            <div class="col-12">
-                                                <div class="alert alert-info text-center mb-0">
-                                                    حالة طلبك: {{ $enrollment?->status ?? 'غير محدد' }}
-                                                </div>
-                                            </div>
-                                    @endswitch
-                                @endif
-                            @else
-                                <div class="col-12 ">
-                                    <div class="alert alert-warning text-center mb-0">
-                                        الرجاء التسجيل بحساب متدرب للانضمام إلى التدريب
-                                    </div>
-                                </div>
+                @case('rejected')
+                    <div class="col-12">
+                        <div class="alert alert-danger text-center mb-0">
+                            تم رفض طلبك للانضمام.
+                            @if (!empty($enrollment?->rejection_reason))
+                                <br>
+                                <strong>السبب:</strong> {{ $enrollment->rejection_reason }}
                             @endif
-                        @else
-                            <div class="col-12">
-                                <div class="alert alert-info text-center mb-0">
-                                    الرجاء تسجيل الدخول أولاً بحساب متدرب للانضمام إلى التدريب
-                                </div>
-                            </div>
-                        @endauth
+                        </div>
+                    </div>
+                @break
+
+                @default
+                    <div class="col-12">
+                        <div class="alert alert-info text-center mb-0">
+                            حالة طلبك: {{ $enrollment?->status ?? 'غير محدد' }}
+                        </div>
+                    </div>
+            @endswitch
+        @endif
+    @else
+        <div class="col-12 ">
+            <div class="alert alert-warning text-center mb-0">
+                الرجاء التسجيل بحساب متدرب للانضمام إلى التدريب
+            </div>
+        </div>
+    @endif
+@else
+    <div class="col-12">
+        <div class="alert alert-info text-center mb-0">
+            الرجاء تسجيل الدخول أولاً بحساب متدرب للانضمام إلى التدريب
+        </div>
+    </div>
+@endauth
                         <div class="col-12 col-md-5">
                             <button type="button" class="custom-share-btn w-100" data-bs-toggle="modal"
                                 data-bs-target="#inviteFriendModal">دعوة صديق</button>

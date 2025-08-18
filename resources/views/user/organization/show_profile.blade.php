@@ -3,361 +3,282 @@
 @section('title', 'الملف الشخصي للمؤسسة')
 @section('content')
     <style>
-        /* العناصر العامة */
-        .profile-header {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        .profile-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .profile-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+        /* تخصيصات التصميم */
+        .org-image {
+            width: 100px;
+            height: 100px;
             object-fit: cover;
-            border: 2px solid #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 20px;
         }
-
+        
         .org-name {
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 5px;
         }
-
+        
         .org-type {
             color: #666;
             font-size: 0.9rem;
         }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .info-item {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
+        
         .info-label {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #666;
             margin-bottom: 5px;
         }
-
+        
         .info-value {
             font-weight: bold;
             font-size: 1.1rem;
         }
-
+        
         .edit-btn {
-            background: #f0f0f0;
+            background: #007bff;
+            color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: flex;
+            padding: 10px 25px;
+            border-radius: 25px;
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            gap: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 180px;
+            margin-left: auto;
         }
-
+        
         .edit-btn:hover {
-            background: #e0e0e0;
+            background: #0069d9;
         }
+        
+        .about-container {
+          
 
+        }
+        
+        .about-content {
+            border: 1px solid #eee;
+            border-radius: 20px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .about-text {
+            line-height: 1.6;
+            color: #333;
+        }
+        
         .section-title {
             font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            padding: 0 10px;
+        }
+        
+        .sectors-container {
+            border: 1px solid #eee;
+            border-radius: 20px;
+            padding: 10px;
+            margin-top: 15px;
+        }
+        
+        .sector-tag {
+            background: #e1f5fe;
+            color: #0288d1;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin: 0 8px 0px 0;
+            border: 1px solid #b3e5fc;
         }
 
-        .about-section {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .about-text {
-            line-height: 1.6;
-            color: #444;
-        }
-
+        
         .contact-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: 20px;
+            padding: 20px;
         }
-
+        
         .contact-item {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
         }
-
+        
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+        
         .contact-label {
             font-size: 0.9rem;
             color: #666;
-            margin-bottom: 5px;
         }
-
+        
         .contact-value {
             font-weight: bold;
+            direction: ltr;
+            text-align: left;
         }
-
-        .sectors-section {
-            margin-bottom: 20px;
+        
+        /* توزيع الأعمدة */
+        .about-column {
+            flex: 0 0 65%;
+            max-width: 65%;
         }
-
-        .sectors-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        
+        .contact-column {
+            flex: 0 0 35%;
+            max-width: 35%;
         }
-
-        .sector-tag {
-            background: #e0f7fa;
-            color: #00796b;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-
-        .branches-section {
-            margin-bottom: 20px;
-        }
-
-        .branches-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .branch-card {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 3px solid #00796b;
-        }
-
-        .branch-city {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .branch-country {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        /* التعديلات للشاشات المتوسطة */
+        
+        /* التجاوب مع أحجام الشاشات */
         @media (max-width: 992px) {
-            .info-grid {
-                grid-template-columns: repeat(3, 1fr);
+            .about-column,
+            .contact-column {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .contact-container {
+                margin-top: 20px;
             }
         }
-
-        /* التعديلات للشاشات الصغيرة */
+        
         @media (max-width: 768px) {
-            .profile-header {
-                flex-direction: column;
-                align-items: flex-start;
+            .org-image {
+                width: 80px;
+                height: 80px;
+                border-radius: 15px;
             }
-
-            .info-grid {
-                grid-template-columns: repeat(2, 1fr);
+            
+            .org-name {
+                font-size: 1.2rem;
             }
-
+            
+            .edit-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+                max-width: 150px;
+            }
+            
+            .about-container,
+            .contact-container {
+                border-radius: 20px;
+                padding: 10px;
+            }
+            
+            .about-content,
+            .sectors-container,
             .contact-info {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .profile-info {
-                flex-direction: column;
-                align-items: flex-start;
+                border-radius: 15px;
+                padding: 10px;
             }
         }
     </style>
 
-    <main class="organization-profile-page">
-        <div class="container py-4">
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <!-- رأس الملف الشخصي -->
-            <div class="custom-card mb-4">
-                <div class="profile-header">
-                    <div class="profile-info">
-                        @if ($organization->logo)
-                            <img src="{{ asset('storage/' . $organization->logo) }}" alt="شعار المؤسسة" class="profile-image">
-                        @else
-                            <img src="{{ asset('images/default-org.png') }}" alt="شعار افتراضي" class="profile-image">
-                        @endif
-                        <div>
-                            <div class="org-name">{{ $organization->name }}</div>
-                            <div class="org-type">{{ $organization->type->name ?? 'مؤسسة غير ربحية' }}</div>
-                        </div>
-                    </div>
-                    <button class="edit-btn" onclick="openEditModal()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M14.06 9.02L14.98 9.94L5.92 19H5V18.08L14.06 9.02ZM17.66 3C17.41 3 17.15 3.1 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.17 3.09 17.92 3 17.66 3ZM14.06 6.19L3 17.25V21H6.75L17.81 9.94L14.06 6.19Z" fill="#555"/>
-                        </svg>
-                        تعديل المعلومات
-                    </button>
-                </div>
-
-                <!-- معلومات المؤسسة الأساسية -->
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="info-label">سنة التأسيس</div>
-                        <div class="info-value">{{ $organization->established_year ?? 'غير محدد' }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">عدد الموظفين</div>
-                        <div class="info-value">{{ $organization->employeeNumber->range ?? 'غير محدد' }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">الميزانية السنوية</div>
-                        <div class="info-value">{{ $organization->AnnualBudget->name ?? 'غير محددة' }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">الدولة</div>
-                        <div class="info-value">{{ $user->country->name ?? 'غير محددة' }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">المدينة</div>
-                        <div class="info-value">{{ $user->city ?? 'غير محددة' }}</div>
+    <div class="container py-4">
+        <!-- الصف الأول: معلومات المؤسسة الأساسية -->
+        <div class="row align-items-center mb-4">
+            <!-- العمود الأول: الصورة واسم المؤسسة -->
+            <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
+                <div class="d-flex align-items-center">
+                    @if ($organization->logo)
+                        <img src="{{ asset('storage/' . $organization->logo) }}" alt="شعار المؤسسة" class="org-image me-3">
+                    @else
+                        <img src="{{ asset('images/default-org.png') }}" alt="شعار افتراضي" class="org-image me-3">
+                    @endif
+                    <div>
+                        <div class="org-name">{{ $organization->user->getTranslation('name', 'ar') }} {{ $organization->getTranslation('last_name', 'ar')  }}</div>
+                        <div class="org-type">مؤسسة غير ربحية</div>
                     </div>
                 </div>
             </div>
-
-            <!-- قسم حول المؤسسة -->
-            <div class="custom-card mb-4">
-                <div class="section-title">
-                    <span>حول المؤسسة</span>
-                    <button class="btn btn-sm btn-link" onclick="openEditModal('about')">تعديل</button>
-                </div>
-                <div class="about-section">
-                    <p class="about-text">
-                        {{ $organization->description ?? 'مجتمع حيوي يزود الشباب السوري بالمعرفة والمهارات والأدوات اللازمة لدخول سوق العمل الحر' }}
-                    </p>
-                </div>
+            
+            <!-- العمود الثاني: سنة التأسيس -->
+            <div class="col-md-2 col-sm-4 mb-3 mb-md-0">
+                <div class="info-label">سنة التأسيس</div>
+                <div class="info-value">2023</div>
             </div>
-
-            <!-- قسم القطاعات -->
-            <div class="custom-card mb-4">
-                <div class="section-title">
-                    <span>القطاعات</span>
-                    <button class="btn btn-sm btn-link" onclick="openEditModal('sectors')">تعديل</button>
-                </div>
-                <div class="sectors-section">
-                    <div class="sectors-container">
-                        @forelse($organization_workSectors as $sector)
-                            <span class="sector-tag">{{ $sector->name }}</span>
-                        @empty
-                            <span class="text-muted">لا توجد قطاعات محددة</span>
-                        @endforelse
-                    </div>
-                </div>
+            
+            <!-- العمود الثالث: عدد الموظفين -->
+            <div class="col-md-2 col-sm-4 mb-3 mb-md-0">
+                <div class="info-label">عدد الموظفين</div>
+                <div class="info-value">2 - 10</div>
             </div>
-
-            <!-- قسم معلومات التواصل -->
-            <div class="custom-card mb-4">
-                <div class="section-title">
-                    <span>معلومات التواصل</span>
-                    <button class="btn btn-sm btn-link" onclick="openEditModal('contact')">تعديل</button>
-                </div>
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <div class="contact-label">عنوان المركز الرئيسي</div>
-                        <div class="contact-value">{{ $organization->address ?? 'غير محدد' }}</div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-label">البريد الإلكتروني</div>
-                        <div class="contact-value">{{ $user->email ?? 'غير محدد' }}</div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-label">الموقع الإلكتروني</div>
-                        <div class="contact-value">
-                            @if($organization->website)
-                                <a href="{{ $organization->website }}" target="_blank">{{ $organization->website }}</a>
-                            @else
-                                غير محدد
-                            @endif
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-label">رقم الهاتف</div>
-                        <div class="contact-value">{{ $user->phone_code }} {{ $user->phone_number }}</div>
-                    </div>
-                </div>
+            
+            <!-- العمود الرابع: الميزانية السنوية -->
+            <div class="col-md-2 col-sm-4 mb-3 mb-md-0">
+                <div class="info-label">الميزانية السنوية</div>
+                <div class="info-value">0 - 10000</div>
             </div>
-
-            <!-- قسم الفروع -->
-            @if(count($branches) > 0)
-                <div class="custom-card mb-4">
-                    <div class="section-title">
-                        <span>الفروع</span>
-                        <button class="btn btn-sm btn-link" onclick="openEditModal('branches')">تعديل</button>
-                    </div>
-                    <div class="branches-section">
-                        <div class="branches-list">
-                            @foreach($branches as $branch)
-                                <div class="branch-card">
-                                    <div class="branch-city">{{ $branch['city'] }}</div>
-                                    <div class="branch-country">
-                                        @php
-                                            $country = $countries->find($branch['country_id']);
-                                        @endphp
-                                        {{ $country->name ?? 'غير محددة' }}
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            @endif
+            
+            <!-- العمود الخامس: زر التعديل -->
+            <div class="col-md-3 col-sm-12">
+                <button class="edit-btn" onclick="openEditModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14.06 9.02L14.98 9.94L5.92 19H5V18.08L14.06 9.02ZM17.66 3C17.41 3 17.15 3.1 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.17 3.09 17.92 3 17.66 3ZM14.06 6.19L3 17.25V21H6.75L17.81 9.94L14.06 6.19Z" fill="white"/>
+                    </svg>
+                    تعديل المعلومات
+                </button>
+            </div>
         </div>
-    </main>
+        
+        <!-- الصف الثاني: حول المؤسسة والقطاعات مقابل معلومات التواصل -->
+        <div class="row">
+            <!-- العمود الأول: حول المؤسسة والقطاعات (أوسع) -->
+            <div class="about-column col-lg-8 col-md-7">
+                <div class="about-container">
+                    <div class="section-title">حول المؤسسة</div>
+                    <div class="about-content">
+                        <p class="about-text m-0">
+                            مجتمع معرفي يزود الشباب السوري بالمعرفة والمهارات والأدوات اللازمة لدخول سوق العمل الحر
+                        </p>
+                    </div>
+                    
+                    <div class="section-title">القطاعات</div>
+                    <div class="sectors-container">
+                        <span class="sector-tag">التدريب</span>
+                        <span class="sector-tag">التمكين</span>
+                        <span class="sector-tag">الخريجين الجدد</span>
+                        <span class="sector-tag">زيادة الأعمال</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- العمود الثاني: معلومات التواصل (أصغر) -->
+            <div class="contact-column col-lg-4 col-md-5">
+                <div class="contact-container">
+                  
+                    <div class="contact-info">
+                        <div class="section-title">معلومات التواصل</div>
+                        <div class="contact-item">
+                            <span class="contact-label">عنوان المركز الرئيسي</span>
+                            <span class="contact-value">سوريا، حلب</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-label">البريد الإلكتروني</span>
+                            <span class="contact-value">info@sygeeks.net</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-label">الموقع الإلكتروني</span>
+                            <span class="contact-value">www.sygeeks.net</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-label">رقم الهاتف</span>
+                            <span class="contact-value">+90 531 497 70 81</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal التعديل -->
     <div id="editModal" class="modal fade" tabindex="-1" aria-hidden="true">
@@ -368,7 +289,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="organizationForm" action="{{ route('organization.update') }}" method="POST" enctype="multipart/form-data">
+                    <form id="organizationForm" action="{{ route('update_organization_profile') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -390,9 +311,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="type_id" class="form-label">نوع المؤسسة</label>
                                 <select class="form-select" id="type_id" name="type_id" required>
-                                    @foreach($organizationTypes as $type)
-                                        <option value="{{ $type->id }}" {{ $organization->type_id == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
-                                    @endforeach
+                                    <option value="1" selected>مؤسسة غير ربحية</option>
                                 </select>
                             </div>
                         </div>
@@ -400,87 +319,76 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="established_year" class="form-label">سنة التأسيس</label>
-                                <input type="number" class="form-control" id="established_year" name="established_year" value="{{ $organization->established_year }}" min="1900" max="{{ date('Y') }}">
+                                <input type="number" class="form-control" id="established_year" name="established_year" value="2023" min="1900" max="{{ date('Y') }}">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="employee_number_id" class="form-label">عدد الموظفين</label>
                                 <select class="form-select" id="employee_number_id" name="employee_number_id">
-                                    <option value="">اختر نطاق الموظفين</option>
-                                    @foreach($employeeNumbers as $number)
-                                        <option value="{{ $number->id }}" {{ $organization->employee_number_id == $number->id ? 'selected' : '' }}>{{ $number->range }}</option>
-                                    @endforeach
+                                    <option value="1" selected>2 - 10</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="annual_budget_id" class="form-label">الميزانية السنوية</label>
                                 <select class="form-select" id="annual_budget_id" name="annual_budget_id">
-                                    <option value="">اختر الميزانية</option>
-                                    @foreach($annualBudgets as $budget)
-                                        <option value="{{ $budget->id }}" {{ $organization->annual_budget_id == $budget->id ? 'selected' : '' }}>{{ $budget->name }}</option>
-                                    @endforeach
+                                    <option value="1" selected>0 - 10000</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">حول المؤسسة</label>
-                            <textarea class="form-control" id="description" name="description" rows="3">{{ $organization->description }}</textarea>
+                            <textarea class="form-control" id="description" name="description" rows="3">مجتمع معرفي يزود الشباب السوري بالمعرفة والمهارات والأدوات اللازمة لدخول سوق العمل الحر</textarea>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">القطاعات</label>
                             <div class="row">
-                                @foreach($workSectors as $sector)
-                                    <div class="col-md-4 mb-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="work_sectors[]" value="{{ $sector->id }}" id="sector{{ $sector->id }}"
-                                                {{ in_array($sector->id, $organization_workSectors->pluck('id')->toArray()) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="sector{{ $sector->id }}">
-                                                {{ $sector->name }}
-                                            </label>
-                                        </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="work_sectors[]" value="1" id="sector1" checked>
+                                        <label class="form-check-label" for="sector1">التدريب</label>
                                     </div>
-                                @endforeach
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="work_sectors[]" value="2" id="sector2" checked>
+                                        <label class="form-check-label" for="sector2">التمكين</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="work_sectors[]" value="3" id="sector3" checked>
+                                        <label class="form-check-label" for="sector3">الخريجين الجدد</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="work_sectors[]" value="4" id="sector4" checked>
+                                        <label class="form-check-label" for="sector4">زيادة الأعمال</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="website" class="form-label">الموقع الإلكتروني</label>
-                            <input type="url" class="form-control" id="website" name="website" value="{{ $organization->website }}">
+                            <input type="url" class="form-control" id="website" name="website" value="www.sygeeks.net">
                         </div>
 
                         <div class="mb-3">
                             <label for="address" class="form-label">عنوان المركز الرئيسي</label>
-                            <input type="text" class="form-control" id="address" name="address" value="{{ $organization->address }}">
+                            <input type="text" class="form-control" id="address" name="address" value="سوريا، حلب">
                         </div>
 
-                        <div id="branchesContainer">
-                            <label class="form-label">الفروع</label>
-                            @foreach($branches as $index => $branch)
-                                <div class="branch-item mb-3 p-3 border rounded">
-                                    <div class="row">
-                                        <div class="col-md-5">
-                                            <label class="form-label">البلد</label>
-                                            <select class="form-select branch-country" name="branches[{{ $index }}][country_id]" required>
-                                                <option value="">اختر البلد</option>
-                                                @foreach($countries as $country)
-                                                    <option value="{{ $country->id }}" {{ $branch['country_id'] == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-5">
-                                            <label class="form-label">المدينة</label>
-                                            <input type="text" class="form-control branch-city" name="branches[{{ $index }}][city]" value="{{ $branch['city'] }}" required>
-                                        </div>
-                                        <div class="col-md-2 d-flex align-items-end">
-                                            <button type="button" class="btn btn-danger btn-sm remove-branch">حذف</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
+                        <div class="mb-3">
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="email" name="email" value="info@sygeeks.net">
                         </div>
 
-                        <button type="button" class="btn btn-secondary btn-sm mb-3" id="addBranch">إضافة فرع جديد</button>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">رقم الهاتف</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="+90 531 497 70 81">
+                        </div>
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
@@ -496,63 +404,9 @@
 @section('scripts')
     <script>
         // فتح مودال التعديل
-        function openEditModal(section = '') {
+        function openEditModal() {
             const modal = new bootstrap.Modal(document.getElementById('editModal'));
             modal.show();
-            
-            if (section) {
-                // يمكنك هنا إضافة منطق للتركيز على قسم معين في المودال
-                // مثلاً تمرير إلى قسم القطاعات أو الفروع
-            }
         }
-
-        // إضافة فرع جديد
-        document.getElementById('addBranch').addEventListener('click', function() {
-            const container = document.getElementById('branchesContainer');
-            const index = document.querySelectorAll('.branch-item').length;
-            
-            const branchHtml = `
-                <div class="branch-item mb-3 p-3 border rounded">
-                    <div class="row">
-                        <div class="col-md-5">
-                            <label class="form-label">البلد</label>
-                            <select class="form-select branch-country" name="branches[${index}][country_id]" required>
-                                <option value="">اختر البلد</option>
-                                @foreach($countries as $country)
-                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label">المدينة</label>
-                            <input type="text" class="form-control branch-city" name="branches[${index}][city]" required>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger btn-sm remove-branch">حذف</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            container.insertAdjacentHTML('beforeend', branchHtml);
-        });
-
-        // حذف فرع
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-branch')) {
-                e.target.closest('.branch-item').remove();
-            }
-        });
-
-        // التحقق من صحة النموذج
-        document.getElementById('organizationForm').addEventListener('submit', function(e) {
-            let valid = true;
-            
-            // يمكنك إضافة المزيد من التحقق هنا
-            
-            if (!valid) {
-                e.preventDefault();
-            }
-        });
     </script>
 @endsection

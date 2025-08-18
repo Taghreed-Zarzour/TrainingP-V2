@@ -18,7 +18,7 @@
 
 
 <header class="bg-white shadow-sm">
-    <div class="container" style="max-width: 1350px;">
+    <div class="container custom-container">
         <nav class="navbar navbar-expand-lg navbar-light py-3">
             <!-- الشعار -->
             <a class="navbar-brand me-auto" href="{{ route('homePage') }}">
@@ -36,30 +36,34 @@
                 <!-- داخل #navbarMain -->
                 <button class="mobile-close-btn d-lg-none"
                     onclick="document.getElementById('navbarMain').classList.remove('show')">
-                    ✕ إغلاق
+                    ✕
                 </button>
 
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li
-                        class="nav-item 
-    {{ auth()->check() && request()->is(auth()->user()->user_type_id == 4 ? 'homePageOrganization' : 'homePage')
-        ? 'active'
-        : '' }}">
-                        <a class="nav-link pb-0"
-                            href="{{ auth()->check()
-                                ? (auth()->user()->user_type_id == 4
-                                    ? route('homePageOrganization')
-                                    : route('homePage'))
-                                : route('homePage') }}">
-                            الرئيسية
-                        </a>
-                    </li>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-2">
+@php
+    // تحديد إذا المستخدم مؤسسة
+    if (auth()->check()) {
+        $isOrg = auth()->user()->user_type_id == 4;
+    } else {
+        // قراءة من الـ type في الرابط إذا ما في تسجيل دخول
+        $isOrg = request('type') === 'organization';
+    }
+
+    $homeRoute = $isOrg ? 'homePageOrganization' : 'homePage';
+@endphp
+
+<li class="nav-item {{ request()->routeIs($homeRoute) ? 'active' : '' }}">
+    <a class="nav-link nav-font va pb-0" 
+       href="{{ route($homeRoute) }}{{ !$isOrg && !auth()->check() ? '?type=individual' : ($isOrg && !auth()->check() ? '?type=organization' : '') }}">
+        الرئيسية
+    </a>
+</li>
+
 
 
 
                     <li class="nav-item {{ request()->is('trainings*') ? 'active' : '' }}">
-                        <a class="nav-link pb-0" href="{{ route('trainings_announcements') }}"
-                            style="font-size: 1.25rem">التدريبات</a>
+                        <a class="nav-link nav-font pb-0" href="{{ route('trainings_announcements') }}">التدريبات</a>
                     </li>
                 </ul>
 
@@ -76,13 +80,12 @@
                             </li>
                         @endif
                         @if (in_array(auth()->user()->user_type_id, [4]))
-                            <li class="nav-item me-2">
-                                <a href=""
-                                    class="pbtn pbtn-main d-flex align-items-center">
-                                    <img src="{{ asset('images/edit.svg') }}" class="me-1" />
-                                    <span>أعلن عن برامجك التدريبية</span>
-                                </a>
-                            </li>
+                  <li class="nav-item me-2">
+    <a href="#" class="pbtn pbtn-main d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#announceTrainingModal">
+        <img src="{{ asset('images/edit.svg') }}" class="me-1" />
+        <span>أعلن عن برامجك التدريبية</span>
+    </a>
+</li>
                         @endif
                         <!-- القائمة المنسدلة للملف الشخصي -->
                         <li class="nav-item dropdown">
@@ -110,16 +113,15 @@
                                     <hr class="dropdown-divider">
                                 </li>
 
-                                @php
-                                    $profileRoute = match (auth()->user()->user_type_id) {
-                                        1 => route('show_trainer_profile'),
-                                        2 => route('show_assistant_profile'),
-                                        3 => route('show_trainee_profile'),
-                                        default => '#',
-                                    };
-                                @endphp
-
-                                <li>
+@php
+    $profileRoute = match (auth()->user()->user_type_id) {
+        1 => route('show_trainer_profile', ['user' => auth()->user()->profile_slug ?? auth()->user()->id]),
+        2 => route('show_assistant_profile', ['user' => auth()->user()->profile_slug ?? auth()->user()->id]),
+        3 => route('show_trainee_profile', ['user' => auth()->user()->profile_slug ?? auth()->user()->id]),
+        4 => route('show_organization_profile', ['user' => auth()->user()->profile_slug ?? auth()->user()->id]),
+        default => '#',
+    };
+@endphp                      <li>
                                     <a class="dropdown-item" href="{{ $profileRoute }}">
                                         <img src="{{ asset('images/profile-menu/user.svg') }}" />
                                         الملف الشخصي
@@ -176,496 +178,54 @@
                                 <li class="nav-item">
                                     <a href="{{ route('login') }}" class="punderlined ">تسجيل الدخول</a>
                                 </li>
-                                <li class="nav-item me-2">
-                                    <a href="{{ route('register') }}" class="pbtn pbtn-main">إنشاء حساب مجانًا</a>
-                                </li>
 @php
     $type = request()->query('type'); // بيرجع 'individual' أو 'organization'
+    // تحديد الرابط حسب النوع
+    $registerRoute = match($type) {
+        'organization' => route('register-org'), // صفحة تسجيل المؤسسات
+        'individual' => route('register'), // صفحة تسجيل الأفراد
+        default => route('register'), // افتراضي: الأفراد
+    };
 @endphp
 
-@if($type === 'organization')
-    <li>
-        <a href="{{ route('homePage', ['type' => 'individual']) }}" class="piconed">
-            <span>للمدربين والأفراد</span>
-            <img src="{{ asset('images/send.svg') }}" />
-        </a>
-    </li>
-@elseif($type === 'individual')
-    <li>
-        <a href="{{ route('homePageOrganization', ['type' => 'organization']) }}" class="piconed">
-            <span>للمؤسسات</span>
-            <img src="{{ asset('images/send.svg') }}" />
-        </a>
-    </li>
-    @else
-    <li>
-        <a href="{{ route('homePageOrganization', ['type' => 'organization']) }}" class="piconed">
-            <span>للمؤسسات</span>
-            <img src="{{ asset('images/send.svg') }}" />
-        </a>
-    </li>
-@endif
+<li class="nav-item me-2">
+    <a href="{{ $registerRoute }}" class="pbtn pbtn-main">إنشاء حساب مجانًا</a>
+</li>
+
+                                @php
+                                    $type = request()->query('type'); // بيرجع 'individual' أو 'organization'
+                                @endphp
+
+                                @if ($type === 'organization')
+                                    <li>
+                                        <a href="{{ route('homePage', ['type' => 'individual']) }}" class="piconed">
+                                            <span>للمدربين والأفراد</span>
+                                            <img src="{{ asset('images/send.svg') }}" />
+                                        </a>
+                                    </li>
+                                @elseif($type === 'individual')
+                                    <li>
+                                        <a href="{{ route('homePageOrganization', ['type' => 'organization']) }}"
+                                            class="piconed">
+                                            <span>للمؤسسات</span>
+                                            <img src="{{ asset('images/send.svg') }}" />
+                                        </a>
+                                    </li>
+                                @else
+                                    <li>
+                                        <a href="{{ route('homePageOrganization', ['type' => 'organization']) }}"
+                                            class="piconed">
+                                            <span>للمؤسسات</span>
+                                            <img src="{{ asset('images/send.svg') }}" />
+                                        </a>
+                                    </li>
+                                @endif
                             </ul>
                         @endauth
             </div>
         </nav>
     </div>
 </header>
-<style>
-    @media (max-width: 991.98px) {
-        .navbar-nav .dropdown:hover .dropdown-menu {
-            display: block !important;
-            position: static;
-            float: none;
-        }
-
-        .navbar-nav .dropdown-menu {
-            border: none;
-            box-shadow: none;
-        }
-    }
-
-    @media (max-width: 991.98px) {
-
-        /* اجعل القائمة المنسدلة تأخذ الشاشة كاملة */
-        #navbarMain {
-            background-color: white;
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 70%;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 1rem;
-            z-index: 1050;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .navbar-collapse.collapsing,
-        .navbar-collapse.show {
-            display: block !important;
-        }
-
-        .navbar-toggler {
-            border: none;
-        }
-
-        /* إغلاق القائمة بزر */
-        .mobile-close-btn {
-            display: block;
-            text-align: left;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #003090;
-            background: none;
-            border: none;
-        }
-
-        /* عناصر القائمة داخل الهاتف */
-        #navbarMain .nav-link,
-        #navbarMain .dropdown-item {
-            font-size: 1.5rem !important;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        /* الأزرار مثل "إنشاء حساب" */
-        #navbarMain .btn {
-            width: 100%;
-            margin: 0.5rem 0;
-        }
-
-        /* القائمة المنسدلة داخل الجوال */
-        .navbar-nav .dropdown-menu {
-            background-color: transparent;
-            box-shadow: none;
-            padding: 0;
-        }
-
-        .navbar-nav .dropdown-item {
-            display: flex;
-            align-items: center;
-        }
-
-        /* تصغير الشعار ليبدو أوضح في الجوال */
-        .navbar-brand img {
-            max-height: 40px;
-        }
-    }
-
-    @media (max-width: 991.98px) {
-
-        /* اجعل القائمة المنسدلة للملف الشخصي مفتوحة دائمًا */
-        .navbar-nav .dropdown-menu {
-            display: block !important;
-            /* تظهر دائمًا */
-            position: static !important;
-            /* تجعلها ضمن التدفق الطبيعي */
-            box-shadow: none !important;
-            border: none !important;
-            background: transparent !important;
-            padding-left: 0 !important;
-        }
-
-        /* اجعل رابط الصورة الشخصية غير قابل للنقر (تعطيل الـ toggle) */
-        .navbar-nav .dropdown-toggle {
-            pointer-events: none;
-        }
-
-        /* ترتيب عناصر القائمة بشكل عمودي واضح */
-        .navbar-nav .dropdown-item {
-            padding: 0.5rem 1rem;
-            border-bottom: 1px solid #eee;
-        }
-    }
-
-    /* Header */
-
-    header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-
-    header nav {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 80px;
-    }
-
-    header nav>ul {
-        display: flex;
-        flex-direction: row;
-        list-style: none;
-        gap: 48px;
-        padding-inline-start: 0px;
-        align-items: center;
-    }
-
-    header nav.auth-links>ul {
-        gap: 24px;
-    }
-
-    header nav ul li {
-        position: relative;
-    }
-
-    header nav ul>li.active::before {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background-image: url('data:image/svg+xml,<svg width="59" height="4" viewBox="0 0 59 5" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 3.99999C12.581 -0.435593 28.6857 0.46061 58 4" stroke="%23003090" stroke-width="2" stroke-linecap="round"/></svg>');
-        background-repeat: no-repeat;
-        background-size: contain;
-        height: 10px;
-        width: 100%;
-    }
-
-    header nav ul>li.active a {
-        color: #003090;
-    }
-
-    @media (max-width: 991.98px) {
-        header nav ul>li.active {
-            position: relative;
-            /* مهم جداً لتفعيل ::before */
-        }
-
-        header nav ul>li.active::before {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            /* بدل top: 100% لتظهر تحت النص */
-            left: 0;
-            right: 0;
-            color: #003090;
-            background-image: none;
-            background-repeat: no-repeat;
-            background-size: 59px 5px;
-            /* الحجم المناسب */
-            height: 5px;
-            width: 59px;
-            margin: 0 auto;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        header nav ul>li.active a {
-            color: #003090;
-            font-weight: 600;
-        }
-
-
-    }
-
-    header nav img.logo {
-        height: 33px;
-        width: 23px;
-        object-fit: contain;
-        object-position: center;
-    }
-
-    header nav ul li a {
-        font-family: IBM Plex Sans Arabic;
-        font-weight: 400;
-        font-size: 20px;
-        line-height: 40px;
-        letter-spacing: 0%;
-        text-decoration: none;
-        color: #333333;
-        position: relative;
-        word-wrap: break-word;
-    }
-
-    header nav ul li.menu>a::after {
-        content: "";
-        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="%23000000" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>');
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-size: contain;
-        background-position: bottom;
-        background-repeat: no-repeat;
-        position: absolute;
-        left: -24px;
-        bottom: 5px;
-        transition: all 0.2s ease-in-out;
-    }
-
-    header nav ul li.menu:hover>a::after {
-        transform: rotate(180deg);
-    }
-
-    header nav ul li.menu ul.submenu {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        width: 150px;
-        box-shadow: 0px 10px 20px 0px #00000012;
-        border-radius: 10px;
-    }
-
-    header nav ul li.menu ul.submenu li {
-        border-bottom: 1px solid #00000012;
-        padding: 0.5rem 1rem;
-    }
-
-    header nav ul li.menu:hover>ul.submenu {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    @media only screen and (max-width: 1200px) {
-        header nav {
-            display: none;
-        }
-    }
-
-    @media only screen and (min-width: 1200px) {
-        header div.mobile {
-            display: none;
-        }
-    }
-
-    header div.mobile {
-        width: 100%;
-    }
-
-    header div.mobile .mobile-main {
-        position: fixed;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 50%;
-        background-color: #003090;
-        padding: 24px;
-        transform: translateX(100%);
-        transition: all 0.2s ease-in-out;
-        z-index: 999;
-        box-sizing: border-box;
-    }
-
-    @media only screen and (max-width: 600px) {
-        header div.mobile .mobile-main {
-            width: 100%;
-        }
-    }
-
-    header div.mobile div.mobile-main.opened {
-        transform: translateX(0);
-    }
-
-    header div.mobile button.burger {
-        background-color: #ffffff;
-        border-color: #00000012;
-        border-radius: 4px;
-        cursor: pointer;
-        vertical-align: middle;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0.5rem;
-    }
-
-    header div.mobile .mobile-header {
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-
-    header div.mobile .mobile-header .logo {
-        width: 33px;
-        height: 43px;
-    }
-
-    header div.mobile .mobile-header .leftside-wrapper {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    header div.mobile .mobile-main ul {
-        display: flex;
-        flex-direction: column;
-        align-items: start;
-        gap: 24px;
-        list-style: none;
-        padding-inline-start: 0px;
-    }
-
-    header div.mobile .mobile-main ul li a {
-        color: #ffffff;
-    }
-
-    header div.mobile ul li ul.submenu {
-        margin-top: 1rem;
-        padding-right: 1rem;
-        gap: 12px;
-    }
-
-    header div.mobile ul>li {
-        position: relative;
-        width: 100%;
-    }
-
-    header div.mobile .mobile-main button.mobile-close {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-    }
-
-    .custom-arrow {
-        position: absolute;
-        bottom: 15px;
-        /* أسفل الصورة */
-        left: 15px;
-        /* يسار الصورة */
-        transform: translate(-30%, 50%);
-        /* ضبط دقيق للموقع */
-        width: 24px;
-        height: 24px;
-        background-color: #003090;
-        /* أزرق */
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .dropdown-toggle::after {
-        content: none;
-    }
-
-    .custom-arrow::before {
-        content: '';
-        display: block;
-        width: 8px;
-        height: 8px;
-        border-right: 2px solid white;
-        border-bottom: 2px solid white;
-        transform: rotate(45deg);
-    }
-
-
-    /* تحسين شكل القائمة المنسدلة لصورة المستخدم */
-    .dropdown-menu.user-menu {
-        padding: 0;
-        min-width: 280px;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    }
-
-    .user-menu-header {
-        background-color: #D9E6FF;
-        padding: 12px 16px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .user-menu-header img {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .user-menu-header .user-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .user-menu-header .user-info strong {
-        font-size: 16px;
-        color: #000000;
-        text-align: right
-    }
-
-    .user-menu-header .user-info small {
-        color: #666;
-        font-size: 13px;
-    }
-
-    /* عناصر القائمة */
-    .user-menu .dropdown-item {
-        font-size: 1rem;
-
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .user-menu .dropdown-item img {
-        width: 18px;
-        height: 18px;
-    }
-
-    /* خط الفاصل */
-    .user-menu .dropdown-divider {
-        margin: 0;
-    }
-
-    /* تسجيل الخروج */
-    .user-menu .dropdown-item.text-danger {
-
-        font-size: 13px;
-        font-weight: 500;
-    }
-</style>
 <script>
     document.querySelectorAll('#navbarMain .nav-link, #navbarMain .dropdown-item').forEach(link => {
         link.addEventListener('click', () => {
@@ -676,11 +236,209 @@
         });
     });
 </script>
-<div class="site-container">
 
 
 
+<div class="modal fade" id="announceTrainingModal" tabindex="-1" aria-labelledby="announceTrainingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title px-5 mt-2" id="announceTrainingModalLabel">اختر ماذا تود أن تُعلن عنه؟</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body">
+                <form class="p-0" id="announceTrainingForm">
+                    <div class="training-options-container row g-4 px-5">
+                        <!-- خيار البرنامج التدريبي (عدة تدريبات) -->
+                        <div class="col-md-6">
+                            <div class="training-option-card h-100">
+                                <input type="radio" name="training_type" id="training_program" value="program" class="option-radio">
+                                <label for="training_program" class="option-label h-100">
+                                  
+                                        <!-- سيتم استبدال هذا بمكان الصورة -->
+                                          <img src="{{ asset('images/org/multi-program.svg') }}"/>
+                              
+                                    <div class="option-title">برنامج تدريبي (عدة تدريبات)</div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- خيار التدريب الواحد -->
+                        <div class="col-md-6">
+                            <div class="training-option-card h-100">
+                                <input type="radio" name="training_type" id="single_training" value="single" class="option-radio">
+                                <label for="single_training" class="option-label h-100">
+                                
+                                        <!-- سيتم استبدال هذا بمكان الصورة -->
+                                        <img src="{{ asset('images/org/one-program.svg') }}"/>
+                                
+                                    <div class="option-title">تدريب واحد فقط</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer px-5 mb-3">
+                <button type="button" class="custom-btn flex-fill" id="continueAnnouncementBtn" disabled>
+                    التالي   
+                    <img src="{{ asset('images/arrow-left.svg') }}" alt="" />
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<style>
+    /* تنسيقات المودال */
+    #announceTrainingModal .modal-dialog {
+        max-width: 800px;
+    }
+    #announceTrainingModal .btn-close{
+      margin-bottom: 22px;
+    }
+    #announceTrainingModal .modal-header {
+        border-bottom: none;
+        padding-bottom: 0;
+        padding-top: 2rem;
+    }
+    
+    #announceTrainingModal .modal-title {
+      color: #000000;
+        font-weight: 500;
+        font-size: 1.5rem;
+        text-align: right;
+        width: 100%;
+    }
+    
+    #announceTrainingModal .modal-body {
+        padding: 1rem 2rem 2rem;
+    }
+    
+    /* تنسيقات خيارات التدريب */
 
-
+    .training-option-card {
+        position: relative;
+        height: 100%;
+    }
+    
+    .option-radio {
+        position: absolute;
+        opacity: 0;
+    }
+    
+    .option-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #fff;
+        border-radius: 15px;
+        padding: 0.5rem 0.3rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .option-radio:checked + .option-label {
+        border-color: #858383;
+        background-color: #dfebff;
+    }
+    
+    .option-image {
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 1.5rem;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    .image-placeholder {
+        width: 100%;
+        height: 100%;
+        background-color: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+    }
+    
+    .option-title {
+      padding-top: 25px;
+        font-weight: 500;
+        font-size: 1.2rem;
+        color: #000000;
+    }
+    
+    /* زر التالي */
+    #continueAnnouncementBtn {
+        font-size: 1.1rem;
+      
+    }
+    
+    #continueAnnouncementBtn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    /* التجاوب مع الشاشات الصغيرة */
+    @media (max-width: 768px) {
+        .training-options-container {
+            flex-direction: column;
+        }
+        
+        .option-image {
+            width: 120px;
+            height: 120px;
+        }
+    }
+    
+    @media (max-width: 576px) {
   
+        
+        .option-image {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .option-title {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // تفعيل/تعطيل زر التالي بناءً على اختيار المستخدم
+        const radioButtons = document.querySelectorAll('.option-radio');
+        const continueBtn = document.getElementById('continueAnnouncementBtn');
+        
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                continueBtn.disabled = false;
+            });
+        });
+        
+        // معالجة النقر على زر التالي
+continueBtn.addEventListener('click', function() {
+    const selectedOption = document.querySelector('input[name="training_type"]:checked');
+    if (selectedOption) {
+        if (selectedOption.value === 'program') {
+            // توجيه المستخدم لإنشاء برنامج تدريبي
+            window.location.href = "";
+        } else {
+            // توجيه المستخدم لإنشاء تدريب واحد
+            window.location.href = "{{ auth()->check() ? (auth()->user()->trainingPrograms()->exists() ? route('training.create') : route('startCreateTraining')) : route('login') }}";
+        }
+    }
+});
+
+    });
+</script>
+
+<div class="site-container">

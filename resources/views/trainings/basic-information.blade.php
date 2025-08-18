@@ -136,13 +136,17 @@
                             </div>
                         </div>
                         
-                        <div class="input-group">
-                            <label>وصف التدريب<span class="required">*</span></label>
-                            <textarea name="description" placeholder="اكتب نبذة مختصرة عن التدريب" rows="5" class="validate @error('description') error-border @enderror" required>{{ old('description', $training->description ?? '') }}</textarea>
-                            @error('description')
-                                <span class="error-message">{{ $message }}</span>
-                            @enderror
-                        </div>
+<div class="input-group position-relative">
+    <label>وصف التدريب<span class="required">*</span></label>
+    <textarea name="description" placeholder="اكتب نبذة مختصرة عن التدريب" rows="5" 
+              class="validate @error('description') error-border @enderror" 
+              required minlength="10" maxlength="500"
+              id="training-description">{{ old('description', $training->description ?? '') }}</textarea>
+    <div class="char-counter-badge" id="description-counter">500</div>
+    @error('description')
+        <span class="error-message">{{ $message }}</span>
+    @enderror
+</div>
                         
                         <div class="input-group-2col mt-4">
                             <div class="input-group">
@@ -210,7 +214,7 @@
                     description: {
                         required: true,
                         minlength: 10,
-                        maxlength: 1000
+                        maxlength: 500
                     }
                 },
                 messages: {
@@ -237,7 +241,7 @@
                     description: {
                         required: "يرجى إدخال وصف التدريب",
                         minlength: "وصف التدريب يجب أن يحتوي على 10 أحرف على الأقل",
-                        maxlength: "وصف التدريب يجب ألا يتجاوز 1000 حرف"
+                        maxlength: "وصف التدريب يجب ألا يتجاوز 500 حرف"
                     }
                 },
                 errorElement: 'span',
@@ -260,4 +264,39 @@
             });
         });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const descriptionTextarea = document.getElementById('training-description');
+        const charCounter = document.getElementById('description-counter');
+        const maxLength = 500;
+        const minLength = 10;
+
+        // تحديث العداد عند الكتابة
+        descriptionTextarea.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            const remaining = maxLength - currentLength;
+            
+            // تحديث العداد
+            charCounter.textContent = remaining;
+            
+            // تغيير مظهر العداد حسب الحالة
+            if (currentLength > maxLength) {
+                charCounter.classList.add('char-counter-danger');
+                charCounter.classList.remove('char-counter-warning');
+            } 
+            else if (remaining < 50) {
+                charCounter.classList.add('char-counter-warning');
+                charCounter.classList.remove('char-counter-danger');
+            }
+            else {
+                charCounter.classList.remove('char-counter-danger', 'char-counter-warning');
+            }
+        });
+
+        // التحقق الأولي عند تحميل الصفحة
+        if (descriptionTextarea.value) {
+            descriptionTextarea.dispatchEvent(new Event('input'));
+        }
+    });
+</script>
 @endsection

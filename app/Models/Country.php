@@ -20,8 +20,7 @@ class Country extends Model
     {
         return $this->hasMany(Assistant::class, 'nationality_id');
     }
-
-    public function trainees()
+      public function trainees()
     {
         return $this->hasMany(Trainee::class, 'nationality_id');
     }

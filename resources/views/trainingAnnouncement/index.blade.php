@@ -1,6 +1,6 @@
 @extends('frontend.layouts.master')
 
-    @section('title', 'التدريبات')
+@section('title', 'التدريبات')
 
 @section('content')
 
@@ -24,20 +24,21 @@
             <img src="{{ asset('images/cources/cources.svg') }}" alt="Training Image" />
         </div>
     </div>
+
     <!-- ✅ السطر الثاني: البحث + زر الفلترة -->
     <div class="container-fluid py-4 bg-white">
         <div class="row justify-content-center">
-            <div class="col-md-11">
+            <div class="col-12 col-lg-11">
                 <div
-                    class="d-flex align-items-center justify-content-between px-3 py-2 shadow-sm bg-white custom-search-bar">
-                    <div class="d-flex align-items-center">
+                    class="d-flex align-items-center justify-content-between px-3 py-2 shadow-sm bg-white custom-search-bar w-100">
+                    <div class="d-flex align-items-center flex-grow-1 me-3">
                         <!-- أيقونة البحث + النص (يمين) -->
-                        <img src="{{ asset('images/cources/search.svg') }}" alt="search icon" />
+                        <img src="{{ asset('images/cources/search.svg') }}" alt="search icon" class="me-2" />
                         <input type="text" class="form-control border-0 flex-grow-1" placeholder="ابحث عن أي شيء"
                             style="box-shadow: none; background: transparent;" />
                     </div>
                     <!-- زر فلترة مخصص -->
-                    <button class="btn custom-filter-btn d-flex align-items-center gap-2" type="button"
+                    <button class="btn custom-filter-btn d-flex align-items-center gap-2 flex-shrink-0" type="button"
                         data-bs-toggle="modal" data-bs-target="#filterModal">
                         <svg width="23" height="22" viewBox="0 0 23 22" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -122,190 +123,215 @@
             </div>
         </div>
     </div>
-{{-- cards --}}
-<div class="container my-5" dir="rtl">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold">البرامج التدريبية المتاحة</h4>
-        @if (!empty($programs))
-        <div class="d-flex gap-2">
-            <button class="arrow-btn" id="carouselPrev">
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15.0374 11.0001C15.0375 11.3085 14.9767 11.6139 14.8586 11.8988C14.7405 12.1837 14.5674 12.4425 14.3491 12.6604L8.73743 18.2696C8.61471 18.3812 8.4537 18.4413 8.28785 18.4373C8.122 18.4334 7.96404 18.3657 7.84679 18.2483C7.72953 18.1309 7.66199 17.9729 7.65819 17.8071C7.65439 17.6412 7.71462 17.4803 7.82637 17.3576L13.4346 11.7468C13.633 11.5482 13.7444 11.279 13.7444 10.9984C13.7444 10.7177 13.633 10.4485 13.4346 10.2499L7.82551 4.64078C7.71154 4.51847 7.64949 4.35669 7.65244 4.18954C7.65539 4.02238 7.72311 3.86289 7.84132 3.74468C7.95954 3.62646 8.11903 3.55875 8.28618 3.5558C8.45334 3.55285 8.61511 3.61489 8.73743 3.72887L14.3491 9.33798C14.5676 9.55609 14.7408 9.81519 14.8589 10.1004C14.9771 10.3856 15.0377 10.6914 15.0374 11.0001Z" fill="white"/>
-                </svg>
-            </button>
-            <button class="arrow-btn" id="carouselNext">
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6.96264 11.0001C6.96254 11.3085 7.02328 11.6139 7.14138 11.8988C7.25948 12.1837 7.43261 12.4425 7.65088 12.6604L13.2626 18.2696C13.3853 18.3812 13.5463 18.4413 13.7122 18.4373C13.878 18.4334 14.036 18.3657 14.1532 18.2483C14.2705 18.1309 14.338 17.9729 14.3418 17.8071C14.3456 17.6412 14.2854 17.4803 14.1736 17.3576L8.56537 11.7468C8.367 11.5482 8.25557 11.279 8.25557 10.9984C8.25557 10.7177 8.367 10.4485 8.56537 10.2499L14.1745 4.64078C14.2885 4.51847 14.3505 4.35669 14.3476 4.18954C14.3446 4.02238 14.2769 3.86289 14.1587 3.74468C14.0405 3.62646 13.881 3.55875 13.7138 3.5558C13.5467 3.55285 13.3849 3.61489 13.2626 3.72887L7.65088 9.33798C7.43241 9.55609 7.25915 9.81519 7.14105 10.1004C7.02295 10.3856 6.96232 10.6914 6.96264 11.0001Z" fill="white"/>
-                </svg>
-            </button>
+    {{-- cards --}}
+    <div class="container-fluid my-5" dir="rtl">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold">البرامج التدريبية المتاحة</h4>
+            @if (!empty($programs))
+                <div class="d-flex gap-2">
+                    <button class="arrow-btn" id="carouselPrev">
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M15.0374 11.0001C15.0375 11.3085 14.9767 11.6139 14.8586 11.8988C14.7405 12.1837 14.5674 12.4425 14.3491 12.6604L8.73743 18.2696C8.61471 18.3812 8.4537 18.4413 8.28785 18.4373C8.122 18.4334 7.96404 18.3657 7.84679 18.2483C7.72953 18.1309 7.66199 17.9729 7.65819 17.8071C7.65439 17.6412 7.71462 17.4803 7.82637 17.3576L13.4346 11.7468C13.633 11.5482 13.7444 11.279 13.7444 10.9984C13.7444 10.7177 13.633 10.4485 13.4346 10.2499L7.82551 4.64078C7.71154 4.51847 7.64949 4.35669 7.65244 4.18954C7.65539 4.02238 7.72311 3.86289 7.84132 3.74468C7.95954 3.62646 8.11903 3.55875 8.28618 3.5558C8.45334 3.55285 8.61511 3.61489 8.73743 3.72887L14.3491 9.33798C14.5676 9.55609 14.7408 9.81519 14.8589 10.1004C14.9771 10.3856 15.0377 10.6914 15.0374 11.0001Z"
+                                fill="white" />
+                        </svg>
+                    </button>
+                    <button class="arrow-btn" id="carouselNext">
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M6.96264 11.0001C6.96254 11.3085 7.02328 11.6139 7.14138 11.8988C7.25948 12.1837 7.43261 12.4425 7.65088 12.6604L13.2626 18.2696C13.3853 18.3812 13.5463 18.4413 13.7122 18.4373C13.878 18.4334 14.036 18.3657 14.1532 18.2483C14.2705 18.1309 14.338 17.9729 14.3418 17.8071C14.3456 17.6412 14.2854 17.4803 14.1736 17.3576L8.56537 11.7468C8.367 11.5482 8.25557 11.279 8.25557 10.9984C8.25557 10.7177 8.367 10.4485 8.56537 10.2499L14.1745 4.64078C14.2885 4.51847 14.3505 4.35669 14.3476 4.18954C14.3446 4.02238 14.2769 3.86289 14.1587 3.74468C14.0405 3.62646 13.881 3.55875 13.7138 3.5558C13.5467 3.55285 13.3849 3.61489 13.2626 3.72887L7.65088 9.33798C7.43241 9.55609 7.25915 9.81519 7.14105 10.1004C7.02295 10.3856 6.96232 10.6914 6.96264 11.0001Z"
+                                fill="white" />
+                        </svg>
+                    </button>
+                </div>
+            @endif
         </div>
+        @if (empty($programs))
+            <div class="empty-state text-center py-5 col-12" style="justify-self: center;">
+
+                <h5 class="fw-bold mb-3">لا توجد برامج تدريبية متاحة حالياً</h5>
+                <p class="text-muted mb-4">يمكنك متابعتنا لمعرفة أحدث البرامج التدريبية عند توفرها</p>
+
+                @auth
+                    @if (in_array(auth()->user()->user_type_id, [1, 4]))
+                        <a href="{{ route('training.create') }}" class="btn custom-btn">
+                            إنشاء تدريب جديد
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('register') }}" class="btn signup-btn m-2">إنشاء حساب</a>
+                    <a href="{{ route('login') }}" class="btn signup-btn m-2">تسجيل الدخول</a>
+                @endauth
+            </div>
+        @else
+            <div class="carousel-wrapper position-relative">
+                <div class="overflow-hidden" style="width: 100%;">
+                    <div class="d-flex flex-nowrap" id="cardCarousel" style="scroll-behavior: smooth; overflow-x: auto;">
+                        @foreach ($programs as $program)
+                            <div class="card-slide p-2">
+                                <a href="{{ route('show_trainings_announcements', $program->id) }}"
+                                    class="text-decoration-none text-dark">
+                                    <div class="card h-100 shadow-sm rounded-4 position-relative">
+                                        <div class="d-flex flex-column justify-content-between image-custom">
+                                            <span
+                                                class="badge-position">{{ $program->TrainingClassification->name ?? 'تدريب' }}</span>
+                                            <img src="{{ $program->AdditionalSetting && $program->AdditionalSetting->profile_image
+                                                ? asset('storage/' . $program->AdditionalSetting->profile_image)
+                                                : asset('images/cources/training-default-img.svg') }}"
+                                                class="card-img-top" alt="صورة التدريب">
+                                        </div>
+                                        <div
+                                            class="card-body d-flex flex-column justify-content-between gap-1 align-items-start">
+                                            <h6 class="fw-bold">{{ $program->title }}</h6>
+                                            <div class="trainer-info mt-2 mb-2">
+                                                @php
+                                                    $trainer = $trainers->find($program->user_id);
+                                                    $trainerPhoto =
+                                                        $trainer && $trainer->photo
+                                                            ? asset('storage/' . $trainer->photo)
+                                                            : asset('images/icons/user.svg');
+                                                @endphp
+                                                <a href="{{ route('show_trainer_profile', ['id' => $program->user_id]) }}"
+                                                    style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
+                                                    <img class="trainer-img" src="{{ $trainerPhoto }}"
+                                                        alt="صورة المدرب" />
+                                                    <span>
+                                                        {{ optional($trainer)->getTranslation('name', 'ar') }}
+                                                        {{ optional(optional($trainer)->trainer)->getTranslation('last_name', 'ar') }}
+                                                    </span>
+                                                </a>
+                                            </div>
+                                            <ul class="list-unstyled d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                <li class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset('images/cources/clock.svg') }}" alt="المدة">
+                                                    @php
+                                                        // التحقق من وجود مدة التدريب
+                                                        $durationText = '';
+
+                                                        if (
+                                                            isset($program->total_duration_hours) &&
+                                                            $program->total_duration_hours > 0
+                                                        ) {
+                                                            // استخدام المدة المحددة مسبقاً
+                                                            $hours = floor($program->total_duration_hours);
+                                                            $minutes = round(
+                                                                ($program->total_duration_hours - $hours) * 60,
+                                                            );
+
+                                                            if ($hours > 0 && $minutes > 0) {
+                                                                $durationText =
+                                                                    $hours . ' ساعة و ' . $minutes . ' دقيقة';
+                                                            } elseif ($hours > 0) {
+                                                                $durationText = $hours . ' ساعة';
+                                                            } else {
+                                                                $durationText = $minutes . ' دقيقة';
+                                                            }
+                                                        } elseif (
+                                                            isset($program->sessions) &&
+                                                            $program->sessions->count() > 0
+                                                        ) {
+                                                            // حساب المدة من الجلسات
+                                                            $totalMinutes = 0;
+                                                            foreach ($program->sessions as $session) {
+                                                                if (
+                                                                    isset($session->session_start_time) &&
+                                                                    isset($session->session_end_time)
+                                                                ) {
+                                                                    $startTime = \Carbon\Carbon::parse(
+                                                                        $session->session_start_time,
+                                                                    );
+                                                                    $endTime = \Carbon\Carbon::parse(
+                                                                        $session->session_end_time,
+                                                                    );
+                                                                    $sessionMinutes = $startTime->diffInMinutes(
+                                                                        $endTime,
+                                                                    );
+                                                                    $totalMinutes += $sessionMinutes;
+                                                                }
+                                                            }
+
+                                                            if ($totalMinutes > 0) {
+                                                                $hours = floor($totalMinutes / 60);
+                                                                $minutes = $totalMinutes % 60;
+
+                                                                if ($hours > 0 && $minutes > 0) {
+                                                                    $durationText =
+                                                                        $hours . ' ساعة و ' . $minutes . ' دقيقة';
+                                                                } elseif ($hours > 0) {
+                                                                    $durationText = $hours . ' ساعة';
+                                                                } else {
+                                                                    $durationText = $minutes . ' دقيقة';
+                                                                }
+                                                            }
+                                                        }
+
+                                                        // إذا لم يتم حساب المدة، عرض رسالة مناسبة
+                                                        if (empty($durationText)) {
+                                                            if ($program->schedules_later) {
+                                                                $durationText = 'سيحدد لاحقاً';
+                                                            } else {
+                                                                $durationText = 'قيد الإعداد';
+                                                            }
+                                                        }
+
+                                                        echo $durationText;
+                                                    @endphp
+                                                </li>
+                                                @if (
+                                                    $program->program_presentation_method_id === \App\Enums\TrainingAttendanceType::HYBRID->value ||
+                                                        $program->program_presentation_method_id === \App\Enums\TrainingAttendanceType::REMOTE->value)
+                                                    <li class="d-flex align-items-center gap-2">
+                                                        <img src="{{ asset('images/cources/online.svg') }}"
+                                                            alt="نوع الدورة">
+                                                        أونلاين
+                                                    </li>
+                                                @else
+                                                    <li class="d-flex align-items-center gap-2">
+                                                        <img src="{{ asset('images/cources/location.svg') }}"
+                                                            alt="الموقع">
+                                                        {{ $program->AdditionalSetting && $program->AdditionalSetting->city ? $program->AdditionalSetting->city : '---' }}
+                                                        {{ $program->AdditionalSetting && $program->AdditionalSetting->country
+                                                            ? ', ' . $program->AdditionalSetting->country->name
+                                                            : '' }}
+                                                    </li>
+                                                @endif
+                                                @php
+                                                    \Carbon\Carbon::setLocale('ar');
+                                                @endphp
+                                                <li class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset('images/cources/calender.svg') }}"
+                                                        alt="تاريخ الانتهاء">
+                                                    ينتهي التسجيل بـ
+                                                    {{ $program->AdditionalSetting && $program->AdditionalSetting->application_deadline
+                                                        ? \Carbon\Carbon::parse($program->AdditionalSetting->application_deadline)->locale('ar')->translatedFormat('j/F/Y')
+                                                        : '---' }}
+                                                </li>
+                                            </ul>
+                                            <div class="text-start mt-2">
+                                                @if (!$program->AdditionalSetting || $program->AdditionalSetting->cost == 0 || $program->AdditionalSetting->cost == null)
+                                                    <span class="price-tag price-free">مجاني</span>
+                                                @else
+                                                    <span class="price-tag">
+                                                        {{ fmod($program->AdditionalSetting->cost, 1) == 0
+                                                            ? number_format($program->AdditionalSetting->cost, 0)
+                                                            : number_format($program->AdditionalSetting->cost, 2) }}
+                                                        {{ $program->AdditionalSetting->currency ?? '' }}
+                                                    </span>
+                                                @endif
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
         @endif
     </div>
-  @if (empty($programs))
-         <div class="empty-state text-center py-5 col-12" style="justify-self: center;">
-            
-            <h5 class="fw-bold mb-3">لا توجد برامج تدريبية متاحة حالياً</h5>
-            <p class="text-muted mb-4">يمكنك متابعتنا لمعرفة أحدث البرامج التدريبية عند توفرها</p>
-            
-            @auth
-                @if(in_array(auth()->user()->user_type_id, [1, 4]))
-                <a href="{{ route('training.create') }}" class="btn custom-btn">
-                    إنشاء تدريب جديد
-                </a>
-                @endif
-            @else
-                <a href="{{ route('register') }}" class="btn signup-btn m-2">إنشاء حساب</a>
-                <a href="{{ route('login') }}" class="btn signup-btn m-2">تسجيل الدخول</a>
-            @endauth
-        </div>
-    @else
-        <div class="carousel-wrapper position-relative">
-            <div class="overflow-hidden" style="width: 100%;">
-                <div class="d-flex flex-nowrap" id="cardCarousel" style="scroll-behavior: smooth; overflow-x: auto;">
-                    @foreach ($programs as $program)
-                      <div class="card-slide p-2">
-    <a href="{{ route('show_trainings_announcements', $program->id) }}" class="text-decoration-none text-dark">
-        <div class="card h-100 shadow-sm rounded-4 position-relative">
-            <div class="d-flex flex-column justify-content-between image-custom">
-                <span class="badge-position">{{ $program->TrainingClassification->name ?? 'تدريب' }}</span>
-                <img src="{{ 
-                    $program->AdditionalSetting && $program->AdditionalSetting->profile_image 
-                        ? asset('storage/' . $program->AdditionalSetting->profile_image) 
-                        : asset('images/cources/training-default-img.svg') 
-                }}" class="card-img-top" alt="صورة التدريب">
-            </div>
-            <div class="card-body d-flex flex-column justify-content-between gap-1 align-items-start">
-                <h6 class="fw-bold">{{ $program->title }}</h6>
-                <div class="trainer-info mt-2 mb-2">
-                    @php
-                        $trainer = $trainers->find($program->user_id);
-                        $trainerPhoto = $trainer && $trainer->photo
-                            ? asset('storage/' . $trainer->photo)
-                            : asset('images/icons/user.svg');
-                    @endphp
-                    <a href="{{ route('show_trainer_profile', ['id' => $program->user_id]) }}" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
-                        <img class="trainer-img" src="{{ $trainerPhoto }}" alt="صورة المدرب" />
-                        <span>
-                            {{ optional($trainer)->getTranslation('name', 'ar') }}
-                            {{ optional(optional($trainer)->trainer)->getTranslation('last_name', 'ar') }}
-                        </span>
-                    </a>
-                </div>
-                <ul class="list-unstyled d-flex flex-wrap gap-3 text-muted small mb-2">
-                    <li class="d-flex align-items-center gap-2">
-                        <img src="{{ asset('images/cources/clock.svg') }}" alt="المدة">
-                        @php
-                            // التحقق من وجود مدة التدريب
-                            $durationText = '';
-                            
-                            if (isset($program->total_duration_hours) && $program->total_duration_hours > 0) {
-                                // استخدام المدة المحددة مسبقاً
-                                $hours = floor($program->total_duration_hours);
-                                $minutes = round(($program->total_duration_hours - $hours) * 60);
-                                
-                                if ($hours > 0 && $minutes > 0) {
-                                    $durationText = $hours . ' ساعة و ' . $minutes . ' دقيقة';
-                                } elseif ($hours > 0) {
-                                    $durationText = $hours . ' ساعة';
-                                } else {
-                                    $durationText = $minutes . ' دقيقة';
-                                }
-                            } elseif (isset($program->sessions) && $program->sessions->count() > 0) {
-                                // حساب المدة من الجلسات
-                                $totalMinutes = 0;
-                                foreach ($program->sessions as $session) {
-                                    if (isset($session->session_start_time) && isset($session->session_end_time)) {
-                                        $startTime = \Carbon\Carbon::parse($session->session_start_time);
-                                        $endTime = \Carbon\Carbon::parse($session->session_end_time);
-                                        $sessionMinutes = $startTime->diffInMinutes($endTime);
-                                        $totalMinutes += $sessionMinutes;
-                                    }
-                                }
-                                
-                                if ($totalMinutes > 0) {
-                                    $hours = floor($totalMinutes / 60);
-                                    $minutes = $totalMinutes % 60;
-                                    
-                                    if ($hours > 0 && $minutes > 0) {
-                                        $durationText = $hours . ' ساعة و ' . $minutes . ' دقيقة';
-                                    } elseif ($hours > 0) {
-                                        $durationText = $hours . ' ساعة';
-                                    } else {
-                                        $durationText = $minutes . ' دقيقة';
-                                    }
-                                }
-                            }
-                            
-                            // إذا لم يتم حساب المدة، عرض رسالة مناسبة
-                            if (empty($durationText)) {
-                                if ($program->schedules_later) {
-                                    $durationText = 'سيحدد لاحقاً';
-                                } else {
-                                    $durationText = 'قيد الإعداد';
-                                }
-                            }
-                            
-                            echo $durationText;
-                        @endphp
-                    </li>
-                    @if (
-                        $program->program_presentation_method_id === \App\Enums\TrainingAttendanceType::HYBRID->value ||
-                        $program->program_presentation_method_id === \App\Enums\TrainingAttendanceType::REMOTE->value)
-                        <li class="d-flex align-items-center gap-2">
-                            <img src="{{ asset('images/cources/online.svg') }}" alt="نوع الدورة">
-                            أونلاين
-                        </li>
-                    @else
-                        <li class="d-flex align-items-center gap-2">
-                            <img src="{{ asset('images/cources/location.svg') }}" alt="الموقع">
-                            {{ 
-                                $program->AdditionalSetting && $program->AdditionalSetting->city 
-                                    ? $program->AdditionalSetting->city 
-                                    : '---' 
-                            }}
-                            {{ 
-                                $program->AdditionalSetting && $program->AdditionalSetting->country 
-                                    ? ', ' . $program->AdditionalSetting->country->name 
-                                    : '' 
-                            }}
-                        </li>
-                    @endif
-                    @php
-                        \Carbon\Carbon::setLocale('ar');
-                    @endphp
-                    <li class="d-flex align-items-center gap-2">
-                        <img src="{{ asset('images/cources/calender.svg') }}" alt="تاريخ الانتهاء">
-                        ينتهي التسجيل بـ
-                        {{ 
-                            $program->AdditionalSetting && $program->AdditionalSetting->application_deadline 
-                                ? \Carbon\Carbon::parse($program->AdditionalSetting->application_deadline)->locale('ar')->translatedFormat('j/F/Y') 
-                                : '---' 
-                        }}
-                    </li>
-                </ul>
-                <div class="text-start mt-2">
-@if (!$program->AdditionalSetting || $program->AdditionalSetting->cost == 0 || $program->AdditionalSetting->cost == null)
-    <span class="price-tag price-free">مجاني</span>
-@else
-    <span class="price-tag">
-        {{ (fmod($program->AdditionalSetting->cost, 1) == 0) 
-            ? number_format($program->AdditionalSetting->cost, 0) 
-            : number_format($program->AdditionalSetting->cost, 2) }}
-        {{ $program->AdditionalSetting->currency ?? '' }}
-    </span>
-@endif
-
-                </div>
-            </div>
-        </div>
-    </a>
-</div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    @endif
-</div>
 @endsection
 @section('scripts')
     <script src="{{ asset('js/singleselect.js') }}"></script>
@@ -316,6 +342,7 @@
         const prevBtn = document.getElementById('carouselPrev');
         const nextBtn = document.getElementById('carouselNext');
         let currentIndex = 0;
+
         function scrollToCurrentCard() {
             slides[currentIndex].scrollIntoView({
                 behavior: 'smooth',

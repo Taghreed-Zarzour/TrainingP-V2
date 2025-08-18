@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrgTrainings\OrgTrainingController;
 use App\Http\Controllers\Trainings\TrainingsController;
 use App\Http\Controllers\User\Organization\OrganizationProfileController;
 use App\Http\Controllers\User\partnershipController;
@@ -141,9 +142,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::prefix('training')->group(function () {
 
-Route::get('/start-create-training', function () {
-    return view('trainings.start_training');
-})->name('startCreateTraining');
+  Route::get('/start-create-training', function () {
+      return view('trainings.start_training');
+  })->name('startCreateTraining');
 
 
     // إنشاء جديد - عرض النموذج الأولي
@@ -156,7 +157,7 @@ Route::get('/start-create-training', function () {
     Route::post('/basic-information', [Trainings_CURD_Controller::class, 'storeBasicInformation'])
         ->name('training.store.basic');
 
-Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBasicInformation'])->name('training.update.basic');
+    Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBasicInformation'])->name('training.update.basic');
 
     // الخطوة 2: الأهداف
     Route::get('/{trainingId}/goals', [Trainings_CURD_Controller::class, 'showGoalsForm'])->name('training.goals');
@@ -232,6 +233,25 @@ Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBas
 
   Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');
 
+  Route::prefix('org-training')->group(function () {
+    Route::get('/basic-information', [OrgTrainingController::class, 'showBasicInformationForm'])->name('orgTraining.basicInformation');
+    Route::post('/basic-information', [OrgTrainingController::class, 'storeBasicInformation'])->name('orgTraining.storeBasicInformation');
+    Route::put('/basic-information', [OrgTrainingController::class, 'updateBasicInformation'])->name('orgTraining.updateBasicInformation');
+
+    Route::get('/goals/{orgTrainingId}', [OrgTrainingController::class, 'showGoalsForm'])->name('orgTraining.goals');
+    Route::post('/goals/{orgTrainingId}', [OrgTrainingController::class, 'storeGoals'])->name('orgTraining.storeGoals');
+
+    Route::get('/training-detail/{orgTrainingId}', [OrgTrainingController::class, 'showTrainingDetailForm'])->name('orgTraining.trainingDetail');
+    Route::post('/training-detail/{orgTrainingId}', [OrgTrainingController::class, 'storeTrainingDetails'])->name('orgTraining.storeTrainingDetails');
+
+    Route::get('/assistants/{orgTrainingId}', [OrgTrainingController::class, 'showAssistantForm'])->name('orgTraining.assistants');
+    Route::post('/assistants/{orgTrainingId}', [OrgTrainingController::class, 'storeAssistants'])->name('orgTraining.storeAssistants');
+
+    Route::get('/settings/{orgTrainingId}', [OrgTrainingController::class, 'showSettingsForm'])->name('orgTraining.settings');
+    Route::post('/settings/{orgTrainingId}', [OrgTrainingController::class, 'storeSettings'])->name('orgTraining.storeSettings');
+
+    Route::get('/review/{orgTrainingId}', [OrgTrainingController::class, 'showReviewForm'])->name('orgTraining.review');
+});
 });
 
 Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');
@@ -242,6 +262,8 @@ Route::get('/trainings/announcements/show/{id}', [TrainingsController::class, 's
 
 //profiles users
   Route::get('/show-trainer-profile/{id?}', [TrainerProfileController::class, 'showProfile'])->name('show_trainer_profile');
+  
+  
   Route::get('/show-trainee-profile/{id?}', [TraineeProfileController::class, 'showProfile'])->name('show_trainee_profile');
   Route::get('/show-assistant-profile/{id?}', [AssistantProfileController::class, 'showProfile'])->name('show_assistant_profile');
   Route::get('/show-organization-profile/{id?}', [OrganizationProfileController::class, 'showProfile'])->name('show_organization_profile');

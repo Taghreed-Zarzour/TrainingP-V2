@@ -44,7 +44,7 @@ class updatePersonalInfo extends FormRequest
 
       'photo' => 'sometimes|image|mimes:jpg,jpeg,png|max:5120',
 
-      'bio' => 'required|string|max:2000',
+      'bio' => 'required|string|max:500',
         'headline' => 'required|string|max:255',
     ];
   }
@@ -86,7 +86,7 @@ class updatePersonalInfo extends FormRequest
 
       'bio.required' => 'النبذة مطلوبة',
       'bio.min' => 'يجب ألا تقل النبذة عن 10 أحرف',
-      'bio.max' => 'يجب ألا تزيد النبذة عن 2000 حرف',
+      'bio.max' => 'يجب ألا تزيد النبذة عن 500 حرف',
 
       'headline.required' => 'العنوان  مطلوب.',
       'headline.string' => 'يجب أن يكون العنوان نصًا.',

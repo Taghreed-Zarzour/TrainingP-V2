@@ -27,6 +27,7 @@ class User extends Authenticatable
         'phone_code',
         'phone_number',
         'photo',
+        'profile_message_shown',
     ];
 
     public function userType()
