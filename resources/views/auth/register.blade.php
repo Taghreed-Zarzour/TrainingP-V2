@@ -55,8 +55,8 @@
                                     fill="#666666" />
                             </svg>
                         </span>
-                  
-                    
+
+
                     <input type="email" class="form-control" name="email" value="{{ old('email') }}" required placeholder="مثال: example@gmail.com">
                 </div>
 </div>
@@ -161,14 +161,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // تحديد نوع المستخدم من الرابط
     const urlParams = new URLSearchParams(window.location.search);
     const userType = urlParams.get('user_type');
-    
+
     if (userType) {
         // تحويل القيمة إلى رقم للتأكد من المطابقة
         const roleValue = parseInt(userType);
-        
+
         // تحديد الراديو المناسب
         const radioBtn = document.querySelector(`input[type="radio"][value="${roleValue}"]`);
-        
+
         if (radioBtn) {
             radioBtn.checked = true;
             document.getElementById('user_type_id').value = roleValue;
