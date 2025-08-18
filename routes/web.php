@@ -96,7 +96,6 @@ Route::post('/complete-organization-register/{id}', [OrganizationController::cla
 
 
 
-
 // Middleware Group (Preserving Token Expiration Logic)
 Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::post('/logout', [AuthController::class, 'logout']);
@@ -262,8 +261,8 @@ Route::get('/trainings/announcements/show/{id}', [TrainingsController::class, 's
 
 //profiles users
   Route::get('/show-trainer-profile/{id?}', [TrainerProfileController::class, 'showProfile'])->name('show_trainer_profile');
-  
-  
+
+
   Route::get('/show-trainee-profile/{id?}', [TraineeProfileController::class, 'showProfile'])->name('show_trainee_profile');
   Route::get('/show-assistant-profile/{id?}', [AssistantProfileController::class, 'showProfile'])->name('show_assistant_profile');
   Route::get('/show-organization-profile/{id?}', [OrganizationProfileController::class, 'showProfile'])->name('show_organization_profile');

@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkSector extends Model
 {
+
+    public $fillable = [
+        'name',
+    ];
     public function trainers()
     {
         return $this->hasMany(Trainer::class, 'work_sectors_id');

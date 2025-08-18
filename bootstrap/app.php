@@ -16,7 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function(): void{
             Route::middleware('web')
                 ->group(base_path('routes/front_fetch.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/admin.php'));
         }
+
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
