@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\OrgTrainings;
 
+use App\Enums\JobPositionEnum;
+use App\Models\EducationLevel;
 use App\Models\OrgTrainingSchedule;
 use App\Models\programType;
 use App\Enums\TrainingAttendanceType;
@@ -21,6 +23,7 @@ use App\Models\TrainingClassification;
 use App\Models\trainingLevel;
 use App\Models\TrainingProgram;
 use App\Models\User;
+use App\Models\WorkSector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -122,37 +125,50 @@ public function updateBasicInformation(StoreBasicInformationRequest $request, $o
         $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
         $trainingGoal = $orgTraining->goals()->firstOrNew();
 
+        $educationLevels = EducationLevel::all();
+        $workSectors = WorkSector::all();
+        $countries = Country::all();
+        $jobPositions = JobPositionEnum::cases();
+
+        
         return view('orgTrainings.goals', [
             'training' => $orgTraining,
             'learning_outcomes' => $trainingGoal->learning_outcomes ?? [],
-            'target_audience' => $trainingGoal->target_audience ?? [],
+            'education_level' => $educationLevels,
+            'work_sector' => $workSectors,
+            'countries' => $countries,
+            'jop_position' => $jobPositions
         ]);
     }
     public function storeGoals(StoreTrainingGoalsRequest $request, $orgTrainingId)
-    {
-        DB::beginTransaction();
-        try {
-            $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
+{
+    DB::beginTransaction();
+    try {
+        $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
 
-            // إنشاء أو تحديث سجل التفاصيل
-            $trainingGoal = $orgTraining->goals()->firstOrNew([
+        $trainingGoal = $orgTraining->goals()->firstOrNew([
             'org_training_program_id' => $orgTrainingId,
-            ]);
+        ]);
 
-            $trainingGoal->fill([
+        $trainingGoal->fill([
             'learning_outcomes' => $request->learning_outcomes ?? [],
-            'target_audience' => $request->target_audience ?? [],
-            ]);
-            $trainingGoal->save();
+            'education_level_id' => $request->education_level_id, 
+            'work_status' => $request->work_status, 
+            'work_sector_id' => $request->work_sector_id, 
+            'job_position' => $request->job_position, 
+            'country_id' => $request->country_id, 
+        ]);
 
-            DB::commit();
-            return redirect()->route('orgTraining.trainingDetail', $orgTraining->id);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('فشل تخزين أهداف التدريب: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
-        }
+        $trainingGoal->save();
+
+        DB::commit();
+        return redirect()->route('orgTraining.trainingDetail', $orgTraining->id);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        \Log::error('فشل تخزين أهداف التدريب: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
     }
+}
 
     // =======  الخطوة 3: إدارة الفريق و التوقيت و الملفات=======
     public function showtrainingDetailForm($orgTrainingId)

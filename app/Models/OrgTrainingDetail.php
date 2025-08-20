@@ -13,10 +13,6 @@ class OrgTrainingDetail extends Model
         'program_title',
         'org_training_program_id',
         'trainer_id',
-        'session_date',
-        'session_start_time',
-        'session_end_time',
-        'schedule_later',
         'training_files',
     ];
 
