@@ -42,7 +42,7 @@ class StoreSchedulingRequest extends FormRequest
         'trainer_id' => 'nullable|array',
         'trainer_id.*' => 'exists:users,id',
         'training_files' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-        'schedules_later' => 'boolean',
+        'schedules.*.schedules_later' => 'boolean',
     ];
 }
 // protected function prepareForValidation()
