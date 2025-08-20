@@ -40,24 +40,24 @@
                 </button>
 
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-2">
-@php
-    // تحديد إذا المستخدم مؤسسة
-    if (auth()->check()) {
-        $isOrg = auth()->user()->user_type_id == 4;
-    } else {
-        // قراءة من الـ type في الرابط إذا ما في تسجيل دخول
-        $isOrg = request('type') === 'organization';
-    }
+                    @php
+                        // تحديد إذا المستخدم مؤسسة
+                        if (auth()->check()) {
+                            $isOrg = auth()->user()->user_type_id == 4;
+                        } else {
+                            // قراءة من الـ type في الرابط إذا ما في تسجيل دخول
+                            $isOrg = request('type') === 'organization';
+                        }
 
-    $homeRoute = $isOrg ? 'homePageOrganization' : 'homePage';
-@endphp
+                        $homeRoute = $isOrg ? 'homePageOrganization' : 'homePage';
+                    @endphp
 
-<li class="nav-item {{ request()->routeIs($homeRoute) ? 'active' : '' }}">
-    <a class="nav-link nav-font va pb-0" 
-       href="{{ route($homeRoute) }}{{ !$isOrg && !auth()->check() ? '?type=individual' : ($isOrg && !auth()->check() ? '?type=organization' : '') }}">
-        الرئيسية
-    </a>
-</li>
+                    <li class="nav-item {{ request()->routeIs($homeRoute) ? 'active' : '' }}">
+                        <a class="nav-link nav-font va pb-0"
+                            href="{{ route($homeRoute) }}{{ !$isOrg && !auth()->check() ? '?type=individual' : ($isOrg && !auth()->check() ? '?type=organization' : '') }}">
+                            الرئيسية
+                        </a>
+                    </li>
 
 
 
@@ -69,10 +69,10 @@
 
                 <!-- الروابط بحسب حالة تسجيل الدخول -->
                 @auth
-                    <ul class="navbar-nav align-items-center">
+                    <ul class="navbar-nav align-items-center gap-3">
                         @if (in_array(auth()->user()->user_type_id, [1]))
-                            <li class="nav-item me-2">
-                                <a href="{{ auth()->user()->trainingPrograms()->exists() ? route('training.create') : route('startCreateTraining') }}"
+                            <li class="nav-item  mx-2">
+                                <a href="{{ route('startCreateTraining') }}"
                                     class="pbtn pbtn-main d-flex align-items-center">
                                     <img src="{{ asset('images/edit.svg') }}" class="me-1" />
                                     <span>إنشاء تدريب</span>
@@ -80,13 +80,43 @@
                             </li>
                         @endif
                         @if (in_array(auth()->user()->user_type_id, [4]))
-                  <li class="nav-item me-2">
-    <a href="#" class="pbtn pbtn-main d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#announceTrainingModal">
-        <img src="{{ asset('images/edit.svg') }}" class="me-1" />
-        <span>أعلن عن برامجك التدريبية</span>
-    </a>
-</li>
+                            <li class="nav-item  mx-2">
+                                <a href="#" class="pbtn pbtn-main d-flex align-items-center" data-bs-toggle="modal"
+                                    data-bs-target="#announceTrainingModal">
+                                    <img src="{{ asset('images/edit.svg') }}" class="me-1" />
+                                    <span>أعلن عن برامجك التدريبية</span>
+                                </a>
+                            </li>
                         @endif
+
+<li class="nav-item position-relative">
+  <img src="{{ asset('images/icons/notification.svg') }}" class="" />
+
+  <!-- الدائرة الحمراء -->
+  <span class="badge-notification">3</span>
+</li>
+
+<style>
+/* الدائرة */
+.badge-notification {
+  position: absolute;
+  top: -5px;
+  right: 0px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  width: 24px; /* حجم الأيقونة */
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 0 5px;    /* مساحة صغيرة يمين ويسار */
+  box-sizing: border-box;
+}
+</style>
+
                         <!-- القائمة المنسدلة للملف الشخصي -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center position-relative" href="#"
@@ -113,15 +143,23 @@
                                     <hr class="dropdown-divider">
                                 </li>
 
-@php
-    $profileRoute = match (auth()->user()->user_type_id) {
-        1 => route('show_trainer_profile', ['user' => auth()->user()->profile_slug ?? auth()->user()->id]),
-        2 => route('show_assistant_profile', ['user' => auth()->user()->profile_slug ?? auth()->user()->id]),
-        3 => route('show_trainee_profile', ['user' => auth()->user()->profile_slug ?? auth()->user()->id]),
-        4 => route('show_organization_profile', ['user' => auth()->user()->profile_slug ?? auth()->user()->id]),
-        default => '#',
-    };
-@endphp                      <li>
+                                @php
+                                    $profileRoute = match (auth()->user()->user_type_id) {
+                                        1 => route('show_trainer_profile', [
+                                            'user' => auth()->user()->profile_slug ?? auth()->user()->id,
+                                        ]),
+                                        2 => route('show_assistant_profile', [
+                                            'user' => auth()->user()->profile_slug ?? auth()->user()->id,
+                                        ]),
+                                        3 => route('show_trainee_profile', [
+                                            'user' => auth()->user()->profile_slug ?? auth()->user()->id,
+                                        ]),
+                                        4 => route('show_organization_profile', [
+                                            'user' => auth()->user()->profile_slug ?? auth()->user()->id,
+                                        ]),
+                                        default => '#',
+                                    };
+                                @endphp <li>
                                     <a class="dropdown-item" href="{{ $profileRoute }}">
                                         <img src="{{ asset('images/profile-menu/user.svg') }}" />
                                         الملف الشخصي
@@ -178,19 +216,19 @@
                                 <li class="nav-item">
                                     <a href="{{ route('login') }}" class="punderlined ">تسجيل الدخول</a>
                                 </li>
-@php
-    $type = request()->query('type'); // بيرجع 'individual' أو 'organization'
-    // تحديد الرابط حسب النوع
-    $registerRoute = match($type) {
-        'organization' => route('register-org'), // صفحة تسجيل المؤسسات
-        'individual' => route('register'), // صفحة تسجيل الأفراد
-        default => route('register'), // افتراضي: الأفراد
-    };
-@endphp
+                                @php
+                                    $type = request()->query('type'); // بيرجع 'individual' أو 'organization'
+                                    // تحديد الرابط حسب النوع
+                                    $registerRoute = match ($type) {
+                                        'organization' => route('register-org'), // صفحة تسجيل المؤسسات
+                                        'individual' => route('register'), // صفحة تسجيل الأفراد
+                                        default => route('register'), // افتراضي: الأفراد
+                                    };
+                                @endphp
 
-<li class="nav-item me-2">
-    <a href="{{ $registerRoute }}" class="pbtn pbtn-main">إنشاء حساب مجانًا</a>
-</li>
+                                <li class="nav-item me-2">
+                                    <a href="{{ $registerRoute }}" class="pbtn pbtn-main">إنشاء حساب مجانًا</a>
+                                </li>
 
                                 @php
                                     $type = request()->query('type'); // بيرجع 'individual' أو 'organization'
@@ -239,7 +277,8 @@
 
 
 
-<div class="modal fade" id="announceTrainingModal" tabindex="-1" aria-labelledby="announceTrainingModalLabel" aria-hidden="true">
+<div class="modal fade" id="announceTrainingModal" tabindex="-1" aria-labelledby="announceTrainingModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -252,26 +291,28 @@
                         <!-- خيار البرنامج التدريبي (عدة تدريبات) -->
                         <div class="col-md-6">
                             <div class="training-option-card h-100">
-                                <input type="radio" name="training_type" id="training_program" value="program" class="option-radio">
+                                <input type="radio" name="training_type" id="training_program" value="program"
+                                    class="option-radio">
                                 <label for="training_program" class="option-label h-100">
-                                  
-                                        <!-- سيتم استبدال هذا بمكان الصورة -->
-                                          <img src="{{ asset('images/org/multi-program.svg') }}"/>
-                              
+
+                                    <!-- سيتم استبدال هذا بمكان الصورة -->
+                                    <img src="{{ asset('images/org/multi-program.svg') }}" />
+
                                     <div class="option-title">برنامج تدريبي (عدة تدريبات)</div>
                                 </label>
                             </div>
                         </div>
-                        
+
                         <!-- خيار التدريب الواحد -->
                         <div class="col-md-6">
                             <div class="training-option-card h-100">
-                                <input type="radio" name="training_type" id="single_training" value="single" class="option-radio">
+                                <input type="radio" name="training_type" id="single_training" value="single"
+                                    class="option-radio">
                                 <label for="single_training" class="option-label h-100">
-                                
-                                        <!-- سيتم استبدال هذا بمكان الصورة -->
-                                        <img src="{{ asset('images/org/one-program.svg') }}"/>
-                                
+
+                                    <!-- سيتم استبدال هذا بمكان الصورة -->
+                                    <img src="{{ asset('images/org/one-program.svg') }}" />
+
                                     <div class="option-title">تدريب واحد فقط</div>
                                 </label>
                             </div>
@@ -281,7 +322,7 @@
             </div>
             <div class="modal-footer px-5 mb-3">
                 <button type="button" class="custom-btn flex-fill" id="continueAnnouncementBtn" disabled>
-                    التالي   
+                    التالي
                     <img src="{{ asset('images/arrow-left.svg') }}" alt="" />
                 </button>
             </div>
@@ -294,39 +335,41 @@
     #announceTrainingModal .modal-dialog {
         max-width: 800px;
     }
-    #announceTrainingModal .btn-close{
-      margin-bottom: 22px;
+
+    #announceTrainingModal .btn-close {
+        margin-bottom: 22px;
     }
+
     #announceTrainingModal .modal-header {
         border-bottom: none;
         padding-bottom: 0;
         padding-top: 2rem;
     }
-    
+
     #announceTrainingModal .modal-title {
-      color: #000000;
+        color: #000000;
         font-weight: 500;
         font-size: 1.5rem;
         text-align: right;
         width: 100%;
     }
-    
+
     #announceTrainingModal .modal-body {
         padding: 1rem 2rem 2rem;
     }
-    
+
     /* تنسيقات خيارات التدريب */
 
     .training-option-card {
         position: relative;
         height: 100%;
     }
-    
+
     .option-radio {
         position: absolute;
         opacity: 0;
     }
-    
+
     .option-label {
         display: flex;
         flex-direction: column;
@@ -340,12 +383,12 @@
         transition: all 0.3s ease;
         height: 100%;
     }
-    
-    .option-radio:checked + .option-label {
+
+    .option-radio:checked+.option-label {
         border-color: #858383;
         background-color: #dfebff;
     }
-    
+
     .option-image {
         width: 140px;
         height: 140px;
@@ -357,7 +400,7 @@
         justify-content: center;
         overflow: hidden;
     }
-    
+
     .image-placeholder {
         width: 100%;
         height: 100%;
@@ -367,45 +410,45 @@
         justify-content: center;
         color: #999;
     }
-    
+
     .option-title {
-      padding-top: 25px;
+        padding-top: 25px;
         font-weight: 500;
         font-size: 1.2rem;
         color: #000000;
     }
-    
+
     /* زر التالي */
     #continueAnnouncementBtn {
         font-size: 1.1rem;
-      
+
     }
-    
+
     #continueAnnouncementBtn:disabled {
         opacity: 0.6;
         cursor: not-allowed;
     }
-    
+
     /* التجاوب مع الشاشات الصغيرة */
     @media (max-width: 768px) {
         .training-options-container {
             flex-direction: column;
         }
-        
+
         .option-image {
             width: 120px;
             height: 120px;
         }
     }
-    
+
     @media (max-width: 576px) {
-  
-        
+
+
         .option-image {
             width: 100px;
             height: 100px;
         }
-        
+
         .option-title {
             font-size: 1rem;
         }
@@ -417,27 +460,28 @@
         // تفعيل/تعطيل زر التالي بناءً على اختيار المستخدم
         const radioButtons = document.querySelectorAll('.option-radio');
         const continueBtn = document.getElementById('continueAnnouncementBtn');
-        
+
         radioButtons.forEach(radio => {
             radio.addEventListener('change', function() {
                 continueBtn.disabled = false;
             });
         });
-        
-        // معالجة النقر على زر التالي
-continueBtn.addEventListener('click', function() {
-    const selectedOption = document.querySelector('input[name="training_type"]:checked');
-    if (selectedOption) {
-        if (selectedOption.value === 'program') {
-            // توجيه المستخدم لإنشاء برنامج تدريبي
-            window.location.href = "";
-        } else {
-            // توجيه المستخدم لإنشاء تدريب واحد
-            window.location.href = "{{ auth()->check() ? (auth()->user()->trainingPrograms()->exists() ? route('training.create') : route('startCreateTraining')) : route('login') }}";
-        }
-    }
-});
 
+        // معالجة النقر على زر التالي
+        continueBtn.addEventListener('click', function() {
+            const selectedOption = document.querySelector('input[name="training_type"]:checked');
+            if (selectedOption) {
+                if (selectedOption.value === 'program') {
+                    // توجيه المستخدم لإنشاء برنامج تدريبي
+                    window.location.href =
+                        "{{ auth()->check() ?  route('startCreateOrgTrainings') : route('login') }}";
+                } else {
+                    // توجيه المستخدم لإنشاء تدريب واحد
+                    window.location.href =
+                        "{{ auth()->check() ?  route('startCreateTraining') : route('login') }}";
+                }
+            }
+        });
     });
 </script>
 

@@ -21,18 +21,27 @@ class StoreSchedulingRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules()
+  public function rules()
 {
     return [
         'program_title' => 'required|array',
         'program_title.*' => 'required|string|max:255',
         'schedules' => 'nullable|array',
         'schedules.*.date' => 'nullable|date_format:Y-m-d',
-        'schedules.*.start_time' => 'nullable|string|date_format:H:i',
-        'schedules.*.end_time' => 'nullable|string|date_format:H:i|after:schedules.*.start_time',
+        'schedules.*.start_time' => 'nullable|date_format:H:i',
+        'schedules.*.end_time' => [
+            'nullable',
+            'date_format:H:i',
+            function ($attribute, $value, $fail) {
+                $startTime = $this->input(str_replace('end_time', 'start_time', $attribute));
+                if ($value && $startTime && $value <= $startTime) {
+                    $fail('وقت الانتهاء يجب أن يكون بعد وقت البداية');
+                }
+            }
+        ],
         'trainer_id' => 'nullable|array',
         'trainer_id.*' => 'exists:users,id',
-        'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        'training_files' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         'schedules_later' => 'boolean',
     ];
 }
@@ -68,9 +77,9 @@ public function messages()
         'trainer_id.array' => 'يجب أن تكون معرفات المدربين مصفوفة.',
         'trainer_id.*.exists' => 'معرف المدرب غير موجود.',
         
-        'file.file' => 'يجب أن يكون الملف ملفًا.',
-        'file.mimes' => 'يجب أن يكون الملف من نوع: pdf، jpg، jpeg، png.',
-        'file.max' => 'حجم الملف لا يمكن أن يتجاوز 2048 كيلوبايت.',
+        'training_files.file' => 'يجب أن يكون الملف ملفًا.',
+        'training_files.mimes' => 'يجب أن يكون الملف من نوع: pdf، jpg، jpeg، png.',
+        'training_files.max' => 'حجم الملف لا يمكن أن يتجاوز 2048 كيلوبايت.',
         
         'schedules_later.boolean' => 'يجب أن تكون القيمة صحيحة أو خاطئة.',
     ];

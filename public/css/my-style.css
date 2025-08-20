@@ -1732,6 +1732,8 @@ font-size: 1.3rem;
         .switch-label {
             color: #1e293b;
             font-weight: 500;
+                line-height: normal;
+
         }
 
 
@@ -1868,167 +1870,7 @@ font-size: 1.3rem;
             position: relative;
         }
 
-        /* الحاوية العامة */
-        .switch {
-            display: flex !important;
-            align-items: center !important;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            direction: rtl !important;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-
-        /* إخفاء الـ checkbox الأصلي */
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-            position: absolute;
-        }
-
-        /* تصميم السلايدر */
-        .slider {
-            position: relative;
-            width: 42px;
-            height: 22px;
-            background-color: #e2e8f0;
-            border-radius: 999px;
-            transition: 0.3s;
-        }
-
-        /* الدائرة الداخلية */
-        .slider::before {
-            content: "";
-            position: absolute;
-            height: 18px;
-            width: 18px;
-            left: 2px;
-            top: 2px;
-            background-color: white;
-            border-radius: 50%;
-            transition: 0.3s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-
-        /* عند التفعيل */
-        .switch input:checked~.slider {
-            background-color: #c7d2fe;
-        }
-
-        .switch input:checked~.slider::before {
-            transform: translateX(20px);
-        }
-
-        /* النص */
-        .switch-label {
-            color: #1e293b;
-            font-weight: 500;
-        }
-
-        .error-message {
-            color: #dc3545 !important;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            font-weight: 500;
-        }
-
-        .error-border {
-            border: 1px solid #dc3545 !important;
-        }
-
-        .error-container {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 1rem;
-            border-radius: 0.25rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #f5c6cb;
-        }
-
-        .error-container ul {
-            margin-bottom: 0;
-            padding-right: 1rem;
-            list-style-type: none;
-        }
-
-        .error-container li {
-            color: #dc3545 !important;
-            margin-bottom: 0.5rem;
-            position: relative;
-            padding-right: 1.5rem;
-        }
-
-        .error-container li:before {
-            content: "•";
-            color: #dc3545;
-            position: absolute;
-            right: 0;
-        }
-
-        .session-title-label {
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .session-input-container {
-            margin-bottom: 15px;
-        }
-
-
-                .switch {
-            display: flex !important;
-            align-items: center !important;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            direction: rtl !important;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-            position: absolute;
-        }
-
-        .slider {
-            position: relative;
-            width: 42px;
-            height: 22px;
-            background-color: #e2e8f0;
-            border-radius: 999px;
-            transition: 0.3s;
-        }
-
-        .slider::before {
-            content: "";
-            position: absolute;
-            height: 18px;
-            width: 18px;
-            left: 2px;
-            top: 2px;
-            background-color: white;
-            border-radius: 50%;
-            transition: 0.3s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-
-        .switch input:checked~.slider {
-            background-color: #c7d2fe;
-        }
-
-        .switch input:checked~.slider::before {
-            transform: translateX(20px);
-        }
-
-        .switch-label {
-            color: #1e293b;
-            font-weight: 500;
-        }
+        
 
         .profile-image-preview {
             display: flex;
@@ -3099,3 +2941,138 @@ font-size: 1.3rem;
     }
 }
 
+    /* قوائم الوقت المنسدلة المحسنة */
+    .time-picker-container {
+        position: relative;
+        width: 100%;
+        border: 1px solid #a5a5a5;
+        border-radius: 12px !important;
+        padding: 14px 24px;
+        font-size: 1rem;
+        background: #ffffff;
+        outline: none;
+        transition: border 0.2s;
+
+        box-sizing: border-box;
+        width: 100%;
+        /* margin-bottom: 24px;
+    }
+
+    .time-picker {
+        width: 100%;
+        padding: 10px 40px 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #fff;
+        cursor: pointer;
+        position: relative;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        height: 42px;
+        /* نفس ارتفاع حقول الإدخال الأخرى */
+    }
+
+    .time-picker::after {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 22px;
+        height: 24px;
+        background-image: url("data:image/svg+xml,%3Csvg width='22' height='24' viewBox='0 0 22 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.974 16.803C10.6462 16.8032 10.3217 16.7326 10.0189 16.5953C9.71614 16.458 9.4411 16.2567 9.20953 16.003L3.24878 9.48004C3.13015 9.33739 3.0663 9.15024 3.07051 8.95746C3.07471 8.76467 3.14665 8.58106 3.27137 8.44477C3.39609 8.30847 3.56402 8.22997 3.74027 8.22555C3.91652 8.22113 4.08756 8.29114 4.21786 8.42104L10.1804 14.94C10.3915 15.1706 10.6775 15.3001 10.9758 15.3001C11.2741 15.3001 11.5602 15.1706 11.7712 14.94L17.7319 8.42004C17.8619 8.28756 18.0338 8.21544 18.2115 8.21887C18.3891 8.2223 18.5586 8.30101 18.6842 8.43842C18.8098 8.57583 18.8818 8.76122 18.8849 8.95552C18.8881 9.14982 18.8221 9.33787 18.701 9.48004L12.7403 16.003C12.5085 16.257 12.2331 16.4584 11.93 16.5957C11.6269 16.7329 11.302 16.8034 10.974 16.803Z' fill='%23444444'/%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        transition: transform 0.3s ease;
+    }
+
+    .time-picker-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .time-picker-option {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .time-picker-option:hover {
+        background-color: #f5f5f5;
+    }
+
+    .time-picker-option.selected {
+        background-color: #e9f5ff;
+        font-weight: bold;
+    }
+
+    .time-picker-input {
+        display: none;
+    }
+
+    /* للتجاوب مع الشاشات الصغيرة */
+    @media (max-width: 768px) {
+        .time-picker-dropdown {
+            max-height: 150px;
+        }
+    }
+    /* إضافة ستايل جديد للعداد */
+        .char-counter-container {
+            position: relative;
+            width: 100%;
+        }
+        .char-counter-badge-new {
+            position: absolute;
+            bottom: -25px; /* تغيير من 10px إلى -25px ليظهر خارج الحقل */
+            left: 0;
+            padding: 2px 8px;
+            font-size: 12px;
+            color: #6c757d;
+
+            z-index: 10;
+        }
+        .error-message   .char-counter-badge-new {
+            position: absolute;
+            bottom: 0px;}
+        .char-counter-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        .char-counter-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        /* إضافة مساحة أسفل الحقل للعداد */
+        .char-counter-container {
+            margin-bottom: 30px;
+        }
+        .education-level-section{
+              padding: 7px 32px;
+              border: 1.13px solid #eff0f6;
+                  border-radius: 10px;
+              box-shadow: 0px 11.34px 15.88px 0px #ffffff;
+        }
+
+.education-level-section .input-group label {
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: IBM Plex Sans Arabic;
+    font-weight: 500;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #333333;
+}

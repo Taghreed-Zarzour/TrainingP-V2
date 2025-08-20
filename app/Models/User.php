@@ -115,5 +115,8 @@ public function nationalities()
 {
     return $this->hasMany(TrainingProgram::class, 'user_id');
 }
-
+//     public function OrgTrainingProgram()
+// {
+//     return $this->hasMany(OrgTrainingProgram::class, 'organization_id');
+// }
 }

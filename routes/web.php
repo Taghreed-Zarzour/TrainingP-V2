@@ -232,10 +232,19 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');
 
+
   Route::prefix('org-training')->group(function () {
-    Route::get('/basic-information', [OrgTrainingController::class, 'showBasicInformationForm'])->name('orgTraining.basicInformation');
+    
+  Route::get('/start-create-training', function () {
+      return view('orgTrainings.start_org_trainings');
+  })->name('startCreateOrgTrainings');
+
+
+    Route::get('/basic-information', [OrgTrainingController::class, 'showBasicInformationForm'])->name('orgTraining.create');
+    Route::get('/basic-information/{orgTrainingId}', [OrgTrainingController::class, 'showBasicInformationForm'])->name('orgTraining.basicInformation');
+
     Route::post('/basic-information', [OrgTrainingController::class, 'storeBasicInformation'])->name('orgTraining.storeBasicInformation');
-    Route::put('/basic-information', [OrgTrainingController::class, 'updateBasicInformation'])->name('orgTraining.updateBasicInformation');
+    Route::put('/basic-information/{orgTrainingId}', [OrgTrainingController::class, 'updateBasicInformation'])->name('orgTraining.updateBasicInformation');
 
     Route::get('/goals/{orgTrainingId}', [OrgTrainingController::class, 'showGoalsForm'])->name('orgTraining.goals');
     Route::post('/goals/{orgTrainingId}', [OrgTrainingController::class, 'storeGoals'])->name('orgTraining.storeGoals');
