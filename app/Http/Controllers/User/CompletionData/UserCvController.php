@@ -16,9 +16,13 @@ class UserCvController extends Controller
     public function uploadCv(uploadCv $request)
 {
     $file = $request->file('uploadPdf');
-    $originalName = $file->getClientOriginalName(); 
+    $originalName = $file->getClientOriginalName();
+
+    $sanitizedFileName = preg_replace('/[^a-zA-Z0-9\s]/', '', $originalName); 
+    $camelCaseFileName = str_replace(' ', '', ucwords(str_replace('_', ' ', $sanitizedFileName))); // Convert to camel case
+
     $userId = Auth::id();
-    $fileName = $userId . '_' . time() . '_' . $originalName;
+    $fileName = $userId . '_' . time() . '_' . $camelCaseFileName . '.pdf';
     $path = $file->storeAs('cvs', $fileName, 'public');
 
     // Save to DB

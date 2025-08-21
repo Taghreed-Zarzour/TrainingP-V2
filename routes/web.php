@@ -71,28 +71,34 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:web')->get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/resend-verification-email/{id}', [AuthController::class, 'resendVerificationEmail'])->name('resend-verification-email');
 
-// Trainer Controller
-Route::get('/complete-trainer-register/{id}', [TrainerController::class, 'showRegistrationForm'])
-  ->name('complete-trainer-register');
-Route::post('/complete-trainer-register/{id}', [TrainerController::class, 'completeRegister'])->name('trainer.complete-register');
+Route::get('/link-expired', function () {
+  return view('link-expired'); 
+})->name('link.expired');
+
+Route::middleware(['check.link.expiration'])->group(function () {
+  // Trainer Controller
+  Route::get('/complete-trainer-register/{id}', [TrainerController::class, 'showRegistrationForm'])
+    ->name('complete-trainer-register');
+  Route::post('/complete-trainer-register/{id}', [TrainerController::class, 'completeRegister'])->name('trainer.complete-register');
 
 
-// Trainee Controller
-Route::get('/complete-trainee-register/{id}', [TraineeController::class, 'showRegistrationForm'])
-  ->name('complete-trainee-register');
-Route::post('/complete-trainee-register/{id}', [TraineeController::class, 'completeRegister'])->name('trainee.complete-register');
+  // Trainee Controller
+  Route::get('/complete-trainee-register/{id}', [TraineeController::class, 'showRegistrationForm'])
+    ->name('complete-trainee-register');
+  Route::post('/complete-trainee-register/{id}', [TraineeController::class, 'completeRegister'])->name('trainee.complete-register');
 
 
-// Assistant Controller
-Route::get('/complete-assistant-register/{id}', [AssistantController::class, 'showRegistrationForm'])
-  ->name('complete-assistant-register');
-Route::post('/complete-assistant-register/{id}', [AssistantController::class, 'completeRegister'])->name('assistant.complete-register');
+  // Assistant Controller
+  Route::get('/complete-assistant-register/{id}', [AssistantController::class, 'showRegistrationForm'])
+    ->name('complete-assistant-register');
+  Route::post('/complete-assistant-register/{id}', [AssistantController::class, 'completeRegister'])->name('assistant.complete-register');
 
 
-// Organization Controller
-Route::get('/complete-organization-register/{id}', [OrganizationController::class, 'showRegistrationForm'])
-  ->name('complete-organization-register');
-Route::post('/complete-organization-register/{id}', [OrganizationController::class, 'completeRegister'])->name('organization-complete-register');
+  // Organization Controller
+  Route::get('/complete-organization-register/{id}', [OrganizationController::class, 'showRegistrationForm'])
+    ->name('complete-organization-register');
+  Route::post('/complete-organization-register/{id}', [OrganizationController::class, 'completeRegister'])->name('organization-complete-register');
+});
 
 
 
@@ -270,8 +276,6 @@ Route::get('/trainings/announcements/show/{id}', [TrainingsController::class, 's
 
 //profiles users
   Route::get('/show-trainer-profile/{id?}', [TrainerProfileController::class, 'showProfile'])->name('show_trainer_profile');
-
-
   Route::get('/show-trainee-profile/{id?}', [TraineeProfileController::class, 'showProfile'])->name('show_trainee_profile');
   Route::get('/show-assistant-profile/{id?}', [AssistantProfileController::class, 'showProfile'])->name('show_assistant_profile');
   Route::get('/show-organization-profile/{id?}', [OrganizationProfileController::class, 'showProfile'])->name('show_organization_profile');
