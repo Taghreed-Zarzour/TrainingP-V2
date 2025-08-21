@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class OrgTrainingSchedule extends Model
+{
+    use HasFactory;
+
+    protected $table = 'org_training_schedules';
+
+    protected $fillable = [
+        'org_training_detail_id',
+        'session_date',
+        'session_start_time',
+        'session_end_time',
+        'schedule_later',
+        'num_of_session',
+        'num_of_hours',
+    ];
+
+    // Define the relationship with OrgTrainingDetail
+    public function trainingDetail()
+    {
+        return $this->belongsTo(OrgTrainingDetail::class, 'org_training_detail_id');
+    }
+}

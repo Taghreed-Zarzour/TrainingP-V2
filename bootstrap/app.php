@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckEmailVerified;
+use App\Http\Middleware\CheckLinkExpiration;
 use App\Http\Middleware\CheckTokenExpiration;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,7 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'CheckEmailVerified' => CheckEmailVerified::class
+            'CheckEmailVerified' => CheckEmailVerified::class,
+            'check.link.expiration' => CheckLinkExpiration::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

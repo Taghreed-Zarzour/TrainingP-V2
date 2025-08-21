@@ -9,3 +9,7 @@ Route::get('/cources', function () {
     return view('cources.couces');
 })->name('cources');
 
+Route::get('/terms', function () {
+    return view('terms');
+})->name('terms');
+

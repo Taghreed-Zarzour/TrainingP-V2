@@ -93,23 +93,21 @@ namespace App\Models;
             'remember_token',
         ];
 
-        /**
-         * Get the attributes that should be cast.
-         *
-         * @return array<string, string>
-         */
-        protected function casts(): array
-        {
-            return [
-                'email_verified_at' => 'datetime',
-                'password' => 'hashed',
-            ];
-        }
-        public function trainingPrograms()
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
     {
-        return $this->hasMany(TrainingProgram::class, 'user_id');
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
+    public function trainingPrograms()
+{
+    return $this->hasMany(TrainingProgram::class, 'user_id');
+}
 
-
-
-    }
+}

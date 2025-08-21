@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\OrgTrainings;
 
-use App\Enums\programType;
+use App\Enums\JobPositionEnum;
+use App\Models\EducationLevel;
+use App\Models\OrgTrainingSchedule;
+use App\Models\programType;
 use App\Enums\TrainingAttendanceType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\orgTrainingProgram\StoreAdditionalSettingsRequest;
@@ -20,6 +23,7 @@ use App\Models\TrainingClassification;
 use App\Models\trainingLevel;
 use App\Models\TrainingProgram;
 use App\Models\User;
+use App\Models\WorkSector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,9 +33,10 @@ class OrgTrainingController extends Controller
 {
     public function showBasicInformationForm($orgTrainingId = null)
     {
-    $orgTraining = $orgTrainingId ? OrgTrainingProgram::with('detail', 'assistants', 'registrationRequirements', 'goals')->findOrFail($orgTrainingId) : null;
+    $orgTraining = $orgTrainingId ? OrgTrainingProgram::with('details', 'assistants', 'registrationRequirements', 'goals')->findOrFail($orgTrainingId) : null;
+
     return view('orgTrainings.basic-information', [
-        'programType' => programType::cases(),
+        'programType' => programType::all(),
         'programPresentationMethod' => TrainingAttendanceType::cases(),
         'levels' => trainingLevel::all(),
         'countries' => Country::all(),
@@ -62,7 +67,7 @@ public function storeBasicInformation(StoreBasicInformationRequest $request, $or
             'training_level_id' => $validatedData['training_level_id'],
             'program_presentation_method' => $validatedData['program_presentation_method'],
             'program_description' => $validatedData['program_description'],
-            'org_training_classification_id' =>(array) $validatedData['org_training_classification_id'] ?? [],
+        'org_training_classification_id' => (array) $validatedData['org_training_classification_id'] ?? [],
             'organization_id' => Auth::id(),
         ]);
         $orgTraining->save();
@@ -80,15 +85,15 @@ public function storeBasicInformation(StoreBasicInformationRequest $request, $or
             ->withInput();
     }
 }
-public function updateBasicInformation(updateBasicInformationRequest $request, $orgTrainingId)
-{
+public function updateBasicInformation(StoreBasicInformationRequest $request, $orgTrainingId)
+{  \Log::info('Request data:', $request->all());
     DB::beginTransaction();
     try {
         $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
         
         $validatedData = $request->validated();
         $orgTraining->fill([
-            'title' => $validatedData,
+            'title' => $validatedData['title'],
             'language_id' => $validatedData['language_id'],
             'country_id' => $validatedData['country_id'],
             'city' => $validatedData['city'],
@@ -120,145 +125,143 @@ public function updateBasicInformation(updateBasicInformationRequest $request, $
         $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
         $trainingGoal = $orgTraining->goals()->firstOrNew();
 
+        $educationLevels = EducationLevel::all();
+        $workSectors = WorkSector::all();
+        $countries = Country::all();
+        $jobPositions = JobPositionEnum::cases();
+
+        
         return view('orgTrainings.goals', [
             'training' => $orgTraining,
             'learning_outcomes' => $trainingGoal->learning_outcomes ?? [],
-            'target_audience' => $trainingGoal->target_audience ?? [],
+            'education_level' => $educationLevels,
+            'work_sector' => $workSectors,
+            'countries' => $countries,
+            'jop_position' => $jobPositions
         ]);
     }
     public function storeGoals(StoreTrainingGoalsRequest $request, $orgTrainingId)
-    {
-        DB::beginTransaction();
-        try {
-            $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
-
-            // إنشاء أو تحديث سجل التفاصيل
-            $trainingGoal = $orgTraining->goals()->firstOrNew([
-            'org_training_program_id' => $orgTrainingId,
-            ]);
-
-            $trainingGoal->fill([
-            'learning_outcomes' => $request->learning_outcomes ?? [],
-            'target_audience' => $request->target_audience ?? [],
-            ]);
-            $trainingGoal->save();
-
-            DB::commit();
-            return redirect()->route('orgTraining.trainingDetail', $orgTraining->id);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('فشل تخزين أهداف التدريب: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
-        }
-    }
-
-    // =======  الخطوة 3: إدارة الفريق و التوقيت و الملفات=======
-    public function showtrainingDetailForm($orgTrainingId)
-{
-    // Get training program details
-    $orgTrainingDetail = OrgTrainingDetail::where('org_training_program_id', $orgTrainingId)->first();
-
-    // Prepare data for the schedule part
-    $schedulesLater = $orgTrainingDetail ? ($orgTrainingDetail->schedule_later ? 1 : 0) : 0;
-    $sessions = $orgTrainingDetail ? ($orgTrainingDetail->sessions ?? collect()) : collect(); // Ensure it's a collection even if null
-
-    // Get organization training program for detail part
-    $orgTraining = OrgTrainingProgram::find($orgTrainingId); // Simplified lookup
-
-   // Prepare available trainers
-    $availableTrainers = User::whereHas('userType', function ($query) {
-        $query->where('type', 'مدرب');
-    })->get();
-
-   // Get current trainers and assistants
-    $currentTeam = $orgTraining ? $orgTraining->assistants()->get() : collect();
-    $currentTrainers = $currentTeam->whereNotNull('trainer_id')->pluck('trainer_id')->toArray();
-
-    return view('orgTrainings.training-detail', [
-        'training' => $orgTraining,
-        'sessions' => $sessions,
-        'schedules_later' => $schedulesLater,
-        'availableTrainers' => $availableTrainers,
-        'currentTrainers' => $currentTrainers,
-        'orgTrainingDetail' => $orgTrainingDetail, // Pass the detail to the view
-    ]); 
-}
-
-public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingId)
 {
     DB::beginTransaction();
     try {
-        // Retrieve the training program
-        $orgTraining = OrgTrainingProgram::findOrFail($trainingId);
-        
-        // Update schedules_later
-        $orgTrainingDetail = $orgTraining->details()->first(); // Get the first detail entry
-        if ($orgTrainingDetail) {
-            $orgTrainingDetail->schedules_later = $request->boolean('schedules_later');
-            $orgTrainingDetail->save();
-        } else {
-            // Handle case where there are no existing details
-            $orgTrainingDetail = new OrgTrainingDetail();
-            $orgTrainingDetail->org_training_program_id = $orgTraining->id;
-            $orgTrainingDetail->schedules_later = $request->boolean('schedules_later');
-        }
+        $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
 
-        // Prepare data for a single entry
-        $data = [
-            'org_training_program_id' => $orgTraining->id,
-            'program_title' => $request->program_title,
-            'training_files' => null, // Initialize file path
-            'sessions' => $request->schedules ?? [], // Initialize sessions
-            'trainer_ids' => $request->trainer_id ?? [], // Initialize trainer IDs
-        ];
-
-        // Handle schedules
-        if (!$orgTrainingDetail->schedules_later && $request->filled('schedules')) {
-            foreach ($request->schedules as $schedule) {
-                // Collect session data
-                $data['sessions'][] = [
-                    'date' => $schedule['date'] ?? null,
-                    'start_time' => $schedule['start_time'] ?? null,
-                    'end_time' => $schedule['end_time'] ?? null,
-                ];
-            }
-        }
-
-        // Handle trainers
-        if ($request->filled('trainer_id')) {
-            foreach ($request->trainer_id as $trainerId) {
-                $data['trainer_ids'][] = $trainerId;
-            }
-        }
-
-        // Handle file upload if present
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $originalName = $file->getClientOriginalName();
-            $data['training_files'] = $file->storeAs('orgTrainingProgram', $originalName, 'public');
-        }
-        // Create a single entry in OrgTrainingDetail
-        OrgTrainingDetail::create([
-            'org_training_program_id' => $data['org_training_program_id'],
-            'program_title' => $data['program_title'],
-            'training_files' => $data['training_files'],
-            'session_start_time' => $data['sessions']['start_time'],
-            'session_end_time' => $data['sessions']['end_time'],
-            'session_date' => $data['sessions']['date'], // Store sessions as array
-            'trainer_ids' => $data['trainer_ids'], // Store trainer IDs as array
+        $trainingGoal = $orgTraining->goals()->firstOrNew([
+            'org_training_program_id' => $orgTrainingId,
         ]);
 
+        $trainingGoal->fill([
+            'learning_outcomes' => $request->learning_outcomes ?? [],
+            'education_level_id' => $request->education_level_id, 
+            'work_status' => $request->work_status, 
+            'work_sector_id' => $request->work_sector_id, 
+            'job_position' => $request->job_position, 
+            'country_id' => $request->country_id, 
+        ]);
+
+        $trainingGoal->save();
+
         DB::commit();
-        return redirect()->route('orgTraining.assistants', $orgTraining->id);
+        return redirect()->route('orgTraining.trainingDetail', $orgTraining->id);
     } catch (\Exception $e) {
         DB::rollBack();
-        \Log::error('فشل تخزين تفاصيل التدريب: ' . $e->getMessage());
-        return redirect()->back()
-            ->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage())
-            ->withInput();
+        \Log::error('فشل تخزين أهداف التدريب: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
     }
 }
 
+    // =======  الخطوة 3: إدارة الفريق و التوقيت و الملفات=======
+    public function showtrainingDetailForm($orgTrainingId)
+    {
+        $orgTrainingDetails = OrgTrainingDetail::where('org_training_program_id', $orgTrainingId)->get();
+
+        $trainingSchedules = [];
+        $schedulesLater = 0;
+
+        foreach ($orgTrainingDetails as $orgTrainingDetail) {
+            $schedules = OrgTrainingSchedule::where('org_training_detail_id', $orgTrainingDetail->id)->get();
+            $trainingSchedules[] = [
+                'detail' => $orgTrainingDetail,
+                'schedules' => $schedules,
+                'schedule_later' => $schedules->contains('schedule_later', true) ? 1 : 0, 
+            ];
+        }
+        $orgTraining = OrgTrainingProgram::find($orgTrainingId);
+
+        $availableTrainers = User::whereHas('userType', function ($query) {
+            $query->where('type', 'مدرب');
+        })
+        ->whereNotNull('email_verified_at') 
+        ->get();
+
+        $currentTeam = $orgTraining ? $orgTraining->assistants()->get() : collect();
+        $currentTrainers = $currentTeam->whereNotNull('trainer_id')->pluck('trainer_id')->toArray();
+
+        return view('orgTrainings.training-detail', [
+            'training' => $orgTraining,
+            'trainingSchedules' => $trainingSchedules, 
+            'availableTrainers' => $availableTrainers,
+            'currentTrainers' => $currentTrainers,
+        ]);
+    }
+
+    public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingId)
+    {
+        DB::beginTransaction();
+        try {
+            $orgTraining = OrgTrainingProgram::findOrFail($trainingId);
+
+            // Process program titles and trainer IDs
+            $programTitles = $request->program_title;
+            $trainerIds = $request->trainer_id;
+
+            if (!is_array($programTitles) || !is_array($trainerIds)) {
+                throw new \Exception('Invalid input format for program titles or trainer IDs.');
+            }
+
+            // Create details for each program title
+            foreach ($programTitles as $programTitle) {
+                $orgTrainingDetail = $orgTraining->details()->create([
+                    'program_title' => $programTitle,
+                    'trainer_ids' => $trainerIds, // Assuming this can accept multiple IDs
+                ]);
+
+                // Process schedules
+                if ($request->filled('schedules')) {
+                    foreach ($request->schedules as $schedule) {
+                        $orgTrainingDetail->trainingSchedules()->create([
+                            'session_date' => $schedule['date'] ?? null,
+                            'session_start_time' => $schedule['start_time'] ?? null,
+                            'session_end_time' => $schedule['end_time'] ?? null,
+                            'schedule_later' => $schedule['schedules_later'] ?? false, // Get schedules_later from each schedule
+                            'num_of_session' => $schedule['num_of_session'] ?? null,
+                            'num_of_hours' => $schedule['num_of_hours'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
+            // Handle training files
+            if ($request->hasFile('training_files')) {
+                $file = $request->file('training_files');
+                $originalName = $file->getClientOriginalName();
+                $orgTrainingDetail->training_files = $file->storeAs(
+                    'orgTrainingProgram', 
+                    $originalName, 
+                    'public'
+                );
+            }
+
+            DB::commit();
+            return redirect()->route('orgTraining.assistants', $orgTraining->id);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('فشل تخزين تفاصيل التدريب: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
     public function showAssistantForm($orgTrainingId)
     {
         $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);

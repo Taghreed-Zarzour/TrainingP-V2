@@ -3110,7 +3110,7 @@ form {
 .input-group input:not([type="radio"]),
 .input-group textarea {
     border: 1px solid #a5a5a5;
-    border-radius: 6px;
+    border-radius: 12px !important;
     padding: 14px 24px;
     font-size: 1rem;
     background: #ffffff;
@@ -3141,6 +3141,7 @@ form {
     letter-spacing: 0%;
     color: #a5a5a5;
 }
+
 
 .input-group input:focus,
 .input-group textarea:focus {
@@ -3270,7 +3271,7 @@ select.custom-multiselect {
     max-height: 100%; /* حد أقصى للارتفاع */
     padding: 8px;
     border: 1px solid #a5a5a5;
-    border-radius: 6px;
+    border-radius: 12px !important;
     background: #ffffff;
     display: flex;
     flex-wrap: wrap;
@@ -3536,7 +3537,7 @@ select.custom-singleselect {
 
 .publish-training-page .grid {
     display: grid;
-    grid-template-columns: 35% 65%;
+    grid-template-columns: 33% 67%;
     gap: 1rem;
     margin-bottom: 24px;
     margin-top: 24px;
@@ -3581,7 +3582,7 @@ select.custom-singleselect {
     flex-direction: column;
     align-items: flex-start;
     position: relative;
-    margin: 40px 0;
+    /* margin: 40px 0; */
 }
 
 .publish-training-page .step {
@@ -3695,7 +3696,7 @@ select.custom-singleselect {
 }
 
 .publish-training-page .info-message {
-    margin: -17px -32px;
+    margin: -18px -20px;
     border-radius: 0px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -3712,7 +3713,7 @@ select.custom-singleselect {
     border: 1px solid #003090;
     background-color: transparent;
     width: max-content;
-    border-radius: 7px;
+    border-radius: 12px !important;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -3777,7 +3778,7 @@ align-items: flex-start;
     padding-left: 8px;
     padding-right: 8px;
     border: 1px solid #a5a5a5;
-    border-radius: 6px;
+    border-radius:12px !important;
     background: #ffffff;
     display: flex;
     flex-wrap: wrap;

@@ -13,20 +13,17 @@ class OrgTrainingDetail extends Model
         'program_title',
         'org_training_program_id',
         'trainer_id',
-        'session_date',
-        'session_start_time',
-        'session_end_time',
-        'schedule_later',
         'training_files',
     ];
 
-    protected $casts = [
-        'sessions' => 'array', 
-        'trainer_ids' => 'array', 
-    ];
+    
     
     public function trainingProgram()
     {
         return $this->belongsTo(OrgTrainingProgram::class);
+    }
+    public function trainingSchedules()
+    {
+        return $this->hasMany(OrgTrainingSchedule::class, 'org_training_detail_id');
     }
 }

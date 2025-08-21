@@ -12,16 +12,31 @@ class OrgTrainingGoal extends Model
     protected $fillable = [
         'org_training_program_id',
         'learning_outcomes',
-        'target_audience',
+        'education_level_id', 
+        'work_status',        
+        'work_sector_id',     
+        'job_position',       
+        'country_id',         
     ];
 
     protected $casts = [
         'learning_outcomes' => 'array',
-        'target_audience' => 'array',
     ];
 
     public function trainingProgram()
     {
         return $this->belongsTo(OrgTrainingProgram::class);
+    }
+    public function educationLevel()
+    {
+        return $this->belongsTo(EducationLevel::class);
+    }
+    public function workSector()
+    {
+        return $this->belongsTo(WorkSector::class);
+    }
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 }
