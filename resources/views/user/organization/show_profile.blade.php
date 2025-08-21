@@ -11,29 +11,29 @@
             border: 1px solid #ddd;
             border-radius: 20px;
         }
-        
+
         .org-name {
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 5px;
         }
-        
+
         .org-type {
             color: #666;
             font-size: 0.9rem;
         }
-        
+
         .info-label {
             font-size: 0.9rem;
             color: #666;
             margin-bottom: 5px;
         }
-        
+
         .info-value {
             font-weight: bold;
             font-size: 1.1rem;
         }
-        
+
         .edit-btn {
             background: #007bff;
             color: white;
@@ -52,42 +52,42 @@
             max-width: 180px;
             margin-left: auto;
         }
-        
+
         .edit-btn:hover {
             background: #0069d9;
         }
-        
+
         .about-container {
-          
+
 
         }
-        
+
         .about-content {
             border: 1px solid #eee;
             border-radius: 20px;
             padding: 10px;
             margin-bottom: 20px;
         }
-        
+
         .about-text {
             line-height: 1.6;
             color: #333;
         }
-        
+
         .section-title {
             font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 15px;
             padding: 0 10px;
         }
-        
+
         .sectors-container {
             border: 1px solid #eee;
             border-radius: 20px;
             padding: 10px;
             margin-top: 15px;
         }
-        
+
         .sector-tag {
             background: #e1f5fe;
             color: #0288d1;
@@ -99,45 +99,45 @@
             border: 1px solid #b3e5fc;
         }
 
-        
+
         .contact-info {
             border: 1px solid #eee;
             border-radius: 20px;
             padding: 20px;
         }
-        
+
         .contact-item {
             display: flex;
             justify-content: space-between;
             margin-bottom: 15px;
         }
-        
+
         .contact-item:last-child {
             margin-bottom: 0;
         }
-        
+
         .contact-label {
             font-size: 0.9rem;
             color: #666;
         }
-        
+
         .contact-value {
             font-weight: bold;
             direction: ltr;
             text-align: left;
         }
-        
+
         /* توزيع الأعمدة */
         .about-column {
             flex: 0 0 65%;
             max-width: 65%;
         }
-        
+
         .contact-column {
             flex: 0 0 35%;
             max-width: 35%;
         }
-        
+
         /* التجاوب مع أحجام الشاشات */
         @media (max-width: 992px) {
             .about-column,
@@ -145,35 +145,35 @@
                 flex: 0 0 100%;
                 max-width: 100%;
             }
-            
+
             .contact-container {
                 margin-top: 20px;
             }
         }
-        
+
         @media (max-width: 768px) {
             .org-image {
                 width: 80px;
                 height: 80px;
                 border-radius: 15px;
             }
-            
+
             .org-name {
                 font-size: 1.2rem;
             }
-            
+
             .edit-btn {
                 padding: 8px 15px;
                 font-size: 0.9rem;
                 max-width: 150px;
             }
-            
+
             .about-container,
             .contact-container {
                 border-radius: 20px;
                 padding: 10px;
             }
-            
+
             .about-content,
             .sectors-container,
             .contact-info {
@@ -195,30 +195,30 @@
                         <img src="{{ asset('images/default-org.png') }}" alt="شعار افتراضي" class="org-image me-3">
                     @endif
                     <div>
-                        <div class="org-name">{{ $organization->user->getTranslation('name', 'ar') }} {{ $organization->getTranslation('last_name', 'ar')  }}</div>
+                        <div class="org-name">{{ $organization->user->getTranslation('name', 'ar') }} </div>
                         <div class="org-type">مؤسسة غير ربحية</div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- العمود الثاني: سنة التأسيس -->
             <div class="col-md-2 col-sm-4 mb-3 mb-md-0">
                 <div class="info-label">سنة التأسيس</div>
                 <div class="info-value">2023</div>
             </div>
-            
+
             <!-- العمود الثالث: عدد الموظفين -->
             <div class="col-md-2 col-sm-4 mb-3 mb-md-0">
                 <div class="info-label">عدد الموظفين</div>
                 <div class="info-value">2 - 10</div>
             </div>
-            
+
             <!-- العمود الرابع: الميزانية السنوية -->
             <div class="col-md-2 col-sm-4 mb-3 mb-md-0">
                 <div class="info-label">الميزانية السنوية</div>
                 <div class="info-value">0 - 10000</div>
             </div>
-            
+
             <!-- العمود الخامس: زر التعديل -->
             <div class="col-md-3 col-sm-12">
                 <button class="edit-btn" onclick="openEditModal()">
@@ -229,7 +229,7 @@
                 </button>
             </div>
         </div>
-        
+
         <!-- الصف الثاني: حول المؤسسة والقطاعات مقابل معلومات التواصل -->
         <div class="row">
             <!-- العمود الأول: حول المؤسسة والقطاعات (أوسع) -->
@@ -241,7 +241,7 @@
                             مجتمع معرفي يزود الشباب السوري بالمعرفة والمهارات والأدوات اللازمة لدخول سوق العمل الحر
                         </p>
                     </div>
-                    
+
                     <div class="section-title">القطاعات</div>
                     <div class="sectors-container">
                         <span class="sector-tag">التدريب</span>
@@ -251,11 +251,11 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- العمود الثاني: معلومات التواصل (أصغر) -->
             <div class="contact-column col-lg-4 col-md-5">
                 <div class="contact-container">
-                  
+
                     <div class="contact-info">
                         <div class="section-title">معلومات التواصل</div>
                         <div class="contact-item">

@@ -52,4 +52,9 @@ class Assistant extends Model
     {
         return $this->belongsTo(ProvidedService::class, 'provided_services_id');
     }
+
+    public function educationLevel()
+    {
+        return $this->belongsTo(EducationLevel::class, 'education_levels_id');
+    }
 }

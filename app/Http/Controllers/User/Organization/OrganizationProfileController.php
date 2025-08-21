@@ -31,7 +31,7 @@ class OrganizationProfileController extends Controller
 
         $organization_workSectors = OrganizationSector::whereIn('id', $organization->organization_sectors ?? [])->get();
 
-        $selected_country = Country::where('phonecode', ltrim($user->phone_code, '+'))->first();
+        $selected_country = Country::where('phone_code', ltrim($user->phone_code, '+'))->first();
 
         return view('user.organization.show_profile',
         compact('user','organization','countries','organization_workSectors','branches','selected_country'));

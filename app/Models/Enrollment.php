@@ -19,4 +19,14 @@ class Enrollment extends Model
     ];
 
 
+    public function trainee()
+    {
+        return $this->belongsTo(Trainee::class, 'trainee_id');
+    }
+
+    public function trainingProgram()
+    {
+        return $this->belongsTo(TrainingProgram::class, 'training_programs_id');
+    }
+
 }

@@ -13,4 +13,9 @@ class feedback extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getUserNameAttribute(): string
+{
+    return $this->user?->name ?? 'Guest';
+}
+
 }

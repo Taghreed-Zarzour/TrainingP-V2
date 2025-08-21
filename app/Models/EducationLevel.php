@@ -6,10 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class EducationLevel extends Model
 {
-    public function educations()
-    {
-        return $this->hasMany(Education::class, 'education_levels_id');
-    }
 
     public function trainees()
     {

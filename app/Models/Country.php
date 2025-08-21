@@ -25,16 +25,6 @@ class Country extends Model
         return $this->hasMany(Trainee::class, 'nationality_id');
     }
 
-    public function trainingExperiences()
-    {
-        return $this->hasMany(TrainingExperience::class);
-    }
-
-    public function tenders()
-    {
-        return $this->hasMany(Tender::class);
-    }
-
     public function jobAds()
     {
         return $this->hasMany(JobAd::class);

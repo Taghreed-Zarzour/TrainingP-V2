@@ -19,7 +19,7 @@ class additional_setting extends Model
         'registration_link',
         'profile_image',
         'training_files',
-                'welcome_message', // إضافة الحقل الجديد
+        'welcome_message', // إضافة الحقل الجديد
 
     ];
     protected $casts = [

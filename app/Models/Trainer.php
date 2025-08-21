@@ -19,6 +19,7 @@ public $incrementing = false;
 
     protected $fillable = [
         'id',
+        'last_name',
         'sex',
         'headline',
         'work_sectors',
@@ -64,6 +65,9 @@ public $incrementing = false;
     {
     return $this->hasMany(TrainerRating::class);
     }
+
+
+
 
 
 }

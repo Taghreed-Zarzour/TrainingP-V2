@@ -6,10 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class schedulingTrainingSessions extends Model
 {
-    protected $fillable = [           
+    protected $fillable = [
 
         'training_program_id',
-      
         'session_date',
         'session_start_time',
         'session_end_time'
@@ -18,6 +17,12 @@ class schedulingTrainingSessions extends Model
 {
     return $this->belongsTo(TrainingProgram::class);
 }
+
+public function attendances()
+{
+    return $this->hasMany(SessionAttendance::class, 'session_id');
+}
+
 
 
 
