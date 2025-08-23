@@ -9,23 +9,29 @@
             
             switch ($stepNumber) {
                 case 1: // معلومات التدريب الأساسية
-                    return !empty($training->title) && !empty($training->program_description);
+                    return !empty($training->title);
+
                     
                 case 2: // الأهداف ومحتوى التدريب
-                    $detail = $training->detail()->first();
-                    return $detail && (
-                        !empty($detail->learning_outcomes) || 
-                        !empty($detail->target_audience)  
+                    $goals = $training->goals()->first();
+                    $hasGoals = $goals && (
+                        !empty($goals->education_level_id) || 
+                        !empty($goals->work_sector_id) || 
+                        !empty($goals->job_position) || 
+                        !empty($goals->country_id) || 
+                        !empty($goals->learning_outcomes)
                     );
+                    return $hasGoals;
                     
-                case 3: // إدارة المدربين والمساعدين
-                    return $training->assistants()->count() > 0;
+                case 3: // محتوى البرنامج (الجلسات التدريبية)
+                    return $training->details()->count() > 0;
                     
-                case 4: // جدولة الجلسات التدريبية
-                    return $training->schedules_later || $training->sessions()->count() > 0;
+                case 4: // ميسرو البرنامج (المدربين والمساعدين)
+                    return $training->assistantUsers()->count() > 0;
                     
-                case 5: // الإعدادات الإضافية
-                    return $training->AdditionalSetting()->exists();
+                case 5: // التسجيل والمتطلبات (الإعدادات الإضافية)
+                    $settings = $training->registrationRequirements()->first();
+                    return  !empty($settings->application_deadline);
                     
                 case 6: // المراجعة النهائية
                     return false; // لا يمكن إكمال هذه الخطوة لأنها الأخيرة
@@ -37,7 +43,7 @@
             return false;
         }
     };
-
+    
     $steps = [
         1 => [
             'title' => 'معلومات البرنامج الأساسية',
@@ -112,6 +118,7 @@
         @endif
     </div>
 @endforeach
+
 
 <style>
     .step.disabled {

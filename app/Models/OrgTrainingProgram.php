@@ -41,7 +41,10 @@ class OrgTrainingProgram extends Model
     {
         return $this->hasMany(OrgAssistantManagement::class);
     }
-
+public function assistantUsers()
+{
+    return $this->belongsToMany(User::class, 'org_assistant_managements', 'org_training_program_id', 'assistant_id');
+}
     public function registrationRequirements()
     {
         return $this->hasOne(OrgRegistrationAndRequirement::class);
@@ -59,6 +62,10 @@ class OrgTrainingProgram extends Model
     public function trainingLevel()
     {
         return $this->belongsTo(TrainingLevel::class, 'training_level_id');
+    }
+        public function programType()
+    {
+        return $this->belongsTo(programType::class, 'program_type');
     }
 
 }

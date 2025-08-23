@@ -486,7 +486,7 @@ public function publishTraining($trainingId)
   {
     try {
       $training = TrainingProgram::findOrFail($trainingId);
-      // $training->update(['status' => 'published']);
+      $training->update(['status' => 'published']);
 
       return redirect()->route('training.completed', $training->id)
         ->with('success', 'تم نشر البرنامج التدريبي بنجاح');

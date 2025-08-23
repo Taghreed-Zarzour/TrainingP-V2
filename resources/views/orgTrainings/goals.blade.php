@@ -42,23 +42,25 @@
                                 يجب عليك تحديد 4 أهداف أو نتائج للتعلم على الأقل.
                             </div>
                             @php
+                                // استخدام البيانات القديمة أولاً إذا موجودة (عند وجود أخطاء)
+                                // ثم البيانات من قاعدة البيانات
                                 $learningOutcomes = old(
-                                    'learning_outcomes',
-                                    isset($learning_outcomes)
-                                        ? (is_array($learning_outcomes)
-                                            ? $learning_outcomes
-                                            : json_decode($learning_outcomes, true))
-                                        : [],
+                                    'learning_outcomes', 
+                                    isset($trainingGoal->learning_outcomes) 
+                                        ? (is_array($trainingGoal->learning_outcomes) 
+                                            ? $trainingGoal->learning_outcomes 
+                                            : json_decode($trainingGoal->learning_outcomes, true)) 
+                                        : []
                                 );
+                                
                                 // ضمان وجود 4 عناصر على الأقل
                                 if (count($learningOutcomes) < 4) {
                                     $learningOutcomes = array_merge(
                                         $learningOutcomes,
-                                        array_fill(0, 4 - count($learningOutcomes), ''),
+                                        array_fill(0, 4 - count($learningOutcomes), '')
                                     );
                                 }
                             @endphp
-
                             @foreach ($learningOutcomes as $index => $outcome)
                                 <div class="{{ $index < 4 ? 'input-without-remove' : 'input-with-remove' }}">
                                     <input type="text" name="learning_outcomes[]" required value="{{ $outcome }}"
@@ -73,117 +75,123 @@
                                 <span>أضف المزيد إلى ردك</span>
                             </button>
                         </div>
-
                         <!-- قسم الفئة المستهدفة -->
                         <div class="input-group ">
                             <label>من هي الفئة المستهدفة؟<span class="required">*</span></label>
                             <div class="sub-label">
-                                قم باختيار خصائص الفئة المستهدفة في هذا المسار ، والذين سيجدون محتواه ذا قيمة. سيساعدك هذا
+                                قم باختيار خصائص الفئة المستهدفة في هذا المسار ، والذين سيجدون محتواه ذا قيمة. سيساعدك هذا
                                 في جذب المتدربين المناسبين إلى برنامجك.
-                                <!-- السؤال الأول: المستوى التعليمي -->
-                                <div class="education-level-section mt-3">
-                                    <div class="input-group mt-3">
-                                        <label>المستوى التعليمي</label>
-                                        <div class="custom-select-container">
-                                            <select name="education_level[]" id="education-level-select"
-                                                class="custom-multiselect" multiple>
-                                                <option value="secondary" @if (in_array('secondary', old('education_level', []))) selected @endif>
-                                                    ثانوي</option>
-                                                <option value="diploma" @if (in_array('diploma', old('education_level', []))) selected @endif>
-                                                    دبلوم</option>
-                                                <option value="bachelor" @if (in_array('bachelor', old('education_level', []))) selected @endif>
-                                                    بكالوريوس</option>
-                                                <option value="master" @if (in_array('master', old('education_level', []))) selected @endif>
-                                                    ماجستير</option>
-                                                <option value="phd" @if (in_array('phd', old('education_level', []))) selected @endif>
-                                                    دكتوراه</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- السؤال الثاني: حالة العمل -->
-                                    <div class="input-group mt-3">
-                                        <label>حالة العمل</label>
-                                        <div class="custom-select-container">
-                                            <select name="employment_status[]" id="employment-status-select"
-                                                class="custom-multiselect" multiple>
-                                                <option value="employed" @if (in_array('employed', old('employment_status', []))) selected @endif>
-                                                    موظف</option>
-                                                <option value="unemployed"
-                                                    @if (in_array('unemployed', old('employment_status', []))) selected @endif>غير موظف</option>
-                                                <option value="self_employed"
-                                                    @if (in_array('self_employed', old('employment_status', []))) selected @endif>عمل حر</option>
-                                                <option value="student" @if (in_array('student', old('employment_status', []))) selected @endif>
-                                                    طالب</option>
-                                                <option value="retired" @if (in_array('retired', old('employment_status', []))) selected @endif>
-                                                    متقاعد</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- السؤال الثالث: القطاع -->
-                                    <div class="input-group mt-3">
-                                        <label>القطاع</label>
-                                        <div class="custom-select-container">
-                                            <select name="sector[]" id="sector-select" class="custom-multiselect" multiple>
-                                                <option value="public" @if (in_array('public', old('sector', []))) selected @endif>
-                                                    قطاع عام</option>
-                                                <option value="private" @if (in_array('private', old('sector', []))) selected @endif>
-                                                    قطاع خاص</option>
-                                                <option value="non_profit"
-                                                    @if (in_array('non_profit', old('sector', []))) selected @endif>قطاع غير ربحي
+                            </div>
+                            <!-- السؤال الأول: المستوى التعليمي -->
+                            <div class="education-level-section mt-3">
+                                <div class="input-group mt-3">
+                                    <label>المستوى التعليمي</label>
+                                    <div class="custom-select-container">
+                                        <select name="education_level_id[]" class="custom-multiselect" multiple>
+                                            @foreach ($educationLevels as $education_level)
+                                                <option value="{{ $education_level->id }}"
+                                                    {{ in_array($education_level->id, old('education_level_id', 
+                                                        is_array($trainingGoal->education_level_id) 
+                                                            ? $trainingGoal->education_level_id 
+                                                            : json_decode($trainingGoal->education_level_id ?? '[]', true)
+                                                        )) ? 'selected' : '' }}>
+                                                    {{ $education_level->name }}
                                                 </option>
-                                                <option value="education"
-                                                    @if (in_array('education', old('sector', []))) selected @endif>قطاع التعليم
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @error('education_level_id')
+                                        <p class="error-message">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <!-- السؤال الثاني: حالة العمل -->
+                                <div class="input-group mt-3">
+                                    <label>حالة العمل</label>
+                                    <div class="custom-select-container">
+                                        <select name="work_status" id="employment-status-select"
+                                            class="custom-singleselect">
+                                            <option value="working" 
+                                                {{ old('work_status', $trainingGoal->work_status) === 'working' ? 'selected' : '' }}>
+                                                يعمل
+                                            </option>
+                                            <option value="not_working"
+                                                {{ old('work_status', $trainingGoal->work_status) === 'not_working' ? 'selected' : '' }}>
+                                                لا يعمل
+                                            </option>
+                                        </select>
+                                    </div>
+                                    @error('work_status')
+                                        <p class="error-message">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- السؤال الثالث: القطاع -->
+                                <div class="input-group mt-3">
+                                    <label>القطاع</label>
+                                    <div class="custom-select-container">
+                                        <select name="work_sector_id[]" id="sector-select" class="custom-multiselect"
+                                            multiple>
+                                            @foreach ($workSectors as $sector)
+                                                <option value="{{ $sector->id }}"
+                                                    {{ in_array($sector->id, old('work_sector_id', 
+                                                        is_array($trainingGoal->work_sector_id) 
+                                                            ? $trainingGoal->work_sector_id 
+                                                            : json_decode($trainingGoal->work_sector_id ?? '[]', true)
+                                                        )) ? 'selected' : '' }}>
+                                                    {{ $sector->name }}
                                                 </option>
-                                                <option value="health" @if (in_array('health', old('sector', []))) selected @endif>
-                                                    قطاع الصحة</option>
-                                            </select>
-                                        </div>
+                                            @endforeach
+                                        </select>
                                     </div>
-
-                                    <!-- السؤال الرابع: المستوى الوظيفي -->
-                                    <div class="input-group mt-3">
-                                        <label>المستوى الوظيفي</label>
-                                        <div class="custom-select-container">
-                                            <select name="job_level[]" id="job-level-select" class="custom-multiselect"
-                                                multiple>
-                                                <option value="entry" @if (in_array('entry', old('job_level', []))) selected @endif>
-                                                    مبتدئ</option>
-                                                <option value="junior" @if (in_array('junior', old('job_level', []))) selected @endif>
-                                                    مستوى متدني</option>
-                                                <option value="mid" @if (in_array('mid', old('job_level', []))) selected @endif>
-                                                    متوسط</option>
-                                                <option value="senior" @if (in_array('senior', old('job_level', []))) selected @endif>
-                                                    مستوى متقدم</option>
-                                                <option value="manager" @if (in_array('manager', old('job_level', []))) selected @endif>
-                                                    مدير</option>
-                                                <option value="executive"
-                                                    @if (in_array('executive', old('job_level', []))) selected @endif>تنفيذي</option>
-                                            </select>
-                                        </div>
+                                    @error('work_sector_id')
+                                        <p class="error-message">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <!-- السؤال الرابع: المستوى الوظيفي -->
+                                <div class="input-group mt-3">
+                                    <label>المستوى الوظيفي</label>
+                                    <div class="custom-select-container">
+                                        <select name="job_position[]" id="job-level-select" class="custom-multiselect"
+                                            multiple>
+                                            @foreach ($jobPositions as $job)
+                                                <option value="{{ $job->value }}"
+                                                    {{ in_array($job->value, old('job_position', 
+                                                        is_array($trainingGoal->job_position) 
+                                                            ? $trainingGoal->job_position 
+                                                            : json_decode($trainingGoal->job_position ?? '[]', true)
+                                                        )) ? 'selected' : '' }}>
+                                                    {{ $job->value }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-
-                                    <!-- السؤال الخامس: الجنسية أو المنطقة -->
-                                    <div class="input-group mt-3">
-                                        <label>الجنسية أو المنطقة</label>
-                                        <div class="custom-select-container">
-                                            <select name="nationality_region[]" id="nationality-region-select"
-                                                class="custom-multiselect" multiple>
-                                                <option value="local" @if (in_array('local', old('nationality_region', []))) selected @endif>
-                                                    محلي</option>
-                                                <option value="gcc" @if (in_array('gcc', old('nationality_region', []))) selected @endif>
-                                                    دول مجلس التعاون الخليجي</option>
-                                                <option value="arab" @if (in_array('arab', old('nationality_region', []))) selected @endif>
-                                                    دول عربية</option>
-                                                <option value="international"
-                                                    @if (in_array('international', old('nationality_region', []))) selected @endif>دولية</option>
-                                            </select>
-                                        </div>
+                                    @error('job_position')
+                                        <p class="error-message">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <!-- السؤال الخامس: الجنسية أو المنطقة -->
+                                <div class="input-group mt-3">
+                                    <label>الجنسية أو المنطقة</label>
+                                    <div class="custom-select-container">
+                                        <select name="country_id[]" id="nationality-region-select"
+                                            class="custom-multiselect" multiple>
+                                            @foreach ($countries as $country)
+                                                <option value="{{ $country->id }}"
+                                                    {{ in_array($country->id, old('country_id', 
+                                                        is_array($trainingGoal->country_id) 
+                                                            ? $trainingGoal->country_id 
+                                                            : json_decode($trainingGoal->country_id ?? '[]', true)
+                                                        )) ? 'selected' : '' }}>
+                                                    {{ $country->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
+                                    @error('country_id')
+                                        <p class="error-message">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
-
                             <div class="input-group-2col mt-4">
                                 <div class="input-group">
                                     <a href="{{ route('orgTraining.basicInformation', $training->id) }}"
@@ -205,6 +213,7 @@
 @endsection
 @section('scripts')
     <script src="{{ asset('js/mutliselect.js') }}"></script>
+    <script src="{{ asset('js/singleselect.js') }}"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -182,10 +182,10 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
     // الخطوة 6: المراجعة
     Route::get('/{trainingId}/review', [Trainings_CURD_Controller::class, 'showReviewForm'])->name('training.review');
-    Route::post('/{trainingId}/publish', [Trainings_CURD_Controller::class, 'publishTraining'])->name('training.publish');
-
+    Route::post('/publish/{trainingId}', action: [Trainings_CURD_Controller::class, 'publishTraining'])->name('training.publish');
     // صفحة الإكمال
     Route::get('/{trainingId}/completed', [Trainings_CURD_Controller::class, 'showCompletionPage'])->name('training.completed');
+
 });
 
 
@@ -265,7 +265,10 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
     Route::post('/settings/{orgTrainingId}', [OrgTrainingController::class, 'storeSettings'])->name('orgTraining.storeSettings');
 
     Route::get('/review/{orgTrainingId}', [OrgTrainingController::class, 'showReviewForm'])->name('orgTraining.review');
-});
+    Route::post('/publish/{orgTrainingId}', [OrgTrainingController::class, 'publishTraining'])->name('orgTraining.publish');
+    Route::get('/completed/{trainingId}', [OrgTrainingController::class, 'showCompletionPage'])->name('orgTrainings.completed');
+
+  });
 });
 
 Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');

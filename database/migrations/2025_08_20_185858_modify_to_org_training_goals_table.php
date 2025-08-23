@@ -12,32 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('org_training_goals', function (Blueprint $table) {
-            $table->dropColumn('target_audience');
-            
-            $table->foreignId('education_level_id')
-            ->nullable()
-            ->references('id')
-            ->on('education_levels')
-            ->onDelete('cascade');
+        $table->dropColumn('target_audience');
 
-            $table->boolean('work_status')
-            ->nullable();
-
-            $table->foreignId('work_sector_id')
-            ->nullable()
-            ->references('id')
-            ->on('work_sectors')
-            ->onDelete('cascade');
-
-            $table->string('job_position')
-            ->nullable()
-            ->after('work_sector_id');
-
-            $table->foreignId('country_id')
-            ->nullable()
-            ->references('id')
-            ->on('countries')
-            ->onDelete('cascade');
+                    // أضف الأعمدة من نوع JSON
+        $table->json('education_level_id')->nullable();
+        $table->string('work_status')->nullable(); // عندك "working / not_working"
+        $table->json('work_sector_id')->nullable();
+        $table->json('job_position')->nullable();
+        $table->json('country_id')->nullable();
 
 
 
@@ -50,8 +32,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('org_training_goals', function (Blueprint $table) {
-            //
-        });
+     Schema::table('org_training_goals', function (Blueprint $table) {
+        //
+    });
     }
 };

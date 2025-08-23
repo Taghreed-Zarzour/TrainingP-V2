@@ -19,21 +19,24 @@ class StoreAdditionalSettingsRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+public function rules(): array
 {
     return [
         'cost' => 'nullable|numeric',
-        'is_free' => 'nullable|boolean',
+        'is_free' => 'required|boolean',
         'currency' => 'nullable|string|max:10',
         'payment_method' => 'nullable|string|max:255',
-        'application_deadline' => 'required|date',
-        'max_trainees' => 'required|integer|min:1',
+        'application_deadline' => 'required|date|after_or_equal:today',
+        'max_trainees' => 'nullable|integer|min:0',
+        'unlimited_trainees' => 'nullable|boolean',
         'application_submission_method' => 'required|in:inside_platform,outside_platform',
         'registration_link' => 'nullable|string|max:255',
-        'requirements' => 'required|string',
-        'benefits' => 'required|string',
+        'requirements' => 'required|array|min:1',
+        'requirements.*' => 'required|string|max:255',
+        'benefits' => 'nullable|array',
+        'benefits.*' => 'nullable|string|max:255',
         'training_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        'welcome_message' => 'nullable|string',
+        'welcome_message' => 'required|string',
     ];
 }
 public function messages(): array
@@ -53,10 +56,10 @@ public function messages(): array
             'application_submission_method.in' => 'يجب أن تكون طريقة تقديم الطلب إما داخل المنصة أو خارجها.',
             'registration_link.string' => 'يجب أن يكون رابط التسجيل نصًا.',
             'registration_link.max' => 'لا يمكن أن يتجاوز رابط التسجيل 255 حرفًا.',
-            'requirements.required' => 'يجب تحديد المتطلبات.',
-            'requirements.string' => 'يجب أن تكون المتطلبات نصًا.',
-            'benefits.required' => 'يجب تحديد الفوائد.',
-            'benefits.string' => 'يجب أن تكون الفوائد نصًا.',
+            // 'requirements.required' => 'يجب تحديد المتطلبات.',
+            // 'requirements.string' => 'يجب أن تكون المتطلبات نصًا.',
+            // 'benefits.required' => 'يجب تحديد الفوائد.',
+            // 'benefits.string' => 'يجب أن تكون الفوائد نصًا.',
             'training_image.image' => 'يجب أن تكون صورة التدريب ملف صورة.',
             'training_image.mimes' => 'يجب أن تكون صورة التدريب من نوع: jpg, jpeg, png.',
             'training_image.max' => 'لا يمكن أن يتجاوز حجم صورة التدريب 2 ميغابايت.',

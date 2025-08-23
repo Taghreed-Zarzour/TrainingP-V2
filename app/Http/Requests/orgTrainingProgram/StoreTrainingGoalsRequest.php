@@ -26,14 +26,20 @@ class StoreTrainingGoalsRequest extends FormRequest
         'learning_outcomes' => 'required|array|min:4',
         'learning_outcomes.*' => 'required|string',
 
-        'target_audience' => 'required|array|min:1',
-        'target_audience.*' => 'required|string',
+'education_level_id'   => 'nullable|array',
+'education_level_id.*' => 'exists:education_levels,id',
 
-        'education_level_id' => 'nullable|exists:education_levels,id', 
-        'work_status' => 'nullable|boolean', 
-        'work_sector_id' => 'nullable|exists:work_sectors,id', 
-        'job_position' => 'nullable|string|in:' . implode(',', array_column(JobPositionEnum::cases(), 'value')), // Ensure valid job position from enum
-        'country_id' => 'nullable|exists:countries,id', 
+'work_sector_id'   => 'nullable|array',
+'work_sector_id.*' => 'exists:work_sectors,id',
+
+'job_position'   => 'nullable|array',
+'job_position.*' => 'string|in:' . implode(',', array_column(JobPositionEnum::cases(), 'value')),
+
+'country_id'   => 'nullable|array',
+'country_id.*' => 'exists:countries,id',
+
+'work_status' => 'nullable|string|in:working,not_working', // لأنه عندك قيم نصية مش boolean
+
     ];
 }
 public function messages(): array
@@ -45,17 +51,12 @@ public function messages(): array
         'learning_outcomes.*.required' => 'يجب إدخال كل نتيجة تعلم.',
         'learning_outcomes.*.string' => 'يجب أن تكون نتيجة التعلم نصاً.',
 
-        'target_audience.required' => 'يجب إدخال الجمهور المستهدف.',
-        'target_audience.array' => 'يجب أن يكون الجمهور المستهدف مصفوفة.',
-        'target_audience.min' => 'يجب أن يحتوي الجمهور المستهدف على عنصر واحد على الأقل.',
-        'target_audience.*.required' => 'يجب إدخال كل عنصر في الجمهور المستهدف.',
-        'target_audience.*.string' => 'يجب أن يكون عنصر الجمهور المستهدف نصاً.',
 
-        'education_level_id.exists' => 'المستوى التعليمي المحدد غير موجود.',
-        'work_status.boolean' => 'يجب أن يكون حالة العمل صحيحة أو خاطئة.',
-        'work_sector_id.exists' => 'قطاع العمل المحدد غير موجود.',
-        'job_position.in' => 'المسمى الوظيفي المحدد غير صالح.',
-        'country_id.exists' => 'الدولة المحددة غير موجودة.',
+        // 'education_level_id.exists' => 'المستوى التعليمي المحدد غير موجود.',
+        // 'work_status.boolean' => 'يجب أن يكون حالة العمل صحيحة أو خاطئة.',
+        // 'work_sector_id.exists' => 'قطاع العمل المحدد غير موجود.',
+        // 'job_position.in' => 'المسمى الوظيفي المحدد غير صالح.',
+        // 'country_id.exists' => 'الدولة المحددة غير موجودة.',
     ];
 }
 }

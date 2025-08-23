@@ -25,11 +25,6 @@ return new class extends Migration
 
             $table->time('session_end_time')->nullable();
 
-            $table->boolean('schedule_later')->default(false);
-
-            $table->unsignedBigInteger('num_of_session')->nullable()->default(0);
-
-            $table->unsignedBigInteger('num_of_hours')->nullable()->default(0);
 
             $table->timestamps();
         });

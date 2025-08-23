@@ -9,19 +9,24 @@ class OrgTrainingGoal extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'org_training_program_id',
-        'learning_outcomes',
-        'education_level_id', 
-        'work_status',        
-        'work_sector_id',     
-        'job_position',       
-        'country_id',         
-    ];
+  protected $fillable = [
+    'org_training_program_id',
+    'learning_outcomes',
+    'education_level_id', 
+    'work_status',        
+    'work_sector_id',     
+    'job_position',       
+    'country_id',         
+];
 
-    protected $casts = [
-        'learning_outcomes' => 'array',
-    ];
+protected $casts = [
+    'learning_outcomes'    => 'array',
+    'education_level_id'   => 'array',
+    'work_sector_id'       => 'array',
+    'job_position'         => 'array',
+    'country_id'           => 'array',
+];
+
 
     public function trainingProgram()
     {

@@ -1,32 +1,131 @@
 @extends('frontend.layouts.master')
 @section('title', 'جدولة الجلسات التدريبية')
-@section('css')
-@endsection
 @section('content')
-    <style>
-        /* إضافة أنماط لتحسين موضع أزرار الحذف */
-        .session-header,
-        .training-section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .remove-session-btn,
-        .remove-training-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-            margin-right: 10px;
-        }
-    </style>
+<style>
+    .session-header,
+    .training-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .remove-session-btn,
+    .remove-training-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        margin-right: 10px;
+    }
+    .template {
+        display: none !important;
+        visibility: hidden;
+        height: 0;
+        overflow: hidden;
+        position: absolute;
+        left: -9999px;
+    }
+    .time-picker-container {
+        position: relative;
+        width: 100%;
+    }
+    .time-picker {
+        cursor: pointer;
+    }
+    .time-picker-dropdown {
+        display: none;
+        position: absolute;
+        background: white;
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        width: 100%;
+        box-sizing: border-box;
+        top: 100%;
+        left: 0;
+    }
+    .time-option {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+    }
+    .time-option:hover {
+        background-color: #f0f0f0;
+    }
+    .time-option:last-child {
+        border-bottom: none;
+    }
+    .error-border {
+        border: 1px solid red !important;
+    }
+    .profile-image-preview {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        aspect-ratio: initial;
+        border-radius: 8px;
+        overflow: visible;
+    }
+    .profile-image-shown {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+    .profile-image-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.3s;
+    }
+    .profile-image-btn:hover {
+        background: #2563eb;
+    }
+    .profile-image-default {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-direction: column;
+    }
+    .training-files-preview-file {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        margin-bottom: 8px;
+    }
+    .remove-training-file {
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .remove-training-file:hover {
+        background: #f8d7da;
+    }
+</style>
     <main>
         <div class="publish-training-page">
             <div class="grid">
                 <div class="right-col">
                     <div class="vertical-stepper">
-                        <!-- خطوات التقدم -->
                         @include('orgTrainings.partials.stepper', [
                             'currentStep' => 3,
                             'trainingId' => $training->id ?? null,
@@ -61,271 +160,131 @@
                         <div class="info-message-content">
                             أضف التدريبات المكوّنة للبرنامج، وأضف تفاصيل الجلسات لكل تدريب على حدة ضمن البرنامج التدريبي.
                             يساعد ذلك في تتبع حضور المتدربين لكل جلسة بدقة. تأكّد من تحديد التاريخ والتوقيت ومدة كل جلسة
-                            بوضوح. يمكنك إضافة عدد غير محدود من التدريبات. </div>
+                            بوضوح. يمكنك إضافة عدد غير محدود من التدريبات.
+                        </div>
                     </div>
                     <form id="publish-training-4-form" method="POST"
-                        action="{{ route('orgTraining.storeTrainingDetails', $training->id) }}">
+                        action="{{ route('orgTraining.storeTrainingDetails', $training->id) }}" enctype="multipart/form-data">
                         @csrf
                         <div id="form-errors-container" class="error-container" style="display: none;"></div>
+                        
+                        <div class="input-group m-0">
+                            <h4>إضافة تدريب</h4>
+                            <p>قم بإضافة معلومات كل تدريب ضمن البرنامج التدريبي</p>
+                        </div>
+                        
                         <div id="trainings-container">
                             @php
-                                // إذا لم يتم تحديد "تحديد الجلسات لاحقاً"، فأضف تدريب واحد على الأقل
-                                if (!$schedules_later) {
-                                    $safeTrainings = $training->trainings ?? collect(); // ضمان أن trainings ليست null
-                                    $trainings = old(
-                                        'program_title',
-                                        $safeTrainings->count() > 0
-                                            ? $safeTrainings->toArray()
-                                            : [
-                                                [
-                                                    'title' => '',
-                                                    'trainer_id' => '',
-                                                    'schedules' => [
-                                                        [
-                                                            'date' => '',
-                                                            'start_time' => '',
-                                                            'end_time' => '',
-                                                        ],
+                                $trainings = $trainings ?? collect();
+                                $availableTrainers = $availableTrainers ?? collect();
+                                $schedules_later = $schedules_later ?? false;
+                                
+                                if (old('program_title')) {
+                                    $trainingsData = [];
+                                    foreach (old('program_title') as $index => $title) {
+                                        $trainingsData[] = [
+                                            'title' => $title,
+                                            'program_title' => $title,
+                                            'trainer_id' => old('trainer_id.' . $index, ''),
+                                            'schedules_later' => old('schedules_later.' . $index, false),
+                                            'num_of_session' => old('num_of_session.' . $index, null),
+                                            'num_of_hours' => old('num_of_hours.' . $index, null),
+                                            'schedules' => old('schedules.' . $index, []),
+                                        ];
+                                    }
+                                } else {
+                                    $trainingsData = $trainings->count() > 0
+                                        ? $trainings->toArray()
+                                        : [
+                                            [
+                                                'title' => '',
+                                                'program_title' => '',
+                                                'trainer_id' => '',
+                                                'schedules_later' => false,
+                                                'num_of_session' => null,
+                                                'num_of_hours' => null,
+                                                'schedules' => [
+                                                    [
+                                                        'date' => '',
+                                                        'start_time' => '',
+                                                        'end_time' => '',
                                                     ],
                                                 ],
                                             ],
-                                    );
-                                } else {
-                                    $trainings = [];
+                                        ];
                                 }
                             @endphp
-                            <div class="input-group m-0">
-                                <h4>إضافة تدريب</h4>
-                                <p>قم بإضافة معلومات كل تدريب ضمن البرنامج التدريبي</p>
-                            </div>
-                            @foreach ($trainings as $trainingIndex => $trainingItem)
-
-                                <div class="training-section" data-training-index="{{ $trainingIndex }}">
-                                    <div class=" border rounded-4 p-3">
-                                        <div class="training-details mb-5">
-                                            <div class="training-section-header">
-                                                <div class="input-group">
-                                                    <h5 class="">{{ $trainingIndex + 1 }}- عنوان التدريب و المدرب
-                                                        الرئيسي
-                                                    </h5>
-                                                    <div class="sub-label">
-                                                        اذكر عنوان التدريب بالإضافة إلى اسم المدرب المسؤول عن تنفيذ التدريب
-                                                    </div>
-                                                </div>
-
-                                                @if ($trainingIndex > 0)
-                                                    <button type="button" class="remove-training-btn"
-                                                        style="top: -50px;position: relative;"
-                                                        onclick="removeTraining({{ $trainingIndex }})">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                            height="16" fill="#e00000" viewBox="0 0 256 256">
-                                                            <path
-                                                                d="M216,48H180V36A28,28,0,0,0,152,8H104A28,28,0,0,0,76,36V48H40a12,12,0,0,0,0,24h4V208a20,20,0,0,0,20,20H192a20,20,0,0,0,20-20V72h4a12,12,0,0,0,0-24ZM100,36a4,4,0,0,1,4-4h48a4,4,0,0,1,4,4V48H100Zm88,168H68V72H188ZM116,104v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Zm48,0v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Z">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
-                                                @endif
-                                            </div>
-                                            <div class="input-group-2col">
-                                                <div class="input-group-2col">
-    <div class="input-group">
-        <input type="text" name="program_title[{{ $trainingIndex }}]"
-            value="{{ 
-                is_array($trainingItem) ? 
-                    ($trainingItem['title'] ?? $trainingItem['program_title'] ?? '') : 
-                    (is_object($trainingItem) ? $trainingItem->title ?? $trainingItem->program_title ?? '' : '')
-            }}"
-            placeholder="مثال : التفكير التصميمي"
-            class="@error('program_title.' . $trainingIndex) error-border @enderror">
-        @error("program_title.$trainingIndex")
-            <span class="error-message">{{ $message }}</span>
-        @enderror
-    </div>
-                                                <div class="input-group">
-<select name="trainer_id[{{ $trainingIndex }}]"
-    class="custom-singleselect @error('trainer_id.' . $trainingIndex) error-border @enderror">
-    <option value="" disabled selected style="color: silver !important;">مثال : عبد الله المصري</option>
-    @foreach ($availableTrainers as $trainer)
-        <option value="{{ $trainer->id }}"
-            {{ 
-                (is_array($trainingItem) ? 
-                    ($trainingItem['trainer_id'] ?? '') : 
-                    (is_object($trainingItem) ? ($trainingItem->trainer_id ?? '') : '')
-                ) == $trainer->id ? 'selected' : '' 
-            }}>
-            {{ $trainer->getTranslation('name', 'ar') }}
-            {{ $trainer->trainer?->getTranslation('last_name', 'ar') }}
-        </option>
-    @endforeach
-</select>                                @error("trainer_id.$trainingIndex")
-                                                        <span class="error-message">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-                                      <div class="input-group">
-    <label class="switch w-100">
-        <span class="switch-label">سيتم تحديد الجلسات لاحقًا بعد اكتمال عدد المشاركين</span>
-        <input type="checkbox"
-            name="schedules_later" 
-            value="1"
-            id="schedules_later_{{ $trainingIndex }}"
-            {{ 
-                old('schedules_later', 
-                    is_array($trainingItem) ? 
-                        ($trainingItem['schedules_later'] ?? false) : 
-                        (is_object($trainingItem) ? ($trainingItem->schedules_later ?? false) : false)
-                ) ? 'checked' : '' 
-            }}>
-        <span class="slider"></span>
-    </label>
-</div>
-                                        <div class="session-container" id="sessions-container-{{ $trainingIndex }}">
-                                            @php
-                                                // إذا لم يتم تحديد "تحديد الجلسات لاحقاً"، فأضف جلسة واحدة على الأقل
-                                                if (
-                                                    !(is_array($trainingItem)
-                                                        ? $trainingItem['schedules_later'] ?? false
-                                                        : $trainingItem->schedules_later)
-                                                ) {
-                                                    $safeSchedules = is_array($trainingItem)
-                                                        ? $trainingItem['schedules'] ?? []
-                                                        : $trainingItem->schedules ?? [];
-                                                    $schedules = old(
-                                                        'schedules',
-                                                        count($safeSchedules) > 0
-                                                            ? $safeSchedules
-                                                            : [
-                                                                [
-                                                                    'date' => '',
-                                                                    'start_time' => '',
-                                                                    'end_time' => '',
-                                                                ],
-                                                            ],
-                                                    );
-                                                } else {
-                                                    $schedules = [];
-                                                }
-                                            @endphp
-                                            @foreach ($schedules as $scheduleIndex => $schedule)
-                                                <div class="session-group" style="margin-bottom: 15px;"
-                                                    data-session-index="{{ $scheduleIndex }}">
-                                                    <div class="session-header">
-                                                        <div class="input-group">
-                                                            <h5 class="w-100">تاريخ الجلسة {{ $scheduleIndex + 1 }} و مدتها
-                                                                <span class="required">*</span>
-                                                            </h5>
-                                                            <div class="sub-label">
-                                                                اختر التاريخ الذي ستُعقد فيه الجلسة و وقت بداية ونهاية
-                                                                الجلسة.
-                                                            </div>
-                                                        </div>
-
-                                                        @if ($scheduleIndex > 0)
-                                                            <button type="button" class="remove-session-btn"
-                                                                style="position: relative; right: 5px;"
-                                                                onclick="removeSession({{ $trainingIndex }}, {{ $scheduleIndex }})">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                                    height="16" fill="#e00000" viewBox="0 0 256 256">
-                                                                    <path
-                                                                        d="M216,48H180V36A28,28,0,0,0,152,8H104A28,28,0,0,0,76,36V48H40a12,12,0,0,0,0,24h4V208a20,20,0,0,0,20,20H192a20,20,0,0,0,20-20V72h4a12,12,0,0,0,0-24ZM100,36a4,4,0,0,1,4-4h48a4,4,0,0,1,4,4V48H100Zm88,168H68V72H188ZM116,104v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Zm48,0v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Z">
-                                                                    </path>
-                                                                </svg>
-                                                            </button>
-                                                        @endif
-                                                    </div>
-                                                    <div class="session-details">
-                                                        <div class="input-group-2col inner"
-                                                            style="align-items: flex-start;">
-                                                            <div class="input-group">
-                                                                <input type="date"
-                                                                    name="schedules[{{ $scheduleIndex }}][date]"
-                                                                    value="{{ is_array($schedule) ? $schedule['date'] ?? '' : $schedule->date }}"
-                                                                    placeholder="مثال: 15 يونيو 2025"
-                                                                    class="session-date-input w-100 @error('schedules.' . $scheduleIndex . '.date') error-border @enderror">
-                                                                @error("schedules.$scheduleIndex.date")
-                                                                    <span class="error-message">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                            <div class="input-group">
-                                                                <div class="time-picker-container">
-                                                                    <div class="time-picker"
-                                                                        data-training-index="{{ $trainingIndex }}"
-                                                                        data-session-index="{{ $scheduleIndex }}"
-                                                                        data-type="start">
-                                                                        {{ is_array($schedule) ? ($schedule['start_time'] ? \Carbon\Carbon::parse($schedule['start_time'])->format('g:i A') : 'وقت بدء الجلسة') : ($schedule->start_time ? \Carbon\Carbon::parse($schedule->start_time)->format('g:i A') : 'وقت بدء الجلسة') }}
-                                                                    </div>
-                                                                    <div class="time-picker-dropdown"></div>
-                                                                    <input type="hidden"
-                                                                        name="schedules[{{ $scheduleIndex }}][start_time]"
-                                                                        value="{{ is_array($schedule) ? $schedule['start_time'] ?? '' : $schedule->start_time }}"
-                                                                        class="time-picker-input @error('schedules.' . $scheduleIndex . '.start_time') error-border @enderror">
-                                                                </div>
-                                                                @error("schedules.$scheduleIndex.start_time")
-                                                                    <span class="error-message">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                            <div class="input-group">
-                                                                <div class="time-picker-container">
-                                                                    <div class="time-picker"
-                                                                        data-training-index="{{ $trainingIndex }}"
-                                                                        data-session-index="{{ $scheduleIndex }}"
-                                                                        data-type="end">
-                                                                        {{ is_array($schedule) ? ($schedule['end_time'] ? \Carbon\Carbon::parse($schedule['end_time'])->format('g:i A') : 'وقت انتهاء الجلسة') : ($schedule->end_time ? \Carbon\Carbon::parse($schedule->end_time)->format('g:i A') : 'وقت انتهاء الجلسة') }}
-                                                                    </div>
-                                                                    <div class="time-picker-dropdown"></div>
-                                                                    <input type="hidden"
-                                                                        name="schedules[{{ $scheduleIndex }}][end_time]"
-                                                                        value="{{ is_array($schedule) ? $schedule['end_time'] ?? '' : $schedule->end_time }}"
-                                                                        class="time-picker-input @error('schedules.' . $scheduleIndex . '.end_time') error-border @enderror">
-                                                                </div>
-                                                                @error("schedules.$scheduleIndex.end_time")
-                                                                    <span class="error-message">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                        <div class="input-group">
-                                            <button type="button" class="add-more-btn" id="add-session-btn"
-                                                onclick="addSession({{ $trainingIndex }})">
-                                                <img src="{{ asset('images/icons/plus-main.svg') }}" />
-                                                <span>أضف جلسة جديدة</span>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                </div>
+                            
+                            @foreach ($trainingsData as $trainingIndex => $trainingItem)
+                                @include('orgTrainings.partials.training_section', [
+                                    'trainingIndex' => $trainingIndex,
+                                    'trainingItem' => $trainingItem,
+                                    'availableTrainers' => $availableTrainers,
+                                    'schedules_later' => $schedules_later,
+                                    'displayNumber' => $trainingIndex + 1,
+                                    'canRemove' => $trainingIndex > 0,
+                                ])
                             @endforeach
                         </div>
+                        
                         <div class="input-group">
                             <button type="button" class="add-more-btn" id="add-training-btn">
                                 <img src="{{ asset('images/icons/plus-main.svg') }}" />
                                 <span>أضف تدريب جديد</span>
                             </button>
                         </div>
-
-<div class="training-files">
+                      <div class="training-files">
     <label>ملفات التدريب (اختياري)</label>
     <div class="sub-label">قم بإرفاق أي ملفات تعريفية أو مرفقات ترغب بعرضها مسبقًا</div>
     <div class="training-files-wrapper file-upload-wrapper" data-multiple="true">
         <div class="training-files-default profile-image-default">
             <img src="{{ asset('images/icons/upload.svg') }}" />
             <button type="button" class="training-files-btn profile-image-btn select-training-files">تصفح الملفات</button>
-            <input type="file" class="training-files-input visually-hidden" name="training_files" multiple>
+            <input type="file" class="training-files-input visually-hidden" name="training_files[]" multiple>
         </div>
-        <div class="file-preview training-files-preview" style="display: none;"></div>
+        <div class="training-files-preview" style="display: none;">
+            @php
+                $trainingFiles = $trainingFiles ?? [];
+            @endphp
+            @if (!empty($trainingFiles))
+                @foreach ($trainingFiles as $file)
+                    @php
+                        // التحقق من نوع البيانات
+                        $filePath = '';
+                        $fileName = '';
+                        
+                        if (is_array($file)) {
+                            // إذا كان مصفوفة، حاول الحصول على المسار أو الاسم
+                            $filePath = $file['path'] ?? '';
+                            $fileName = $file['name'] ?? ($filePath ? basename($filePath) : 'ملف غير معروف');
+                        } elseif (is_string($file)) {
+                            // إذا كان نصًا، استخدمه كمسار
+                            $filePath = $file;
+                            $fileName = basename($file);
+                        }
+                    @endphp
+                    <div class="training-files-preview-file" data-file-path="{{ $filePath }}">
+                        <span>{{ $fileName }}</span>
+                        <input type="hidden" name="existing_training_files[]" value="{{ $filePath }}" class="existing-file-input">
+                        <button type="button" class="remove-training-file">&times;</button>
+                    </div>
+                @endforeach
+            @endif
+        </div>
         <div id="real-files-container"></div>
-        <button type="button" class="add-more-training profile-image-btn" style="display:none;">إضافة المزيد</button>
+        <button type="button" class="add-training-files add-more-training profile-image-btn" style="display:none;">إضافة المزيد</button>
     </div>
+    @error('training_files')
+        <span class="error-message">{{ $message }}</span>
+    @enderror
+    @error('training_files.*')
+     <span class="error-message">{{ $message }}</span>
+    @enderror
 </div>
 
                         <div class="input-group-2col mt-4">
                             <div class="input-group">
-                                <a href="{{ route('orgTraining.goals', $training->id) }}"
-                                    class="pbtn pbtn-outlined-main">
+                                <a href="{{ route('orgTraining.goals', $training->id) }}" class="pbtn pbtn-outlined-main">
                                     السابق
                                 </a>
                             </div>
@@ -340,253 +299,18 @@
             </div>
         </div>
     </main>
-@endsection
-@section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/validator@13.9.0/validator.min.js"></script>
-    <script src="{{ asset('js/mutliselect.js') }}"></script>
-    <script src="{{ asset('js/singleselect.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // عدد التدريبات الحالية من السيرفر
-            let currentTrainingCount = {{ count($trainings) }};
-            let nextTrainingIndex = currentTrainingCount; // يستخدم فقط عند إضافة تدريب جديد
-
-            // عدد الجلسات لكل تدريب
-            let sessionIndices = {};
-            @foreach ($trainings as $trainingIndex => $trainingItem)
-                sessionIndices[{{ $trainingIndex }}] =
-                    {{ count(is_array($trainingItem) ? $trainingItem['schedules'] ?? [] : $trainingItem->schedules ?? []) }};
-            @endforeach
-
-            // إنشاء قائمة بالأوقات المتاحة
-            function generateTimeOptions() {
-                const options = [];
-                for (let hour = 0; hour < 24; hour++) {
-                    for (let minute = 0; minute < 60; minute += 15) {
-                        const time24 = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                        let hour12 = hour % 12 || 12;
-                        const ampm = hour < 12 ? 'صباحاً' : 'مساءً';
-                        const time12 = `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
-                        options.push({
-                            value: time24,
-                            label: time12
-                        });
-                    }
-                }
-                return options;
-            }
-            const timeOptions = generateTimeOptions();
-
-            // دالة لتحويل الوقت من 24 ساعة إلى 12 ساعة
-            function formatTimeTo12Hour(time24) {
-                if (!time24) return '';
-                const [hours, minutes] = time24.split(':');
-                const hour12 = hours % 12 || 12;
-                const ampm = hours < 12 ? 'صباحاً' : 'مساءً';
-                return `${hour12}:${minutes} ${ampm}`;
-            }
-
-            // دالة لتحويل الوقت من 12 ساعة إلى 24 ساعة
-            function formatTimeTo24Hour(time12) {
-                if (!time12) return '';
-                // استخراج الساعات والدقائق والفترة
-                const match = time12.match(/(\d{1,2}):(\d{2})\s*(صباحاً|مساءً)/);
-                if (!match) return '';
-                let hours = parseInt(match[1]);
-                const minutes = match[2];
-                const period = match[3];
-                // تحويل إلى 24 ساعة
-                if (period === 'مساءً' && hours < 12) {
-                    hours += 12;
-                } else if (period === 'صباحاً' && hours === 12) {
-                    hours = 0;
-                }
-                return `${hours.toString().padStart(2, '0')}:${minutes}`;
-            }
-
-            // تهيئة منتقي الوقت
-            function initializeTimePickers(container = document) {
-                const timePickers = container.querySelectorAll('.time-picker');
-                timePickers.forEach(picker => {
-                    const dropdown = picker.nextElementSibling;
-                    const hiddenInput = dropdown.nextElementSibling;
-                    // الحصول على القيمة الحالية من الحقل المخفي
-                    const currentValue = hiddenInput.value;
-                    // تحديث النص المعروض بناءً على القيمة الحالية
-                    if (currentValue && currentValue !== 'وقت بدء الجلسة' && currentValue !==
-                        'وقت انتهاء الجلسة') {
-                        // تحويل القيمة من 24 ساعة إلى 12 ساعة للعرض
-                        picker.textContent = formatTimeTo12Hour(currentValue);
-                        // التأكد من أن القيمة في الحقل المخفي بتنسيق 24 ساعة
-                        hiddenInput.value = currentValue;
-                    } else {
-                        // تعيين النص الافتراضي إذا لم تكن هناك قيمة
-                        const defaultText = picker.dataset.type === 'start' ? 'وقت بدء الجلسة' :
-                            'وقت انتهاء الجلسة';
-                        picker.textContent = defaultText;
-                        // لا تقم بتعيين الحقل المخفي كفارغ إذا كان هناك قيمة صالحة من قبل
-                        if (!currentValue || currentValue === 'وقت بدء الجلسة' || currentValue ===
-                            'وقت انتهاء الجلسة') {
-                            hiddenInput.value = '';
-                        }
-                    }
-
-                    // إنشاء قائمة الخيارات
-                    dropdown.innerHTML = '';
-                    timeOptions.forEach(option => {
-                        const optionElement = document.createElement('div');
-                        optionElement.className = 'time-picker-option';
-                        optionElement.textContent = option.label;
-                        optionElement.dataset.value = option.value;
-                        // تحديد الخيار المحدد مسبقاً
-                        if (option.value === currentValue) {
-                            optionElement.classList.add('selected');
-                        }
-                        optionElement.addEventListener('click', function() {
-                            // تحديث القيمة المعروضة
-                            picker.textContent = option.label;
-                            // تحديث القيمة في الحقل المخفي
-                            hiddenInput.value = option.value;
-                            // تحديث الخيار المحدد
-                            dropdown.querySelectorAll('.time-picker-option').forEach(
-                            opt => {
-                                opt.classList.remove('selected');
-                            });
-                            optionElement.classList.add('selected');
-                            // إغلاق القائمة
-                            dropdown.style.display = 'none';
-                            // التحقق من صحة الوقت
-                            validateTimeInputs(picker);
-                        });
-                        dropdown.appendChild(optionElement);
-                    });
-
-                    // إظهار/إخفاء القائمة عند النقر
-                    picker.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        dropdown.style.display = dropdown.style.display === 'block' ? 'none' :
-                            'block';
-                    });
-
-                    // إغلاق القائمة عند النقر في أي مكان آخر
-                    document.addEventListener('click', function() {
-                        dropdown.style.display = 'none';
-                    });
-                });
-            }
-
-            // التحقق من صحة حقول الوقت
-            function validateTimeInputs(timePicker) {
-                const sessionGroup = timePicker.closest('.session-group');
-                const startTimeInput = sessionGroup.querySelector('input[name$="[start_time]"]');
-                const endTimeInput = sessionGroup.querySelector('input[name$="[end_time]"]');
-                if (startTimeInput.value && endTimeInput.value) {
-                    const startTime = startTimeInput.value;
-                    const endTime = endTimeInput.value;
-                    if (startTime >= endTime) {
-                        // إضافة رسالة خطأ
-                        const errorElement = sessionGroup.querySelector('#end-time-error-' + timePicker.dataset
-                            .sessionIndex);
-                        if (errorElement) {
-                            errorElement.textContent = 'وقت النهاية يجب أن يكون بعد وقت البداية';
-                            errorElement.style.display = 'block';
-                            endTimeInput.classList.add('error-border');
-                        }
-                    } else {
-                        // إزالة رسالة الخطأ
-                        const errorElement = sessionGroup.querySelector('#end-time-error-' + timePicker.dataset
-                            .sessionIndex);
-                        if (errorElement) {
-                            errorElement.style.display = 'none';
-                            endTimeInput.classList.remove('error-border');
-                        }
-                    }
-                }
-            }
-
-            // دالة لتحديث الحقول المخفية للوقت
-            function updateHiddenTimeInputs(sessionGroup) {
-                const startTimePicker = sessionGroup.querySelector('.time-picker[data-type="start"]');
-                const endTimePicker = sessionGroup.querySelector('.time-picker[data-type="end"]');
-                const startTimeHidden = sessionGroup.querySelector('input[name$="[start_time]"]');
-                const endTimeHidden = sessionGroup.querySelector('input[name$="[end_time]"]');
-                // تحديث وقت البدء
-                if (startTimePicker && startTimeHidden) {
-                    const pickerText = startTimePicker.textContent.trim();
-                    if (pickerText !== 'وقت بدء الجلسة' && pickerText !== '') {
-                        const time24 = formatTimeTo24Hour(pickerText);
-                        startTimeHidden.value = time24;
-                    }
-                }
-                // تحديث وقت الانتهاء
-                if (endTimePicker && endTimeHidden) {
-                    const pickerText = endTimePicker.textContent.trim();
-                    if (pickerText !== 'وقت انتهاء الجلسة' && pickerText !== '') {
-                        const time24 = formatTimeTo24Hour(pickerText);
-                        endTimeHidden.value = time24;
-                    }
-                }
-            }
-
-            // دالة لتحديث جميع الحقول المخفية قبل الإرسال
-            function updateHiddenInputsBeforeSubmit() {
-                document.querySelectorAll('.session-group').forEach((sessionGroup) => {
-                    const startTimePicker = sessionGroup.querySelector('.time-picker[data-type="start"]');
-                    const endTimePicker = sessionGroup.querySelector('.time-picker[data-type="end"]');
-                    const startTimeHidden = sessionGroup.querySelector(
-                        'input[name$="[start_time]"]');
-                    const endTimeHidden = sessionGroup.querySelector('input[name$="[end_time]"]');
-                    // معالجة وقت البداية
-                    if (startTimePicker && startTimeHidden) {
-                        const pickerText = startTimePicker.textContent.trim();
-                        if (pickerText === 'وقت بدء الجلسة' || pickerText === '') {
-                            startTimeHidden.value = '';
-                        } else {
-                            // تحويل النص إلى تنسيق 24 ساعة
-                            const time24 = formatTimeTo24Hour(pickerText);
-                            startTimeHidden.value = time24;
-                        }
-                    }
-                    // معالجة وقت الانتهاء
-                    if (endTimePicker && endTimeHidden) {
-                        const pickerText = endTimePicker.textContent.trim();
-                        if (pickerText === 'وقت انتهاء الجلسة' || pickerText === '') {
-                            // إذا كان الحقل المخفي يحتوي على قيمة من قبل، احتفظ بها
-                            if (!endTimeHidden.value || endTimeHidden.value === 'وقت انتهاء الجلسة') {
-                                endTimeHidden.value = '';
-                            }
-                        } else {
-                            // تحويل النص إلى تنسيق 24 ساعة
-                            const time24 = formatTimeTo24Hour(pickerText);
-                            endTimeHidden.value = time24;
-                        }
-                    }
-                });
-            }
-
-            // تهيئة جميع منتقي الوقت عند تحميل الصفحة
-            initializeTimePickers();
-
-            // إضافة تدريب جديد
-            document.getElementById('add-training-btn').addEventListener('click', function() {
-                const container = document.getElementById('trainings-container');
-                const newTrainingIndex = nextTrainingIndex;
-                const displayNumber = currentTrainingCount + 1; // الرقم المعروض للمستخدم
-
-                const newTraining = document.createElement('div');
-                newTraining.className = 'training-section';
-                newTraining.setAttribute('data-training-index', newTrainingIndex);
-                newTraining.innerHTML = `
-            <div class=" border rounded-4 p-3  mt-5">
+    <div id="templates" class="template">
+        <div id="training-template">
+            <div class="training-section border rounded-4 p-3 mt-4" data-training-index="{trainingIndex}">
                 <div class="training-details mb-5">
                     <div class="training-section-header">
                         <div class="input-group">
-                            <h5 class="">${displayNumber}- عنوان التدريب و المدرب الرئيسي</h5>
+                            <h5 class="">{displayNumber}- عنوان التدريب و المدرب الرئيسي</h5>
                             <div class="sub-label">
                                 اذكر عنوان التدريب بالإضافة إلى اسم المدرب المسؤول عن تنفيذ التدريب
                             </div>
                         </div>
-                        <button type="button" class="remove-training-btn" style="top: -50px;position: relative;" onclick="removeTraining(${newTrainingIndex})">
+                        <button type="button" class="remove-training-btn" style="top: -50px;position: relative; display: {removeButtonDisplay}" data-training-index="{trainingIndex}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e00000" viewBox="0 0 256 256">
                                 <path d="M216,48H180V36A28,28,0,0,0,152,8H104A28,28,0,0,0,76,36V48H40a12,12,0,0,0,0,24h4V208a20,20,0,0,0,20,20H192a20,20,0,0,0,20-20V72h4a12,12,0,0,0,0-24ZM100,36a4,4,0,0,1,4-4h48a4,4,0,0,1,4,4V48H100Zm88,168H68V72H188ZM116,104v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Zm48,0v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Z"></path>
                             </svg>
@@ -595,18 +319,15 @@
                     
                     <div class="input-group-2col">
                         <div class="input-group">
-                            <input type="text" name="program_title[${newTrainingIndex}]" placeholder="أدخل عنوان التدريب">
-                            <span class="error-message" id="program-title-error-${newTrainingIndex}" style="display:none;"></span>
+                            <input type="text" name="program_title[{trainingIndex}]" placeholder="أدخل عنوان التدريب">
+                            <span class="error-message" id="program-title-error-{trainingIndex}" style="display:none;"></span>
                         </div>
                         
                         <div class="input-group">
-                            <select name="trainer_id[${newTrainingIndex}]" class="custom-singleselect">
-                                <option value="" disabled selected>اختر مدربًا</option>
-                                @foreach ($availableTrainers as $trainer)
-                                    <option value="{{ $trainer->id }}">{{ $trainer->name }}</option>
-                                @endforeach
+                            <select name="trainer_id[{trainingIndex}]" class="custom-singleselect">
+                                {trainersOptions}
                             </select>
-                            <span class="error-message" id="trainer-id-error-${newTrainingIndex}" style="display:none;"></span>
+                            <span class="error-message" id="trainer-id-error-{trainingIndex}" style="display:none;"></span>
                         </div>
                     </div>
                 </div>
@@ -614,438 +335,832 @@
                 <div class="input-group">
                     <label class="switch w-100">
                         <span class="switch-label">سيتم تحديد الجلسات لاحقًا بعد اكتمال عدد المشاركين</span>
-                        <input type="checkbox" name="schedules_later" value="1" id="schedules_later_${newTrainingIndex}">
+                        <input type="checkbox" name="schedules_later[{trainingIndex}]" value="1" id="schedules_later_{trainingIndex}">
                         <span class="slider"></span>
                     </label>
                 </div>
                 
-                <div class="session-container" id="sessions-container-${newTrainingIndex}">
-                    <div class="session-group" style="margin-bottom: 15px;" data-session-index="0">
-                        <div class="session-header">
-                            <div class="input-group">
-                                <h5 class="w-100">تاريخ الجلسة 1 و مدتها <span class="required">*</span></h5>
-                                <div class="sub-label">
-                                    اختر التاريخ الذي ستُعقد فيه الجلسة و وقت بداية ونهاية الجلسة.
-                                </div>
-                            </div>
+                <div class="session-details-container" id="session-details-{trainingIndex}" style="display: none;">
+                    <div class="input-group-2col">
+                        <div class="input-group">
+                            <label>عدد الجلسات</label>
+                            <input type="number" name="num_of_session[{trainingIndex}]" min="1" placeholder="مثال: 5">
+                            <span class="error-message" id="num-of-session-error-{trainingIndex}" style="display:none;"></span>
                         </div>
-                        
-                        <div class="session-details">
-                            <div class="input-group-2col inner" style="align-items: flex-start;">
-                                <div class="input-group">
-                                    <input type="date" name="schedules[0][date]" placeholder="مثال: 15 يونيو 2025" class="session-date-input w-100">
-                                    <span class="error-message" id="schedule-date-error-${newTrainingIndex}-0" style="display:none;"></span>
-                                </div>
-                                
-                                <div class="input-group">
-                                    <div class="time-picker-container">
-                                        <div class="time-picker" data-training-index="${newTrainingIndex}" data-session-index="0" data-type="start">وقت بدء الجلسة</div>
-                                        <div class="time-picker-dropdown"></div>
-                                        <input type="hidden" name="schedules[0][start_time]" class="time-picker-input" value="">
-                                    </div>
-                                    <span class="error-message" id="start-time-error-${newTrainingIndex}-0" style="display:none;"></span>
-                                </div>
-                                
-                                <div class="input-group">
-                                    <div class="time-picker-container">
-                                        <div class="time-picker" data-training-index="${newTrainingIndex}" data-session-index="0" data-type="end">وقت انتهاء الجلسة</div>
-                                        <div class="time-picker-dropdown"></div>
-                                        <input type="hidden" name="schedules[0][end_time]" class="time-picker-input" value="">
-                                    </div>
-                                    <span class="error-message" id="end-time-error-${newTrainingIndex}-0" style="display:none;"></span>
-                                </div>
-                            </div>
+                        <div class="input-group">
+                            <label>عدد الساعات</label>
+                            <input type="number" name="num_of_hours[{trainingIndex}]" min="0.5" step="0.5" placeholder="مثال: 10">
+                            <span class="error-message" id="num-of-hours-error-{trainingIndex}" style="display:none;"></span>
                         </div>
                     </div>
                 </div>
                 
+                <div class="session-container" id="sessions-container-{trainingIndex}" style="display: none;">
+                </div>
+                
                 <div class="input-group">
-                    <button type="button" class="add-more-btn" id="add-session-btn" onclick="addSession(${newTrainingIndex})">
+                    <button type="button" class="add-more-btn add-session-btn" data-training-index="{trainingIndex}" style="display: none;">
                         <img src="{{ asset('images/icons/plus-main.svg') }}" />
                         <span>أضف جلسة جديدة</span>
                     </button>
                 </div>
             </div>
-        `;
-                container.appendChild(newTraining);
-
-                // تهيئة منتقي الوقت للتدريب الجديد
-                initializeTimePickers(newTraining);
-
-                // تهيئة القائمة المنسدلة للمدربين
-                const newSelect = newTraining.querySelector('select.custom-singleselect');
-                if (typeof initCustomSelect === 'function') {
-                    initCustomSelect(newSelect);
-                }
-
-                // إضافة مستمع حدث لخيار "تحديد الجلسات لاحقاً"
-                const schedulesSwitch = newTraining.querySelector(`#schedules_later_${newTrainingIndex}`);
-                const sessionContainer = newTraining.querySelector(
-                    `#sessions-container-${newTrainingIndex}`);
-                const addSessionBtn = newTraining.querySelector('#add-session-btn');
-
-                schedulesSwitch.addEventListener('change', function() {
-                    if (this.checked) {
-                        sessionContainer.style.display = 'none';
-                        addSessionBtn.style.display = 'none';
-                    } else {
-                        sessionContainer.style.display = 'block';
-                        addSessionBtn.style.display = 'flex';
-                        // إذا لم تكن هناك جلسات معروضة، أضف جلسة واحدة
-                        if (sessionContainer.querySelectorAll('.session-group').length === 0) {
-                            addSession(newTrainingIndex);
-                        }
-                    }
+        </div>
+        
+        <div id="session-template">
+            <div class="session-group" style="margin-bottom: 15px;" data-training-index="{trainingIndex}" data-session-index="{sessionIndex}">
+                <div class="session-header">
+                    <div class="input-group">
+                        <h5 class="w-100">تاريخ الجلسة {sessionNumber} و مدتها <span class="required">*</span></h5>
+                        <div class="sub-label">
+                            اختر التاريخ الذي ستُعقد فيه الجلسة و وقت بداية ونهاية الجلسة.
+                        </div>
+                    </div>
+                    <button type="button" style="position: relative; right: 5px; display: {removeButtonDisplay}" class="remove-session-btn" data-training-index="{trainingIndex}" data-session-index="{sessionIndex}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e00000" viewBox="0 0 256 256">
+                            <path d="M216,48H180V36A28,28,0,0,0,152,8H104A28,28,0,0,0,76,36V48H40a12,12,0,0,0,0,24h4V208a20,20,0,0,0,20,20H192a20,20,0,0,0,20-20V72h4a12,12,0,0,0,0-24ZM100,36a4,4,0,0,1,4-4h48a4,4,0,0,1,4,4V48H100Zm88,168H68V72H188ZM116,104v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Zm48,0v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Z"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="session-details">
+                    <div class="input-group-2col inner" style="align-items: flex-start;">
+                        <div class="input-group">
+                            <input type="date" name="schedules[{trainingIndex}][{sessionIndex}][date]" placeholder="مثال: 15 يونيو 2025" class="session-date-input w-100">
+                            <span class="error-message" id="schedule-date-error-{trainingIndex}-{sessionIndex}" style="display:none;"></span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <div class="time-picker-container">
+                                <div class="time-picker" data-training-index="{trainingIndex}" data-session-index="{sessionIndex}" data-type="start">وقت بدء الجلسة</div>
+                                <div class="time-picker-dropdown"></div>
+                                <input type="hidden" name="schedules[{trainingIndex}][{sessionIndex}][start_time]" class="time-picker-input" value="">
+                            </div>
+                            <span class="error-message" id="start-time-error-{trainingIndex}-{sessionIndex}" style="display:none;"></span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <div class="time-picker-container">
+                                <div class="time-picker" data-training-index="{trainingIndex}" data-session-index="{sessionIndex}" data-type="end">وقت انتهاء الجلسة</div>
+                                <div class="time-picker-dropdown"></div>
+                                <input type="hidden" name="schedules[{trainingIndex}][{sessionIndex}][end_time]" class="time-picker-input" value="">
+                            </div>
+                            <span class="error-message" id="end-time-error-{trainingIndex}-{sessionIndex}" style="display:none;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+@section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/validator@13.9.0/validator.min.js"></script>
+    <script src="{{ asset('js/mutliselect.js') }}"></script>
+    <script src="{{ asset('js/singleselect.js') }}"></script>
+    <script>
+const availableTrainers = [
+    @foreach ($availableTrainers as $trainer)
+    {
+        id: {{ $trainer->id }},
+        name: "{{ $trainer->getTranslation('name', 'ar') }} {{ $trainer->trainer?->getTranslation('last_name', 'ar') }}"
+    },
+    @endforeach
+];
+let appState = {
+    nextTrainingIndex: {{ count($trainingsData) }},
+    sessionCounters: {}
+};
+@foreach ($trainingsData as $trainingIndex => $trainingItem)
+    appState.sessionCounters[{{ $trainingIndex }}] = {{ count(is_array($trainingItem) ? ($trainingItem['schedules'] ?? []) : ($trainingItem->schedules ?? [])) }};
+@endforeach
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAllTimePickers();
+    
+    const addTrainingBtn = document.getElementById('add-training-btn');
+    if (addTrainingBtn) {
+        addTrainingBtn.addEventListener('click', addNewTraining);
+    }
+    
+    setupEventDelegation();
+    initializeExistingSwitches();
+    updateCounters();
+    
+    // إدارة ملفات التدريب
+    const wrapper = document.querySelector(".training-files-wrapper[data-multiple='true']");
+    if (wrapper) {
+        const fileInput = wrapper.querySelector(".training-files-input");
+        const selectBtn = wrapper.querySelector(".select-training-files");
+        const defaultView = wrapper.querySelector(".training-files-default");
+        const previewContainer = wrapper.querySelector(".training-files-preview");
+        const addMoreBtn = wrapper.querySelector(".add-training-files");
+        
+        selectBtn.addEventListener("click", () => fileInput.click());
+        addMoreBtn.addEventListener("click", () => fileInput.click());
+        
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files.length > 0) {
+                addFiles(Array.from(fileInput.files));
+                fileInput.value = "";
+            }
+        });
+        
+        function addFiles(files) {
+            const realFilesContainer = document.getElementById("real-files-container");
+            files.forEach(file => {
+                const fileDiv = document.createElement("div");
+                fileDiv.className = "training-files-preview-file";
+                fileDiv.innerHTML = `
+                    <span>${file.name}</span>
+                    <button type="button" class="remove-training-file">&times;</button>
+                `;
+                const input = document.createElement("input");
+                input.type = "file";
+                input.name = "training_files[]";
+                input.className = "visually-hidden";
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                input.files = dataTransfer.files;
+                realFilesContainer.appendChild(input);
+                fileDiv.querySelector(".remove-training-file").addEventListener("click", () => {
+                    fileDiv.remove();
+                    input.remove();
+                    toggleView();
                 });
-
-                // تهيئة عدد الجلسات للتدريب الجديد
-                sessionIndices[newTrainingIndex] = 1;
-                currentTrainingCount++;
-                nextTrainingIndex++;
+                previewContainer.appendChild(fileDiv);
             });
-
-            // إضافة جلسة جديدة
-            window.addSession = function(trainingIndex) {
-                const container = document.getElementById(`sessions-container-${trainingIndex}`);
-                const sessionIndex = sessionIndices[trainingIndex];
-                const newSession = document.createElement('div');
-                newSession.className = 'session-group';
-                newSession.style.marginBottom = '15px';
-                newSession.setAttribute('data-session-index', sessionIndex);
-                newSession.innerHTML = `
-            <div class="session-header">
-                <div class="input-group">
-                    <h5 class="w-100">تاريخ الجلسة ${sessionIndex + 1} و مدتها <span class="required">*</span></h5>
-                    <div class="sub-label">
-                        اختر التاريخ الذي ستُعقد فيه الجلسة و وقت بداية ونهاية الجلسة.
-                    </div>
-                </div>
-                <button type="button" style="position: relative; right: 5px;" class="remove-session-btn" onclick="removeSession(${trainingIndex}, ${sessionIndex})">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e00000" viewBox="0 0 256 256">
-                        <path d="M216,48H180V36A28,28,0,0,0,152,8H104A28,28,0,0,0,76,36V48H40a12,12,0,0,0,0,24h4V208a20,20,0,0,0,20,20H192a20,20,0,0,0,20-20V72h4a12,12,0,0,0,0-24ZM100,36a4,4,0,0,1,4-4h48a4,4,0,0,1,4,4V48H100Zm88,168H68V72H188ZM116,104v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Zm48,0v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Z"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="session-details">
-                <div class="input-group-2col inner" style="align-items: flex-start;">
-                    <div class="input-group">
-                        <input type="date" name="schedules[${sessionIndex}][date]" placeholder="مثال: 15 يونيو 2025" class="session-date-input w-100">
-                        <span class="error-message" id="schedule-date-error-${trainingIndex}-${sessionIndex}" style="display:none;"></span>
-                    </div>
-                    
-                    <div class="input-group">
-                        <div class="time-picker-container">
-                            <div class="time-picker" data-training-index="${trainingIndex}" data-session-index="${sessionIndex}" data-type="start">وقت بدء الجلسة</div>
-                            <div class="time-picker-dropdown"></div>
-                            <input type="hidden" name="schedules[${sessionIndex}][start_time]" class="time-picker-input" value="">
-                        </div>
-                        <span class="error-message" id="start-time-error-${trainingIndex}-${sessionIndex}" style="display:none;"></span>
-                    </div>
-                    
-                    <div class="input-group">
-                        <div class="time-picker-container">
-                            <div class="time-picker" data-training-index="${trainingIndex}" data-session-index="${sessionIndex}" data-type="end">وقت انتهاء الجلسة</div>
-                            <div class="time-picker-dropdown"></div>
-                            <input type="hidden" name="schedules[${sessionIndex}][end_time]" class="time-picker-input" value="">
-                        </div>
-                        <span class="error-message" id="end-time-error-${trainingIndex}-${sessionIndex}" style="display:none;"></span>
-                    </div>
-                </div>
-            </div>
-        `;
-                container.appendChild(newSession);
-                // تهيئة منتقي الوقت للجلسة الجديدة
-                initializeTimePickers(newSession);
-                // زيادة عدد الجلسات
-                sessionIndices[trainingIndex]++;
-            };
-
-            // حذف جلسة
-            window.removeSession = function(trainingIndex, sessionIndex) {
-                const container = document.getElementById(`sessions-container-${trainingIndex}`);
-                const sessionElement = container.querySelector(
-                    `.session-group[data-session-index="${sessionIndex}"]`);
-                if (sessionElement) {
-                    sessionElement.remove();
-
-                    // تحديث عناوين الجلسات المتبقية وأزرار الحذف
-                    const remainingSessions = container.querySelectorAll('.session-group');
-                    remainingSessions.forEach((session, index) => {
-                        // تحديث رقم الجلسة في العنوان
-                        const header = session.querySelector('.session-header h5');
-                        if (header) {
-                            header.innerHTML =
-                                `تاريخ الجلسة ${index + 1} و مدتها <span class="required">*</span>`;
-                        }
-
-                        // تحديث زر الحذف
-                        const deleteBtn = session.querySelector('.remove-session-btn');
-                        if (deleteBtn) {
-                            deleteBtn.setAttribute('onclick',
-                                `removeSession(${trainingIndex}, ${index})`);
-                        }
-
-                        // تحديث data-session-index
-                        session.setAttribute('data-session-index', index);
-
-                        // تحديث حقول الإدخال
-                        const dateInput = session.querySelector('input[name$="[date]"]');
-                        if (dateInput) {
-                            dateInput.setAttribute('name',
-                                `schedules[${index}][date]`);
-                        }
-
-                        const startTimeInput = session.querySelector(
-                            'input[name$="[start_time]"]');
-                        if (startTimeInput) {
-                            startTimeInput.setAttribute('name',
-                                `schedules[${index}][start_time]`
-                                );
-                        }
-
-                        const endTimeInput = session.querySelector('input[name$="[end_time]"]');
-                        if (endTimeInput) {
-                            endTimeInput.setAttribute('name',
-                                `schedules[${index}][end_time]`);
-                        }
-
-                        // تحديث عناصر منتقي الوقت
-                        const startTimePicker = session.querySelector(
-                        '.time-picker[data-type="start"]');
-                        if (startTimePicker) {
-                            startTimePicker.setAttribute('data-session-index', index);
-                        }
-
-                        const endTimePicker = session.querySelector('.time-picker[data-type="end"]');
-                        if (endTimePicker) {
-                            endTimePicker.setAttribute('data-session-index', index);
-                        }
-                    });
-
-                    // تحديث عدد الجلسات
-                    sessionIndices[trainingIndex] = remainingSessions.length;
-                }
-            };
-
-            // حذف تدريب
-            window.removeTraining = function(trainingIndex) {
-                const container = document.getElementById('trainings-container');
-                const trainingElement = container.querySelector(
-                    `.training-section[data-training-index="${trainingIndex}"]`);
-                if (trainingElement) {
-                    trainingElement.remove();
-                    currentTrainingCount--;
-
-                    // تحديث عناوين التدريبات المتبقية وأزرار الحذف
-                    const remainingTrainings = container.querySelectorAll('.training-section');
-                    remainingTrainings.forEach((training, index) => {
-                        const currentIndex = parseInt(training.getAttribute('data-training-index'));
-
-                        // تحديث رقم التدريب في العنوان
-                        const header = training.querySelector('.training-section-header h5');
-                        if (header) {
-                            header.textContent = `${index + 1}- عنوان التدريب و المدرب الرئيسي`;
-                        }
-
-                        // تحديث زر الحذف
-                        const deleteBtn = training.querySelector('.remove-training-btn');
-                        if (deleteBtn) {
-                            deleteBtn.setAttribute('onclick', `removeTraining(${currentIndex})`);
-                        }
-
-                        // تحديث حقول الإدخال
-                        const titleInput = training.querySelector('input[name$="[title]"]');
-                        if (titleInput) {
-                            titleInput.setAttribute('name', `program_title[${currentIndex}]`);
-                        }
-
-                        const trainerSelect = training.querySelector('select[name$="[trainer_id]"]');
-                        if (trainerSelect) {
-                            trainerSelect.setAttribute('name',
-                            `trainer_id[${currentIndex}]`);
-                        }
-
-                        const schedulesLater = training.querySelector(
-                            'input[name$="[schedules_later]"]');
-                        if (schedulesLater) {
-                            schedulesLater.setAttribute('name',
-                                `schedules_later`);
-                            schedulesLater.setAttribute('id', `schedules_later_${currentIndex}`);
-                        }
-
-                        // تحديث حاوية الجلسات
-                        const sessionContainer = training.querySelector('.session-container');
-                        if (sessionContainer) {
-                            sessionContainer.setAttribute('id', `sessions-container-${currentIndex}`);
-                        }
-
-                        // تحديث زر إضافة جلسة
-                        const addSessionBtn = training.querySelector('#add-session-btn');
-                        if (addSessionBtn) {
-                            addSessionBtn.setAttribute('onclick', `addSession(${currentIndex})`);
-                        }
-
-                        // تحديث الجلسات داخل التدريب
-                        const sessions = training.querySelectorAll('.session-group');
-                        sessions.forEach((session, sessionIdx) => {
-                            // تحديث أسماء حقول الجلسة
-                            const dateInput = session.querySelector(
-                                'input[name$="[date]"]');
-                            if (dateInput) {
-                                dateInput.setAttribute('name',
-                                    `schedules[${sessionIdx}][date]`
-                                    );
-                            }
-
-                            const startTimeInput = session.querySelector(
-                                'input[name$="[start_time]"]');
-                            if (startTimeInput) {
-                                startTimeInput.setAttribute('name',
-                                    `schedules[${sessionIdx}][start_time]`
-                                    );
-                            }
-
-                            const endTimeInput = session.querySelector(
-                                'input[name$="[end_time]"]');
-                            if (endTimeInput) {
-                                endTimeInput.setAttribute('name',
-                                    `schedules[${sessionIdx}][end_time]`
-                                    );
-                            }
-
-                            // تحديث عناصر منتقي الوقت
-                            const startTimePicker = session.querySelector(
-                                '.time-picker[data-type="start"]');
-                            if (startTimePicker) {
-                                startTimePicker.setAttribute('data-training-index',
-                                    currentIndex);
-                                startTimePicker.setAttribute('data-session-index', sessionIdx);
-                            }
-
-                            const endTimePicker = session.querySelector(
-                                '.time-picker[data-type="end"]');
-                            if (endTimePicker) {
-                                endTimePicker.setAttribute('data-training-index', currentIndex);
-                                endTimePicker.setAttribute('data-session-index', sessionIdx);
-                            }
-
-                            // تحديث زر حذف الجلسة
-                            const deleteSessionBtn = session.querySelector(
-                                '.remove-session-btn');
-                            if (deleteSessionBtn) {
-                                deleteSessionBtn.setAttribute('onclick',
-                                    `removeSession(${currentIndex}, ${sessionIdx})`);
-                            }
-
-                            // تحديث data-session-index
-                            session.setAttribute('data-session-index', sessionIdx);
-                        });
-                    });
-                }
-            };
-
-            // التحكم في خيار "تحديد الجلسات لاحقًا"
-            document.querySelectorAll('input[id^="schedules_later_"]').forEach(schedulesSwitch => {
-                const trainingIndex = schedulesSwitch.id.split('_')[2];
-                const sessionContainer = document.getElementById(`sessions-container-${trainingIndex}`);
-                const addSessionBtn = schedulesSwitch.closest('.training-section').querySelector(
-                    '#add-session-btn');
-
-                function toggleSessionFields() {
-                    if (schedulesSwitch.checked) {
-                        sessionContainer.style.display = 'none';
-                        if (addSessionBtn) addSessionBtn.style.display = 'none';
-                    } else {
-                        sessionContainer.style.display = 'block';
-                        if (addSessionBtn) addSessionBtn.style.display = 'flex';
-                        // إذا لم تكن هناك جلسات معروضة، أضف جلسة واحدة
-                        if (sessionContainer.querySelectorAll('.session-group').length === 0) {
-                            addSession(parseInt(trainingIndex));
-                        }
-                    }
-                }
-
-                // استدعاء الدالة عند تحميل الصفحة
-                toggleSessionFields();
-                // استدعاء الدالة عند تغيير قيمة الخانة
-                schedulesSwitch.addEventListener('change', toggleSessionFields);
-            });
-
-            // إدارة ملفات التدريب
-            document.querySelectorAll('.file-upload-wrapper').forEach(wrapper => {
-              const trainingFilesWrapper = document.querySelector(".training-files-wrapper[data-multiple='true']");
-if (trainingFilesWrapper) {
-    const fileInput = trainingFilesWrapper.querySelector(".training-files-input");
-    const selectBtn = trainingFilesWrapper.querySelector(".select-training-files");
-    const defaultView = trainingFilesWrapper.querySelector(".training-files-default");
-    const previewContainer = trainingFilesWrapper.querySelector(".training-files-preview");
-    const addMoreBtn = trainingFilesWrapper.querySelector(".add-more-training");
-    
-    selectBtn.addEventListener("click", () => fileInput.click());
-    addMoreBtn.addEventListener("click", () => fileInput.click());
-    
-    fileInput.addEventListener("change", () => {
-        if (fileInput.files.length > 0) {
-            addFiles(Array.from(fileInput.files));
-            fileInput.value = "";
+            toggleView();
         }
-    });
-    
-    function addFiles(files) {
-        const realFilesContainer = document.getElementById("real-files-container");
-        files.forEach(file => {
-            const fileDiv = document.createElement("div");
-            fileDiv.className = "training-files-preview-file";
-            fileDiv.innerHTML = `
-                <span>${file.name}</span>
-                <button type="button" class="remove-training-file">&times;</button>
-            `;
-            const input = document.createElement("input");
-            input.type = "file";
-            input.name = "training_files[]";
-            input.className = "visually-hidden";
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            input.files = dataTransfer.files;
-            realFilesContainer.appendChild(input);
-            fileDiv.querySelector(".remove-training-file").addEventListener("click", () => {
-                fileDiv.remove();
-                input.remove();
+        
+        function toggleView() {
+            const hasFiles = previewContainer.querySelectorAll(".training-files-preview-file").length > 0;
+            defaultView.style.display = hasFiles ? "none" : "flex";
+            previewContainer.style.display = hasFiles ? "flex" : "none";
+            addMoreBtn.style.display = hasFiles ? "inline-block" : "none";
+        }
+        
+        previewContainer.querySelectorAll(".remove-training-file").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.closest(".training-files-preview-file").remove();
                 toggleView();
             });
-            previewContainer.appendChild(fileDiv);
         });
+        
         toggleView();
     }
     
-    function toggleView() {
-        const hasFiles = previewContainer.querySelectorAll(".training-files-preview-file").length > 0;
-        defaultView.style.display = hasFiles ? "none" : "flex";
-        previewContainer.style.display = hasFiles ? "flex" : "none";
-        addMoreBtn.style.display = hasFiles ? "inline-block" : "none";
+    const form = document.getElementById('publish-training-4-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validateFormBeforeSubmit()) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            
+            updateHiddenInputsBeforeSubmit();
+            
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = `
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    جاري الحفظ...
+                `;
+            }
+        });
+    }
+});
+function generateTimeOptions() {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+            const time24 = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            let hour12 = hour % 12 || 12;
+            const ampm = hour < 12 ? 'صباحاً' : 'مساءً';
+            const time12 = `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
+            options.push({
+                value: time24,
+                label: time12
+            });
+        }
+    }
+    return options;
+}
+const timeOptions = generateTimeOptions();
+function initializeAllTimePickers() {
+    document.querySelectorAll('.time-picker-container').forEach(container => {
+        if (!container.dataset.initialized) {
+            initializeTimePicker(container);
+        }
+    });
+}
+function initializeTimePicker(container) {
+    const picker = container.querySelector('.time-picker');
+    const dropdown = container.querySelector('.time-picker-dropdown');
+    const hiddenInput = container.querySelector('.time-picker-input');
+    
+    const currentValue = hiddenInput.value;
+    
+    if (currentValue) {
+        const option = timeOptions.find(opt => opt.value === currentValue);
+        if (option) {
+            picker.textContent = option.label;
+        }
     }
     
-    // معالجة الملفات الموجودة مسبقاً إن وجدت
-    toggleView();
-}
+    dropdown.innerHTML = '';
+    
+    timeOptions.forEach(option => {
+        const optionElement = document.createElement('div');
+        optionElement.className = 'time-option';
+        optionElement.textContent = option.label;
+        optionElement.dataset.value = option.value;
+        
+        if (option.value === currentValue) {
+            optionElement.classList.add('selected');
+        }
+        
+        optionElement.addEventListener('click', function(e) {
+            e.stopPropagation();
+            picker.textContent = option.label;
+            hiddenInput.value = option.value;
+            
+            dropdown.querySelectorAll('.time-option').forEach(opt => {
+                opt.classList.remove('selected');
             });
-
-            // تحديث الحقول المخفية قبل إرسال النموذج
-            const form = document.getElementById('publish-training-4-form');
-            form.addEventListener('submit', function(e) {
-                // تحديث جميع الحقول المخفية قبل الإرسال
-                updateHiddenInputsBeforeSubmit();
-
-                const submitButton = this.querySelector('button[type="submit"]');
-                if (submitButton) {
-                    submitButton.disabled = true;
-                    submitButton.innerHTML = `
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                جاري الحفظ...
-            `;
+            optionElement.classList.add('selected');
+            
+            dropdown.style.display = 'none';
+        });
+        
+        dropdown.appendChild(optionElement);
+    });
+    
+    picker.addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.querySelectorAll('.time-picker-dropdown').forEach(d => {
+            if (d !== dropdown) d.style.display = 'none';
+        });
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    container.dataset.initialized = 'true';
+}
+function closeAllTimeDropdowns() {
+    document.querySelectorAll('.time-picker-dropdown').forEach(dropdown => {
+        dropdown.style.display = 'none';
+    });
+}
+function setupEventDelegation() {
+    const trainingsContainer = document.getElementById('trainings-container');
+    
+    if (!trainingsContainer) {
+        return;
+    }
+    
+    trainingsContainer.addEventListener('click', function(e) {
+        const addSessionBtn = e.target.closest('.add-session-btn');
+        if (addSessionBtn) {
+            const trainingIndex = parseInt(addSessionBtn.dataset.trainingIndex);
+            if (!isNaN(trainingIndex)) {
+                addNewSession(trainingIndex);
+            }
+            return;
+        }
+        
+        const removeSessionBtn = e.target.closest('.remove-session-btn');
+        if (removeSessionBtn) {
+            const trainingIndex = parseInt(removeSessionBtn.dataset.trainingIndex);
+            const sessionIndex = parseInt(removeSessionBtn.dataset.sessionIndex);
+            if (!isNaN(trainingIndex) && !isNaN(sessionIndex)) {
+                removeSession(trainingIndex, sessionIndex);
+            }
+            return;
+        }
+        
+        const removeTrainingBtn = e.target.closest('.remove-training-btn');
+        if (removeTrainingBtn) {
+            const trainingIndex = parseInt(removeTrainingBtn.dataset.trainingIndex);
+            if (!isNaN(trainingIndex)) {
+                removeTraining(trainingIndex);
+            }
+            return;
+        }
+        
+        if (e.target.classList.contains('time-picker')) {
+            handleTimePickerClick(e.target);
+            return;
+        }
+        
+        if (e.target.classList.contains('time-option')) {
+            handleTimeOptionClick(e.target);
+            return;
+        }
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!e.target.classList.contains('time-picker') && 
+            !e.target.classList.contains('time-option')) {
+            closeAllTimeDropdowns();
+        }
+    });
+}
+function handleTimePickerClick(picker) {
+    closeAllTimeDropdowns();
+    const dropdown = picker.nextElementSibling;
+    if (dropdown && dropdown.classList.contains('time-picker-dropdown')) {
+        dropdown.style.display = 'block';
+    }
+}
+function handleTimeOptionClick(option) {
+    const time = option.getAttribute('data-value');
+    const dropdown = option.closest('.time-picker-dropdown');
+    const picker = dropdown ? dropdown.previousElementSibling : null;
+    const hiddenInput = dropdown ? dropdown.nextElementSibling : null;
+    
+    if (picker && hiddenInput) {
+        picker.textContent = option.textContent;
+        hiddenInput.value = time;
+        dropdown.style.display = 'none';
+    }
+}
+function initializeExistingSwitches() {
+    document.querySelectorAll('input[name^="schedules_later"]').forEach(checkbox => {
+        const name = checkbox.getAttribute('name');
+        const matches = name.match(/schedules_later\[(\d+)\]/);
+        
+        if (matches && matches.length > 1) {
+            const trainingIndex = parseInt(matches[1]);
+            if (!isNaN(trainingIndex)) {
+                checkbox.setAttribute('id', `schedules_later_${trainingIndex}`);
+                checkbox.addEventListener('change', function() {
+                    toggleScheduleFields(trainingIndex);
+                });
+                
+                toggleScheduleFields(trainingIndex);
+            }
+        }
+    });
+}
+function addNewTraining() {
+    const container = document.getElementById('trainings-container');
+    if (!container) {
+        return;
+    }
+    
+    const existingIndices = Array.from(container.querySelectorAll('.training-section'))
+        .map(section => {
+            const index = section.getAttribute('data-training-index');
+            return index && !isNaN(parseInt(index)) ? parseInt(index) : -1;
+        })
+        .filter(index => index >= 0);
+    
+    const trainingIndex = existingIndices.length > 0 ? Math.max(...existingIndices) + 1 : 0;
+    
+    const trainingTemplate = document.getElementById('training-template');
+    if (!trainingTemplate) {
+        return;
+    }
+    
+    let trainersOptions = '<option value="" disabled selected style="color: silver !important;">اختر مدربًا</option>';
+    availableTrainers.forEach(trainer => {
+        trainersOptions += `<option value="${trainer.id}">${trainer.name}</option>`;
+    });
+    
+    let newTrainingHtml = trainingTemplate.innerHTML
+        .replace(/{trainingIndex}/g, trainingIndex)
+        .replace(/{displayNumber}/g, existingIndices.length + 1)
+        .replace(/{removeButtonDisplay}/g, existingIndices.length > 0 ? 'block' : 'none')
+        .replace(/{trainersOptions}/g, trainersOptions);
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = newTrainingHtml;
+    const newTraining = tempDiv.firstElementChild;
+    container.appendChild(newTraining);
+    
+    const allElements = newTraining.querySelectorAll('*');
+    allElements.forEach(element => {
+        Array.from(element.attributes).forEach(attr => {
+            if (attr.value.includes('{trainingIndex}')) {
+                element.setAttribute(attr.name, attr.value.replace(/{trainingIndex}/g, trainingIndex));
+            }
+        });
+        
+        if (element.textContent && element.textContent.includes('{trainingIndex}')) {
+            element.textContent = element.textContent.replace(/{trainingIndex}/g, trainingIndex);
+        }
+        
+        if (element.innerHTML && element.innerHTML.includes('{trainingIndex}')) {
+            element.innerHTML = element.innerHTML.replace(/{trainingIndex}/g, trainingIndex);
+        }
+    });
+    
+    appState.sessionCounters[trainingIndex] = 0;
+    
+    const newCheckbox = newTraining.querySelector(`input[name="schedules_later[${trainingIndex}]"]`);
+    if (newCheckbox) {
+        newCheckbox.setAttribute('id', `schedules_later_${trainingIndex}`);
+        newCheckbox.addEventListener('change', function() {
+            toggleScheduleFields(trainingIndex);
+        });
+        
+        newCheckbox.checked = false;
+        toggleScheduleFields(trainingIndex);
+    }
+    
+    const trainerSelect = newTraining.querySelector(`select[name="trainer_id[${trainingIndex}]"]`);
+    if (trainerSelect) {
+        populateTrainersEnhanced(trainerSelect);
+    }
+    
+    initializeTimePickersForElement(newTraining);
+    updateCounters();
+}
+function populateTrainersEnhanced(selectElement) {
+    if (!selectElement) {
+        return false;
+    }
+    
+    try {
+        selectElement.innerHTML = '';
+        
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        defaultOption.style.color = "silver";
+        defaultOption.textContent = "اختر مدربًا";
+        selectElement.appendChild(defaultOption);
+        
+        if (!availableTrainers || availableTrainers.length === 0) {
+            return false;
+        }
+        
+        availableTrainers.forEach((trainer) => {
+            const option = document.createElement('option');
+            option.value = trainer.id;
+            option.textContent = trainer.name;
+            selectElement.appendChild(option);
+        });
+        
+        if (typeof window.initCustomSelect === 'function') {
+            window.initCustomSelect(selectElement);
+        }
+        
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+function addNewSession(trainingIndex) {
+    const container = document.getElementById(`sessions-container-${trainingIndex}`);
+    if (!container) {
+        return;
+    }
+    
+    const currentSessions = container.querySelectorAll('.session-group').length;
+    const sessionIndex = currentSessions;
+    
+    const sessionTemplate = document.getElementById('session-template');
+    if (!sessionTemplate) {
+        return;
+    }
+    
+    let newSessionHtml = sessionTemplate.innerHTML
+        .replace(/{trainingIndex}/g, trainingIndex)
+        .replace(/{sessionIndex}/g, sessionIndex)
+        .replace(/{sessionNumber}/g, sessionIndex + 1)
+        .replace(/{removeButtonDisplay}/g, sessionIndex > 0 ? 'block' : 'none');
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = newSessionHtml;
+    const newSessionGroup = tempDiv.firstElementChild;
+    container.appendChild(newSessionGroup);
+    
+    const allElements = newSessionGroup.querySelectorAll('*');
+    allElements.forEach(element => {
+        Array.from(element.attributes).forEach(attr => {
+            if (attr.value.includes('{trainingIndex}') || attr.value.includes('{sessionIndex}')) {
+                element.setAttribute(attr.name, 
+                    attr.value
+                        .replace(/{trainingIndex}/g, trainingIndex)
+                        .replace(/{sessionIndex}/g, sessionIndex)
+                );
+            }
+        });
+        
+        if (element.textContent && (element.textContent.includes('{trainingIndex}') || element.textContent.includes('{sessionIndex}'))) {
+            element.textContent = element.textContent
+                .replace(/{trainingIndex}/g, trainingIndex)
+                .replace(/{sessionIndex}/g, sessionIndex);
+        }
+        
+        if (element.innerHTML && (element.innerHTML.includes('{trainingIndex}') || element.innerHTML.includes('{sessionIndex}'))) {
+            element.innerHTML = element.innerHTML
+                .replace(/{trainingIndex}/g, trainingIndex)
+                .replace(/{sessionIndex}/g, sessionIndex);
+        }
+    });
+    
+    appState.sessionCounters[trainingIndex] = sessionIndex + 1;
+    
+    initializeTimePickersForElement(newSessionGroup);
+    updateCounters();
+}
+function initializeTimePickersForElement(element) {
+    element.querySelectorAll('.time-picker-container').forEach(container => {
+        if (!container.dataset.initialized) {
+            initializeTimePicker(container);
+        }
+    });
+}
+function removeSession(trainingIndex, sessionIndex) {
+    const container = document.getElementById(`sessions-container-${trainingIndex}`);
+    if (!container) return;
+    
+    const sessionElement = container.querySelector(`.session-group[data-session-index="${sessionIndex}"]`);
+    
+    if (sessionElement) {
+        sessionElement.remove();
+        updateCounters();
+    }
+}
+function removeTraining(trainingIndex) {
+    const container = document.getElementById('trainings-container');
+    if (!container) return;
+    
+    const trainingElement = container.querySelector(`.training-section[data-training-index="${trainingIndex}"]`);
+    
+    if (trainingElement) {
+        trainingElement.remove();
+        delete appState.sessionCounters[trainingIndex];
+        updateCounters();
+    }
+}
+function toggleScheduleFields(trainingIndex) {
+    if (!isValidIndex(trainingIndex.toString())) {
+        return;
+    }
+    
+    const checkbox = document.getElementById(`schedules_later_${trainingIndex}`);
+    const sessionContainer = document.getElementById(`sessions-container-${trainingIndex}`);
+    const detailsContainer = document.getElementById(`session-details-${trainingIndex}`);
+    const addSessionBtn = document.querySelector(`.add-session-btn[data-training-index="${trainingIndex}"]`);
+    
+    if (!checkbox || !sessionContainer || !detailsContainer) {
+        return;
+    }
+    
+    if (checkbox.checked) {
+        detailsContainer.style.display = 'block';
+        sessionContainer.style.display = 'none';
+        if (addSessionBtn) addSessionBtn.style.display = 'none';
+        
+        sessionContainer.innerHTML = '';
+        appState.sessionCounters[trainingIndex] = 0;
+    } else {
+        detailsContainer.style.display = 'none';
+        sessionContainer.style.display = 'block';
+        if (addSessionBtn) addSessionBtn.style.display = 'flex';
+        
+        if (sessionContainer.querySelectorAll('.session-group').length === 0) {
+            addNewSession(trainingIndex);
+        }
+    }
+}
+function updateCounters() {
+    const trainingSections = document.querySelectorAll('.training-section:not(.template)');
+    
+    trainingSections.forEach((section, index) => {
+        const originalTrainingIndex = section.getAttribute('data-training-index');
+        
+        if (!originalTrainingIndex || 
+            originalTrainingIndex.includes('{') || 
+            section.closest('.template') ||
+            isNaN(parseInt(originalTrainingIndex))) {
+            return;
+        }
+        
+        const trainingIndex = parseInt(originalTrainingIndex);
+        
+        const header = section.querySelector('.training-section-header h5');
+        if (header) {
+            header.textContent = `${index + 1}- عنوان التدريب و المدرب الرئيسي`;
+        }
+        
+        const deleteBtn = section.querySelector('.remove-training-btn');
+        if (deleteBtn) {
+            deleteBtn.style.display = trainingSections.length > 1 ? 'block' : 'none';
+            deleteBtn.setAttribute('data-training-index', trainingIndex);
+        }
+        
+        const sessionContainer = section.querySelector('.session-container');
+        if (sessionContainer) {
+            sessionContainer.setAttribute('id', `sessions-container-${trainingIndex}`);
+        }
+        
+        const detailsContainer = section.querySelector('.session-details-container');
+        if (detailsContainer) {
+            detailsContainer.setAttribute('id', `session-details-${trainingIndex}`);
+        }
+        
+        const scheduleLaterCheckbox = section.querySelector(`input[name^="schedules_later"]`);
+        if (scheduleLaterCheckbox) {
+            scheduleLaterCheckbox.setAttribute('id', `schedules_later_${trainingIndex}`);
+        }
+        
+        const sessionGroups = section.querySelectorAll('.session-group');
+        
+        sessionGroups.forEach((session, sessionIndex) => {
+            const header = session.querySelector('.session-header h5');
+            if (header) {
+                header.innerHTML = `تاريخ الجلسة ${sessionIndex + 1} و مدتها <span class="required">*</span>`;
+            }
+            
+            const deleteBtn = session.querySelector('.remove-session-btn');
+            if (deleteBtn) {
+                deleteBtn.style.display = sessionGroups.length > 1 ? 'block' : 'none';
+                deleteBtn.setAttribute('data-training-index', trainingIndex);
+                deleteBtn.setAttribute('data-session-index', sessionIndex);
+            }
+            
+            session.setAttribute('data-session-index', sessionIndex);
+            session.setAttribute('data-training-index', trainingIndex);
+            
+            const dateInput = session.querySelector('input[name$="[date]"]');
+            if (dateInput) {
+                dateInput.setAttribute('name', `schedules[${trainingIndex}][${sessionIndex}][date]`);
+            }
+            
+            const startTimeInput = session.querySelector('input[name$="[start_time]"]');
+            if (startTimeInput) {
+                startTimeInput.setAttribute('name', `schedules[${trainingIndex}][${sessionIndex}][start_time]`);
+            }
+            
+            const endTimeInput = session.querySelector('input[name$="[end_time]"]');
+            if (endTimeInput) {
+                endTimeInput.setAttribute('name', `schedules[${trainingIndex}][${sessionIndex}][end_time]`);
+            }
+            
+            const startTimePicker = session.querySelector('.time-picker[data-type="start"]');
+            if (startTimePicker) {
+                startTimePicker.setAttribute('data-training-index', trainingIndex);
+                startTimePicker.setAttribute('data-session-index', sessionIndex);
+            }
+            
+            const endTimePicker = session.querySelector('.time-picker[data-type="end"]');
+            if (endTimePicker) {
+                endTimePicker.setAttribute('data-training-index', trainingIndex);
+                endTimePicker.setAttribute('data-session-index', sessionIndex);
+            }
+        });
+        
+        appState.sessionCounters[trainingIndex] = sessionGroups.length;
+        
+        const addSessionBtn = section.querySelector('.add-session-btn');
+        if (addSessionBtn) {
+            addSessionBtn.setAttribute('data-training-index', trainingIndex);
+        }
+    });
+}
+function isValidIndex(indexString) {
+    return indexString && 
+           !indexString.includes('{') && 
+           !isNaN(parseInt(indexString)) && 
+           parseInt(indexString) >= 0;
+}
+function validateFormBeforeSubmit() {
+    let isValid = true;
+    const trainingSections = document.querySelectorAll('.training-section');
+    const errorContainer = document.getElementById('form-errors-container');
+    let errorMessages = [];
+    
+    trainingSections.forEach((section, index) => {
+        const trainingIndex = section.getAttribute('data-training-index');
+        if (!trainingIndex) return;
+        
+        const schedulesLater = section.querySelector(`#schedules_later_${trainingIndex}`);
+        
+        const programTitleInput = section.querySelector(`input[name="program_title[${trainingIndex}]"]`);
+        if (!programTitleInput || !programTitleInput.value.trim()) {
+            programTitleInput.classList.add('error-border');
+            errorMessages.push(`التدريب ${index + 1}: عنوان التدريب مطلوب`);
+            isValid = false;
+        } else {
+            programTitleInput.classList.remove('error-border');
+        }
+        
+        const trainerSelect = section.querySelector(`select[name="trainer_id[${trainingIndex}]"]`);
+        if (!trainerSelect || !trainerSelect.value) {
+            trainerSelect.classList.add('error-border');
+            errorMessages.push(`التدريب ${index + 1}: يجب اختيار مدرب`);
+            isValid = false;
+        } else {
+            trainerSelect.classList.remove('error-border');
+        }
+        
+        if (schedulesLater && schedulesLater.checked) {
+            const numOfSessionInput = section.querySelector(`input[name="num_of_session[${trainingIndex}]"]`);
+            const numOfHoursInput = section.querySelector(`input[name="num_of_hours[${trainingIndex}]"]`);
+            
+            if (numOfSessionInput && !numOfSessionInput.value.trim()) {
+                numOfSessionInput.classList.add('error-border');
+                errorMessages.push(`التدريب ${index + 1}: عدد الجلسات مطلوب`);
+                isValid = false;
+            } else if (numOfSessionInput) {
+                numOfSessionInput.classList.remove('error-border');
+            }
+            
+            if (numOfHoursInput && !numOfHoursInput.value.trim()) {
+                numOfHoursInput.classList.add('error-border');
+                errorMessages.push(`التدريب ${index + 1}: عدد الساعات مطلوب`);
+                isValid = false;
+            } else if (numOfHoursInput) {
+                numOfHoursInput.classList.remove('error-border');
+            }
+        } else {
+            const sessionGroups = section.querySelectorAll('.session-group');
+            if (sessionGroups.length === 0) {
+                errorMessages.push(`التدريب ${index + 1}: يجب إضافة جلسة واحدة على الأقل`);
+                isValid = false;
+            }
+            
+            sessionGroups.forEach((sessionGroup, sessionIndex) => {
+                const dateInput = sessionGroup.querySelector('input[name$="[date]"]');
+                const startTimeInput = sessionGroup.querySelector('input[name$="[start_time]"]');
+                const endTimeInput = sessionGroup.querySelector('input[name$="[end_time]"]');
+                
+                if (dateInput && !dateInput.value.trim()) {
+                    dateInput.classList.add('error-border');
+                    errorMessages.push(`التدريب ${index + 1}, الجلسة ${sessionIndex + 1}: تاريخ الجلسة مطلوب`);
+                    isValid = false;
+                } else if (dateInput) {
+                    dateInput.classList.remove('error-border');
+                }
+                
+                if (startTimeInput && !startTimeInput.value.trim()) {
+                    startTimeInput.classList.add('error-border');
+                    errorMessages.push(`التدريب ${index + 1}, الجلسة ${sessionIndex + 1}: وقت بدء الجلسة مطلوب`);
+                    isValid = false;
+                } else if (startTimeInput) {
+                    startTimeInput.classList.remove('error-border');
+                }
+                
+                if (endTimeInput && !endTimeInput.value.trim()) {
+                    endTimeInput.classList.add('error-border');
+                    errorMessages.push(`التدريب ${index + 1}, الجلسة ${sessionIndex + 1}: وقت انتهاء الجلسة مطلوب`);
+                    isValid = false;
+                } else if (endTimeInput) {
+                    endTimeInput.classList.remove('error-border');
+                }
+                
+                if (startTimeInput && endTimeInput && startTimeInput.value.trim() && endTimeInput.value.trim()) {
+                    if (startTimeInput.value >= endTimeInput.value) {
+                        endTimeInput.classList.add('error-border');
+                        errorMessages.push(`التدريب ${index + 1}, الجلسة ${sessionIndex + 1}: وقت الانتهاء يجب أن يكون بعد وقت البداية`);
+                        isValid = false;
+                    }
                 }
             });
-        });
+        }
+    });
+    
+    if (errorMessages.length > 0) {
+        errorContainer.innerHTML = '<ul>' + errorMessages.map(msg => '<li>' + msg + '</li>').join('') + '</ul>';
+        errorContainer.style.display = 'block';
+    } else {
+        errorContainer.style.display = 'none';
+    }
+    
+    return isValid;
+}
+function updateHiddenInputsBeforeSubmit() {
+    document.querySelectorAll('.session-group').forEach((sessionGroup) => {
+        const startTimePicker = sessionGroup.querySelector('.time-picker[data-type="start"]');
+        const endTimePicker = sessionGroup.querySelector('.time-picker[data-type="end"]');
+        const startTimeHidden = sessionGroup.querySelector('input[name$="[start_time]"]');
+        const endTimeHidden = sessionGroup.querySelector('input[name$="[end_time]"]');
+        
+        if (startTimePicker && startTimeHidden) {
+            const pickerText = startTimePicker.textContent.trim();
+            if (pickerText !== 'وقت بدء الجلسة') {
+                const option = timeOptions.find(opt => opt.label === pickerText);
+                if (option) {
+                    startTimeHidden.value = option.value;
+                }
+            }
+        }
+        
+        if (endTimePicker && endTimeHidden) {
+            const pickerText = endTimePicker.textContent.trim();
+            if (pickerText !== 'وقت انتهاء الجلسة') {
+                const option = timeOptions.find(opt => opt.label === pickerText);
+                if (option) {
+                    endTimeHidden.value = option.value;
+                }
+            }
+        }
+    });
+}
     </script>
 @endsection
