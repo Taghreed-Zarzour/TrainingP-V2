@@ -486,6 +486,7 @@ public function publishTraining($trainingId)
   {
     try {
       $training = TrainingProgram::findOrFail($trainingId);
+            //يجب فحص حقل مطلوب من كل خطوة بعدها جعل التدريب منشور للتاكد انه مر على الخطوات
       $training->update(['status' => 'published']);
 
       return redirect()->route('training.completed', $training->id)

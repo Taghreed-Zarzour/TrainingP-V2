@@ -108,8 +108,8 @@
                                 <div class="input-group mt-3">
                                     <label>حالة العمل</label>
                                     <div class="custom-select-container">
-                                        <select name="work_status" id="employment-status-select"
-                                            class="custom-singleselect">
+                                        <select name="work_status[]" id="employment-status-select"
+                                            class="custom-multiselect" multiple>
                                             <option value="working" 
                                                 {{ old('work_status', $trainingGoal->work_status) === 'working' ? 'selected' : '' }}>
                                                 يعمل

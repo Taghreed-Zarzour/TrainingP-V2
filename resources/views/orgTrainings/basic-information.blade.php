@@ -155,8 +155,7 @@
                                     <div class="custom-select-container">
                                         <select name="city" class="custom-singleselect" id="city"
                                             data-placeholder="المدينة"
-                                            {{ old('city', $training->city ?? '') ? '' : 'disabled' }}>
-                                            <option value="" disabled
+{{ !empty(old('city', $training->city ?? null)) ? '' : 'disabled' }}                                            <option value="" disabled
                                                 {{ old('city', $training->city ?? '') ? '' : 'selected' }}>المدينة
                                             </option>
                                             @if (old('city', $training->city ?? false))
@@ -247,213 +246,215 @@
     <script src="{{ asset('js/mutliselect.js') }}"></script>
     <script src="{{ asset('js/counter.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // عناصر DOM
-            const countrySelect = document.getElementById('country_id');
-            const citySelect = document.getElementById('city');
-            const oldCountryId = "{{ old('country_id', $training->country_id ?? '') }}";
-            const savedCity = "{{ old('city', $training->city ?? '') }}";
-            const presentationMethod = document.getElementById('presentation-method');
-            const locationFields = document.getElementById('location-fields');
-            const descriptionTextarea = document.getElementById('description');
-            const charCounter = document.getElementById('description-counter');
-            const form = document.getElementById("publish-training-1-form");
-            const maxLength = 500;
+    document.addEventListener('DOMContentLoaded', function() {
+    // عناصر DOM
+    const countrySelect = document.getElementById('country_id');
+    const citySelect = document.getElementById('city');
+    const oldCountryId = "{{ old('country_id', $training->country_id ?? '') }}";
+    const savedCity = "{{ old('city', $training->city ?? '') }}";
+    const presentationMethod = document.getElementById('presentation-method');
+    const locationFields = document.getElementById('location-fields');
+    const descriptionTextarea = document.getElementById('description');
+    const charCounter = document.getElementById('description-counter');
+    const form = document.getElementById("publish-training-1-form");
+    const maxLength = 500;
 
-            // تحميل المدن حسب الدولة
-            function loadCities(countryId, selectedCity = null) {
-                if (!countryId) {
-                    citySelect.innerHTML = '<option value="" disabled selected>اختر الدولة أولاً</option>';
-                    citySelect.disabled = true;
-                    return;
-                }
-
-                citySelect.innerHTML = '<option value="" disabled selected>جاري تحميل المدن...</option>';
-                citySelect.disabled = true;
-
-                fetch(`/cities?country_id=${countryId}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        citySelect.innerHTML = '<option value="" disabled selected hidden>اختر المدينة</option>';
-
-                        data.forEach(city => {
-                            const option = new Option(city.name, city.name);
-                            if (selectedCity && selectedCity === city.name) {
-                                option.selected = true;
-                            }
-                            citySelect.add(option);
-                        });
-
-                        if (selectedCity && !Array.from(citySelect.options).some(o => o.value ===
-                                selectedCity)) {
-                            citySelect.add(new Option(selectedCity, selectedCity, true, true));
-                        }
-
-                        citySelect.disabled = false;
-
-                        // تهيئة custom select إذا كانت الدالة موجودة
-                        if (typeof initCustomSelect === 'function') {
-                            initCustomSelect(citySelect);
-                        }
-                    })
-                    .catch(err => {
-                        console.error("فشل تحميل المدن:", err);
-                        citySelect.innerHTML = '<option disabled selected>فشل في تحميل المدن</option>';
-                    });
+    // دالة تحميل المدن - معدلة لتعمل بنفس طريقة الكود الثاني
+    function loadCities(countryId, selectedCity = null) {
+        if (!countryId) {
+            citySelect.innerHTML = '<option value="" disabled selected>اختر الدولة أولاً</option>';
+            citySelect.disabled = true;
+            // إعادة تهيئة الـ custom select
+            if (typeof initCustomSelect === 'function') {
+                initCustomSelect(citySelect);
             }
-
-            // عرض/إخفاء حقول الموقع حسب طريقة التقديم
-            function toggleLocationFields() {
-                const selectedMethod = presentationMethod.value;
-                locationFields.style.display = (selectedMethod === 'حضوري' || selectedMethod === 'هجين') ?
-                    'block' :
-                    'none';
-
-                // إذا كانت الطريقة غير حضورية، قم بإزالة علامات الخطأ من حقول الموقع
-                if (selectedMethod !== 'حضوري' && selectedMethod !== 'هجين') {
-                    const locationInputs = ['country_id', 'city', 'address_in_detail'];
-                    locationInputs.forEach(inputName => {
-                        const input = form.elements[inputName];
-                        if (input) {
-                            input.classList.remove("error-border");
-                            const errorElement = document.getElementById(`error-${inputName}`);
-                            if (errorElement) errorElement.remove();
-                        }
-                    });
-                }
-            }
-
-            // تحديث عداد الأحرف
-            function updateCounter() {
-                const currentLength = descriptionTextarea.value.length;
-                charCounter.textContent = `${currentLength}/${maxLength}`;
-            }
-
-            // إظهار رسائل الخطأ
-            function showError(input, message) {
-                const errorId = `error-${input.name}`;
-                const existingError = document.getElementById(errorId);
-
-                if (existingError) {
-                    existingError.remove();
-                }
-
-                input.classList.add("error-border");
-                const errorMsg = document.createElement("span");
-                errorMsg.className = "error-message";
-                errorMsg.textContent = message;
-                errorMsg.id = errorId;
-
-                const parentContainer = input.closest('.input-group') || input.closest('.custom-select-container');
-                if (parentContainer) {
-                    parentContainer.appendChild(errorMsg);
-                } else {
-                    input.parentNode.insertBefore(errorMsg, input.nextSibling);
-                }
-            }
-
-            // أحداث المستخدم
-            countrySelect.addEventListener('change', function() {
-                loadCities(this.value);
-            });
-
-            presentationMethod.addEventListener('change', toggleLocationFields);
-            descriptionTextarea.addEventListener('input', updateCounter);
-
-            form.addEventListener("submit", function(e) {
-                // تأكد من إرسال city حتى لو كانت فارغة
-                if (!form.elements['city']) {
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'city';
-                    hiddenInput.value = '';
-                    form.appendChild(hiddenInput);
-                }
-
-                let valid = true;
-
-                // الحقول المطلوبة للتحقق
-                const requiredFields = {
-                    title: "يرجى إدخال عنوان التدريب",
-                    program_description: "يرجى إدخال وصف التدريب",
-                    "org_training_classification_id[]": "يرجى اختيار تصنيف واحد على الأقل"
-                };
-
-                // التحقق من الحقول المطلوبة الأساسية
-                Object.keys(requiredFields).forEach(fieldName => {
-                    const input = form.elements[fieldName];
-                    if (!input) return;
-
-                    input.classList.remove("error-border");
-                    if (input.parentNode && input.parentNode.classList.contains(
-                            'custom-select-container')) {
-                        input.parentNode.classList.remove("error-border");
+            return;
+        }
+        
+        // إظهار مؤشر التحميل
+        citySelect.innerHTML = '<option value="" disabled selected>جاري تحميل المدن...</option>';
+        citySelect.disabled = true;
+        
+        // إعادة تهيئة الـ custom select
+        if (typeof initCustomSelect === 'function') {
+            initCustomSelect(citySelect);
+        }
+        
+        // جلب جميع المدن ثم فلترتها
+        fetch('/cities')
+            .then(response => response.json())
+            .then(data => {
+                citySelect.innerHTML = '<option value="" disabled selected>اختر المدينة</option>';
+                const filtered = data.filter(city => city.country_id == countryId);
+                filtered.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.name; // استخدام اسم المدينة كقيمة
+                    option.textContent = city.name;
+                    // مقارنة اسم المدينة وليس المعرف
+                    if (selectedCity && selectedCity === city.name) {
+                        option.selected = true;
                     }
-
-                    // إزالة أي رسائل خطأ سابقة
-                    const errorId = `error-${fieldName}`;
-                    const existingError = document.getElementById(errorId);
-                    if (existingError) existingError.remove();
-
-                    let isEmpty = false;
-
-                    if (fieldName === "org_training_classification_id[]") {
-                        // التحقق من التصنيفات المتعددة
-                        const selectedOptions = Array.from(input.options).filter(opt => opt
-                            .selected);
-                        isEmpty = selectedOptions.length === 0;
-                    } else {
-                        isEmpty = !input.value.trim();
-                    }
-
-                    if (isEmpty) {
-                        valid = false;
-                        showError(input, requiredFields[fieldName]);
-                    }
+                    citySelect.appendChild(option);
                 });
-
-                // تحقق إضافي للحقول المشروطة (مكان الانعقاد)
-                const delivery = form.elements["program_presentation_method"];
-                if (delivery.value === 'حضوري' || delivery.value === 'هجين') {
-                    const locationFields = {
-                        country_id: "يرجى إدخال الدولة",
-                        city: "يرجى إدخال المدينة",
-                        address_in_detail: "يرجى إدخال العنوان التفصيلي"
-                    };
-
-                    Object.keys(locationFields).forEach(fieldName => {
-                        const input = form.elements[fieldName];
-                        if (!input || !input.value.trim()) {
-                            valid = false;
-                            showError(input, locationFields[fieldName]);
-                        }
-                    });
+                
+                // إذا كانت هناك مدينة محفوظة وغير موجودة في القائمة، أضفها
+                if (selectedCity && !Array.from(citySelect.options).some(o => o.value === selectedCity)) {
+                    const option = document.createElement('option');
+                    option.value = selectedCity;
+                    option.textContent = selectedCity;
+                    option.selected = true;
+                    citySelect.appendChild(option);
                 }
-
-                // تحقق من طول الوصف
-                const description = form.elements["program_description"];
-                if (description.value.length < 50) {
-                    valid = false;
-                    showError(description, "الوصف يجب أن يحتوي على 50 أحرف على الأقل");
+                
+                citySelect.disabled = false;
+                if (typeof initCustomSelect === 'function') {
+                    initCustomSelect(citySelect);
                 }
-
-                if (!valid) {
-                    console.log("❌ الفورم فيه حقول ناقصة، الإرسال توقف");
-                    e.preventDefault();
-                } else {
-                    console.log("✅ الفورم جاهز، رح ينرسل");
+            })
+            .catch(err => {
+                console.error("فشل تحميل المدن:", err);
+                citySelect.innerHTML = '<option disabled selected>فشل في تحميل المدن</option>';
+                
+                // إعادة تهيئة الـ custom select
+                if (typeof initCustomSelect === 'function') {
+                    initCustomSelect(citySelect);
                 }
             });
+    }
 
-            // التهيئة الأولية
-            if (oldCountryId) {
-                loadCities(oldCountryId, savedCity);
+    // عرض/إخفاء حقول الموقع حسب طريقة التقديم
+    function toggleLocationFields() {
+        const selectedMethod = presentationMethod.value;
+        locationFields.style.display = (selectedMethod === 'حضوري' || selectedMethod === 'هجين') ?
+            'block' :
+            'none';
+        // إذا كانت الطريقة غير حضورية، قم بإزالة علامات الخطأ من حقول الموقع
+        if (selectedMethod !== 'حضوري' && selectedMethod !== 'هجين') {
+            const locationInputs = ['country_id', 'city', 'address_in_detail'];
+            locationInputs.forEach(inputName => {
+                const input = form.elements[inputName];
+                if (input) {
+                    input.classList.remove("error-border");
+                    const errorElement = document.getElementById(`error-${inputName}`);
+                    if (errorElement) errorElement.remove();
+                }
+            });
+        }
+    }
+
+    // تحديث عداد الأحرف
+    function updateCounter() {
+        const currentLength = descriptionTextarea.value.length;
+        charCounter.textContent = `${currentLength}/${maxLength}`;
+    }
+
+    // إظهار رسائل الخطأ
+    function showError(input, message) {
+        const errorId = `error-${input.name}`;
+        const existingError = document.getElementById(errorId);
+        if (existingError) {
+            existingError.remove();
+        }
+        input.classList.add("error-border");
+        const errorMsg = document.createElement("span");
+        errorMsg.className = "error-message";
+        errorMsg.textContent = message;
+        errorMsg.id = errorId;
+        const parentContainer = input.closest('.input-group') || input.closest('.custom-select-container');
+        if (parentContainer) {
+            parentContainer.appendChild(errorMsg);
+        } else {
+            input.parentNode.insertBefore(errorMsg, input.nextSibling);
+        }
+    }
+
+    // أحداث المستخدم
+    countrySelect.addEventListener('change', function() {
+        loadCities(this.value);
+    });
+
+    presentationMethod.addEventListener('change', toggleLocationFields);
+    descriptionTextarea.addEventListener('input', updateCounter);
+
+    form.addEventListener("submit", function(e) {
+        // تأكد من إرسال city حتى لو كانت فارغة
+        if (!form.elements['city']) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'city';
+            hiddenInput.value = '';
+            form.appendChild(hiddenInput);
+        }
+        let valid = true;
+        // الحقول المطلوبة للتحقق
+        const requiredFields = {
+            title: "يرجى إدخال عنوان التدريب",
+            program_description: "يرجى إدخال وصف التدريب",
+            "org_training_classification_id[]": "يرجى اختيار تصنيف واحد على الأقل"
+        };
+        // التحقق من الحقول المطلوبة الأساسية
+        Object.keys(requiredFields).forEach(fieldName => {
+            const input = form.elements[fieldName];
+            if (!input) return;
+            input.classList.remove("error-border");
+            if (input.parentNode && input.parentNode.classList.contains(
+                    'custom-select-container')) {
+                input.parentNode.classList.remove("error-border");
             }
-            toggleLocationFields();
-            updateCounter();
+            // إزالة أي رسائل خطأ سابقة
+            const errorId = `error-${fieldName}`;
+            const existingError = document.getElementById(errorId);
+            if (existingError) existingError.remove();
+            let isEmpty = false;
+            if (fieldName === "org_training_classification_id[]") {
+                // التحقق من التصنيفات المتعددة
+                const selectedOptions = Array.from(input.options).filter(opt => opt
+                    .selected);
+                isEmpty = selectedOptions.length === 0;
+            } else {
+                isEmpty = !input.value.trim();
+            }
+            if (isEmpty) {
+                valid = false;
+                showError(input, requiredFields[fieldName]);
+            }
         });
+        // تحقق إضافي للحقول المشروطة (مكان الانعقاد)
+        const delivery = form.elements["program_presentation_method"];
+        if (delivery.value === 'حضوري' || delivery.value === 'هجين') {
+            const locationFields = {
+                country_id: "يرجى إدخال الدولة",
+                city: "يرجى إدخال المدينة",
+                address_in_detail: "يرجى إدخال العنوان التفصيلي"
+            };
+            Object.keys(locationFields).forEach(fieldName => {
+                const input = form.elements[fieldName];
+                if (!input || !input.value.trim()) {
+                    valid = false;
+                    showError(input, locationFields[fieldName]);
+                }
+            });
+        }
+        // تحقق من طول الوصف
+        const description = form.elements["program_description"];
+        if (description.value.length < 50) {
+            valid = false;
+            showError(description, "الوصف يجب أن يحتوي على 50 أحرف على الأقل");
+        }
+        if (!valid) {
+            console.log("❌ الفورم فيه حقول ناقصة، الإرسال توقف");
+            e.preventDefault();
+        } else {
+            console.log("✅ الفورم جاهز، رح ينرسل");
+        }
+    });
+
+    // التهيئة الأولية
+    if (oldCountryId) {
+        loadCities(oldCountryId, savedCity);
+    }
+    toggleLocationFields();
+    updateCounter();
+});
     </script>
 @endsection

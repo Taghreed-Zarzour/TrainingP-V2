@@ -171,7 +171,7 @@
                                                         data-iso="{{ strtolower($country->iso2) }}">
                                                         <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
                                                             class="flag-img">
-                                                        <span class="flag-code">+{{ $country->phonecode }}</span>
+                                                        <span class="flag-code">{{ $country->phonecode }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -181,7 +181,7 @@
                                         <div class="divider-line"></div>
 
                                         <!-- رمز الدولة -->
-                                        <div class="code-box" id="phoneCode" dir="ltr">+{{ old('phone_code', '90') }}</div>
+                                        <div class="code-box" id="phoneCode" dir="ltr">{{ old('phone_code', '+90') }}</div>
 
                                         <!-- حقل الإدخال -->
                                         <input type="text" id="phone_number" name="phone_number" required
@@ -332,7 +332,7 @@
                     const iso = item.getAttribute("data-iso");
                     const code = item.getAttribute("data-code");
                     selectedFlag.src = `/flags/${iso}.svg`;
-                    phoneCode.textContent = `+${code}`;
+                    phoneCode.textContent = `${code}`;
                     flagOptions.style.display = "none";
                 });
             });
@@ -352,7 +352,24 @@
                     item.style.display = code.startsWith(value) ? "flex" : "none";
                 });
             });
-            
+              // إغلاق القائمة عند النقر خارجها
+        document.addEventListener("click", (e) => {
+            const isClickInside = dropdown.contains(e.target) ||
+                flagOptions.contains(e.target) ||
+                searchBox.contains(e.target);
+
+            if (!isClickInside) {
+                flagOptions.style.display = "none";
+                isDropdownOpen = false;
+            }
+        });
+
+        // منع إغلاق القائمة عند النقر داخل حقل البحث
+        searchBox.addEventListener("click", function(e) {
+            e.stopPropagation();
+            flagOptions.style.display = "flex";
+            isDropdownOpen = true;
+        });
             // تحميل البيانات المحفوظة
             loadFormState();
             

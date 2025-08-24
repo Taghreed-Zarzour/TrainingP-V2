@@ -16,7 +16,7 @@ return new class extends Migration
 
                     // أضف الأعمدة من نوع JSON
         $table->json('education_level_id')->nullable();
-        $table->string('work_status')->nullable(); // عندك "working / not_working"
+        $table->json('work_status')->nullable(); // عندك "working / not_working"
         $table->json('work_sector_id')->nullable();
         $table->json('job_position')->nullable();
         $table->json('country_id')->nullable();

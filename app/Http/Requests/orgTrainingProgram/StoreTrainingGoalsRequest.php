@@ -38,7 +38,8 @@ class StoreTrainingGoalsRequest extends FormRequest
 'country_id'   => 'nullable|array',
 'country_id.*' => 'exists:countries,id',
 
-'work_status' => 'nullable|string|in:working,not_working', // لأنه عندك قيم نصية مش boolean
+'work_status'   => 'nullable|array',
+'work_status.*'=> 'nullable|string|in:working,not_working', // لأنه عندك قيم نصية مش boolean
 
     ];
 }

@@ -131,7 +131,7 @@ public function showGoalsForm($orgTrainingId)
         [
             'learning_outcomes' => [],
             'education_level_id' => [],
-            'work_status' => null,
+            'work_status' => [],
             'work_sector_id' => [],
             'job_position' => [],
             'country_id' => []
@@ -163,7 +163,7 @@ public function storeGoals(StoreTrainingGoalsRequest $request, $orgTrainingId)
             [
                 'learning_outcomes' => $request->learning_outcomes ?? [],
                 'education_level_id' => $request->education_level_id ?? [],
-                'work_status' => $request->work_status,
+                'work_status' => $request->work_status?? [],
                 'work_sector_id' => $request->work_sector_id ?? [],
                 'job_position' => $request->job_position ?? [],
                 'country_id' => $request->country_id ?? [],
@@ -344,8 +344,7 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
         }
         
         DB::commit();
-        return redirect()->route('orgTraining.assistants', $orgTraining->id)
-            ->with('success', 'تم تحديث تفاصيل التدريب بنجاح');
+        return redirect()->route('orgTraining.assistants', $orgTraining->id);
             
     } catch (\Exception $e) {
         DB::rollBack();
@@ -484,7 +483,8 @@ public function showSettingsForm($orgTrainingId)
     }
 
     if (!$settings->welcome_message) {
-        $settings->welcome_message = "شكرًا لتسجيلك في البرنامج...";
+        $settings->welcome_message = "شكرًا لتسجيلك في المسار. يسعدنا أن تكون/ي جزءًا من هذا المسار، ونتطلع إلى رحلة مليئة بالتعلّم  والتطوير.
+سيتم مراجعة طلبك وإشعارك بالقبول أو الاعتذار في أقرب وقت، لذا تأكد/ي من متابعة بريدك الإلكتروني أو الإشعارات داخل المنصة.";
     }
 
     return view('orgTrainings.settings', [
@@ -655,6 +655,7 @@ public function showReviewForm($orgTrainingId)
 
         try {
       $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
+      //يجب فحص حقل مطلوب من كل خطوة بعدها جعل التدريب منشور للتاكد انه مر على الخطوات
       $orgTraining->update(['status' => 'published']);
 
       return redirect()->route('orgTrainings.completed', $orgTraining->id)

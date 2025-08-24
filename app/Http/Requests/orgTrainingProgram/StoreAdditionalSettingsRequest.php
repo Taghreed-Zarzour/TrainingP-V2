@@ -23,7 +23,7 @@ public function rules(): array
 {
     return [
         'cost' => 'nullable|numeric',
-        'is_free' => 'required|boolean',
+        'is_free' => 'nullable|boolean',
         'currency' => 'nullable|string|max:10',
         'payment_method' => 'nullable|string|max:255',
         'application_deadline' => 'required|date|after_or_equal:today',
