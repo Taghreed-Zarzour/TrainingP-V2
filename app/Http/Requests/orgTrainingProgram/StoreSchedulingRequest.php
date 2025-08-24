@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests\orgTrainingProgram;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -35,7 +34,7 @@ class StoreSchedulingRequest extends FormRequest
             'num_of_hours.*' => 'nullable|numeric|min:0.5',
             'schedules' => 'nullable|array',
             'training_files' => 'nullable|array',
-'training_files.*' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,txt,jpg,jpeg,png,bmp,gif,svg,webp,mp4,mov,avi,mp3,wav,zip,rar|max:20480',
+            'training_files.*' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,txt,jpg,jpeg,png,bmp,gif,svg,webp,mp4,mov,avi,mp3,wav,zip,rar|max:20480',
         ];
     }
 
@@ -48,10 +47,28 @@ class StoreSchedulingRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $schedulesLater = $this->schedules_later;
-            $schedules = $this->schedules;
-            $numOfSessions = $this->num_of_session;
-            $numOfHours = $this->num_of_hours;
+            // التحقق من وجود البيانات قبل استخدامها
+            $schedulesLater = $this->schedules_later ?? [];
+            $schedules = $this->schedules ?? [];
+            $numOfSessions = $this->num_of_session ?? [];
+            $numOfHours = $this->num_of_hours ?? [];
+            
+            // التأكد من أن البيانات مصفوفات
+            if (!is_array($schedulesLater)) {
+                $schedulesLater = [];
+            }
+            
+            if (!is_array($schedules)) {
+                $schedules = [];
+            }
+            
+            if (!is_array($numOfSessions)) {
+                $numOfSessions = [];
+            }
+            
+            if (!is_array($numOfHours)) {
+                $numOfHours = [];
+            }
             
             // التحقق من الجداول فقط إذا لم يتم تحديد "الجلسات لاحقاً"
             foreach ($schedulesLater as $trainingIndex => $scheduleLater) {
@@ -131,9 +148,8 @@ class StoreSchedulingRequest extends FormRequest
             'num_of_hours.*.min' => 'عدد الساعات يجب أن يكون على الأقل 0.5.',
             
             'training_files.*.file' => 'كل ملف يجب أن يكون من نوع ملف صالح.',
-'training_files.*.mimes' => 'الملفات المسموحة هي: pdf, doc, docx, ppt, pptx, xls, xlsx, txt, jpg, jpeg, png, bmp, gif, svg, webp, mp4, mov, avi, mp3, wav, zip, rar.',
-            'training_files.*.max' => 'كل ملف يجب ألا يتجاوز حجمه 5 ميغابايت.',
-      
+            'training_files.*.mimes' => 'الملفات المسموحة هي: pdf, doc, docx, ppt, pptx, xls, xlsx, txt, jpg, jpeg, png, bmp, gif, svg, webp, mp4, mov, avi, mp3, wav, zip, rar.',
+            'training_files.*.max' => 'كل ملف يجب ألا يتجاوز حجمه 20 ميغابايت.',
         ];
     }
 }
