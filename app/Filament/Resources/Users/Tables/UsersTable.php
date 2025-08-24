@@ -34,7 +34,7 @@ class UsersTable
                     ->sortable(),
                 TextColumn::make('bio')
                     ->searchable(),
-                TextColumn::make('country.name_ar')
+                TextColumn::make('country.name')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('city')

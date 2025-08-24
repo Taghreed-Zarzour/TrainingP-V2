@@ -12,11 +12,11 @@ class OrgTrainingGoal extends Model
   protected $fillable = [
     'org_training_program_id',
     'learning_outcomes',
-    'education_level_id', 
-    'work_status',        
-    'work_sector_id',     
-    'job_position',       
-    'country_id',         
+    'education_level_id',
+    'work_status',
+    'work_sector_id',
+    'job_position',
+    'country_id',
 ];
 
 protected $casts = [

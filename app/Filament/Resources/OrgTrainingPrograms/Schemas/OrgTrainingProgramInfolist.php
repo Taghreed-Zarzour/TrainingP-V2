@@ -12,17 +12,35 @@ class OrgTrainingProgramInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('organization_id')
+                TextEntry::make('organization.user.name')
+                    ->label('organization name')
                     ->numeric(),
-                TextEntry::make('language_id')
+                TextEntry::make('title'),
+                TextEntry::make('language.name')
+                    ->label('language')
                     ->numeric(),
-                TextEntry::make('country_id')
+                TextEntry::make('country.name')
+                    ->label('country')
                     ->numeric(),
                 TextEntry::make('city'),
-                TextEntry::make('program_type'),
-                TextEntry::make('training_level_id')
+                TextEntry::make('address_in_detail'),
+                TextEntry::make('programType.name')
+                    ->label('program type'),
+                TextEntry::make('trainingLevel.name')
+                    ->label('training level')
                     ->numeric(),
                 TextEntry::make('program_presentation_method'),
+
+                TextEntry::make('org_training_classification_id')
+                ->label('Training Classifications')
+                ->getStateUsing(function ($record) {
+                    $ids = $record->org_training_classification_id; // Already an array
+
+                    return \App\Models\TrainingClassification::whereIn('id', $ids)
+                        ->pluck('name')
+                        ->implode(', ');
+                }),
+                TextEntry::make('program_description'),
                 TextEntry::make('created_at')
                     ->dateTime(),
                 TextEntry::make('updated_at')

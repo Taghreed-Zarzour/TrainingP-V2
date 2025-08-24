@@ -6,6 +6,7 @@ use App\Filament\Resources\OrgTrainingPrograms\Pages\CreateOrgTrainingProgram;
 use App\Filament\Resources\OrgTrainingPrograms\Pages\EditOrgTrainingProgram;
 use App\Filament\Resources\OrgTrainingPrograms\Pages\ListOrgTrainingPrograms;
 use App\Filament\Resources\OrgTrainingPrograms\Pages\ViewOrgTrainingProgram;
+use App\Filament\Resources\OrgTrainingPrograms\RelationManagers\GoalsRelationManager;
 use App\Filament\Resources\OrgTrainingPrograms\Schemas\OrgTrainingProgramForm;
 use App\Filament\Resources\OrgTrainingPrograms\Schemas\OrgTrainingProgramInfolist;
 use App\Filament\Resources\OrgTrainingPrograms\Tables\OrgTrainingProgramsTable;
@@ -42,7 +43,7 @@ class OrgTrainingProgramResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            GoalsRelationManager::class,
         ];
     }
 

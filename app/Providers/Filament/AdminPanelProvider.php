@@ -25,8 +25,10 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->default()
             ->id('admin')
-            ->path('filament/admin/auth')
+            ->path('filament/auth/admin')
+            ->login()
             ->authGuard('admin')
             ->colors([
                 'primary' => Color::Blue,
@@ -65,9 +67,4 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
-
-    // public function register(): void
-    // {
-    //     //
-    // }
 }

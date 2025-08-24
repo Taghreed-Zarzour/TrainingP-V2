@@ -31,19 +31,20 @@ class OrgTrainingProgramForm
                 Textarea::make('title')
                     ->required()
                     ->columnSpanFull(),
+
                 Select::make('language_id')
-                    ->options(fn () => Language::pluck('name', 'id')->toArray())
-                    ->columnSpanFull()
-                    ->required(),
+                    ->label('Language')
+                    ->options(Language::pluck('name', 'id')->toArray())
+                    ->required()
+                    ->columnSpanFull(),
+
                 Select::make('country_id')
-                    ->label('country')
-                    ->options(
-                        Country::pluck('name_ar', 'id')->toArray()
-                    )
+                    ->label('Country')
+                    ->options(Country::pluck('name', 'id')->toArray())
                     ->reactive()
                     ->required(),
 
-                Select::make('city')
+                    Select::make('city')
                     ->label('city')
                     ->options(function (callable $get) {
                         $countryId = $get('country_id');
@@ -59,45 +60,53 @@ class OrgTrainingProgramForm
                     })
                     ->reactive()
                     ->required(),
+
                 Textarea::make('address_in_detail')
-                    ->default(null)
+                    ->label('Address in Detail')
                     ->columnSpanFull(),
-                Select::make('program_type_id')
-                    ->label('Program Type')
-                    ->options(programType::all()->pluck('name', 'id')->toArray())
+
+                Select::make('programType')
+                    ->relationship('programType', 'name')
                     ->required(),
+
                 Select::make('training_level_id')
                     ->label('Training Level')
-                    ->options(trainingLevel::all()->pluck('name', 'id')->toArray())
+                    ->options(trainingLevel::pluck('name', 'id')->toArray())
                     ->required(),
-                    Select::make('program_presentation_method_id')
+
+                Select::make('program_presentation_method')
                     ->label('Presentation Method')
-                    ->options(collect(TrainingAttendanceType::cases())
-                        ->mapWithKeys(fn ($case) => [$case->name => $case->value])
-                        ->toArray()
+                    ->options(
+                        collect(TrainingAttendanceType::cases())
+                            ->mapWithKeys(fn ($case) => [$case->value => $case->name])
+                            ->toArray()
                     )
                     ->native(false)
+                    ->required(),
 
-                    ->required(),
-                    Select::make('training_classification_id')
-                    ->label('Training Classification')
-                    ->options(
-                        TrainingClassification::orderBy('name')->pluck('name', 'id')->toArray()
-                    )
-                    ->searchable()
+                Select::make('org_training_classification_id')
+                    ->label('Training Classifications')
+                    ->options(TrainingClassification::orderBy('name')->pluck('name', 'id')->toArray())
                     ->multiple()
-                    ->placeholder('Select a classification')
-                    ->required(),
+                    ->searchable()
+                    ->required()
+                    ->placeholder('Select classifications'),
 
                 Textarea::make('program_description')
-                    ->default(null)
+                    ->label('Program Description')
                     ->columnSpanFull(),
+
                 Toggle::make('is_edit_mode')
-                    ->required(),
+                    ->label('Edit Mode')
+                    ->required()
+                    ->dehydrateStateUsing(fn ($state) => $state ? 1 : 0),
+
                 Select::make('status')
+                    ->label('Status')
                     ->options(['online' => 'Online', 'offline' => 'Offline'])
                     ->default('online')
                     ->required(),
             ]);
+
     }
 }

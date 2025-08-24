@@ -21,12 +21,19 @@ class OrgTrainingProgram extends Model
         'program_presentation_method',
         'org_training_classification_id',
         'program_description',
+        'is_edit_mode'
     ];
 
     protected $casts = [
         'org_training_classification_id' => 'array',
+        'is_edit_mode' => 'boolean',
     ];
-    
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
     public function goals()
     {
         return $this->hasMany(OrgTrainingGoal::class);
@@ -67,5 +74,11 @@ public function assistantUsers()
     {
         return $this->belongsTo(programType::class, 'program_type');
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
 
 }

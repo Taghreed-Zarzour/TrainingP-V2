@@ -16,20 +16,23 @@ class OrgTrainingProgramsTable
     {
         return $table
             ->columns([
-                TextColumn::make('organization_id')
+                TextColumn::make('organization.user.name')
+                    ->label('organization')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('language_id')
+                TextColumn::make('title')
+                    ->sortable(),
+                TextColumn::make('language.name')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('country_id')
+                TextColumn::make('country.name')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('city')
                     ->searchable(),
-                TextColumn::make('program_type')
+                TextColumn::make('programType.name')
                     ->searchable(),
-                TextColumn::make('training_level_id')
+                TextColumn::make('trainingLevel.name')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('program_presentation_method')
