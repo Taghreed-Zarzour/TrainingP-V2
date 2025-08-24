@@ -55,13 +55,13 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
 
-            ->plugins([
-                FilamentTranslatableFieldsPlugin::make()
-                    ->supportedLocales([
-                        'en' => 'English',
-                        'ar' => 'Arabic',
-                    ]),
-            ])
+            // ->plugins([
+            //     FilamentTranslatableFieldsPlugin::make()
+            //         ->supportedLocales([
+            //             'en' => 'English',
+            //             'ar' => 'Arabic',
+            //         ]),
+            // ])
 
             ->authMiddleware([
                 Authenticate::class,

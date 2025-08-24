@@ -4,6 +4,7 @@ namespace App\Http\Controllers\OrgTrainings;
 
 use App\Enums\JobPositionEnum;
 use App\Models\EducationLevel;
+use App\Models\OrgTrainingDetailFile;
 use App\Models\OrgTrainingSchedule;
 use App\Models\programType;
 use App\Enums\TrainingAttendanceType;
@@ -253,68 +254,61 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
     try {
         $orgTraining = OrgTrainingProgram::findOrFail($trainingId);
         
-        // 1. الحصول على التفاصيل القديمة
+        // 1. Retrieve old details
         $oldDetails = OrgTrainingDetail::where('org_training_program_id', $trainingId)->get();
         
-        // 2. جمع الملفات القديمة من جميع التفاصيل
+        // 2. Collect old files from all details
         $oldFiles = [];
         foreach ($oldDetails as $detail) {
             if ($detail->training_files) {
-                $files = is_string($detail->training_files) 
-                    ? json_decode($detail->training_files, true) 
-                    : $detail->training_files;
-                
-                if (is_array($files)) {
-                    $oldFiles = array_merge($oldFiles, $files);
-                }
+                $oldFiles[] = $detail->training_files; // Assume it's a single file path
             }
             
-            // حذف الجداول الزمنية المرتبطة بالتفصيل
+            // Delete associated schedules
             OrgTrainingSchedule::where('org_training_detail_id', $detail->id)->delete();
             $detail->delete();
         }
         
-        // 3. معالجة البيانات الجديدة
+        // 3. Process new data
         $programTitles = $request->program_title ?? [];
         $trainerIds = $request->trainer_id ?? [];
         $schedulesLater = $request->schedules_later ?? [];
         $numOfSessions = $request->num_of_session ?? [];
         $numOfHours = $request->num_of_hours ?? [];
         $schedules = $request->schedules ?? [];
-        $trainingFilesInput = $request->file('training_files') ?? [];
+        $trainingFileInput = $request->file('training_file'); // Single file input
         
-        // 4. الحصول على قائمة الملفات التي نريد الاحتفاظ بها
-        $filesToKeep = $request->input('existing_training_files', []);
+        // 4. Get list of files to keep
+        $fileToKeep = $request->input('existing_training_file'); // Single file input
         
         if (!is_array($programTitles) || !is_array($trainerIds)) {
             throw new \Exception('Invalid input format for program titles or trainer IDs.');
         }
         
-        // 5. حذف الملفات القديمة التي لم يتم الاحتفاظ بها
+        // 5. Delete old files not kept
         foreach ($oldFiles as $oldFile) {
-            if (!in_array($oldFile, $filesToKeep)) {
+            if ($oldFile !== $fileToKeep) {
                 Storage::disk('public')->delete($oldFile);
             }
         }
         
-        // 6. معالجة الملفات الجديدة
-        $newFiles = [];
-        if (!empty($trainingFilesInput)) {
-            foreach ($trainingFilesInput as $file) {
-                $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                $extension = $file->getClientOriginalExtension();
-                $timestamp = now()->format('Ymd_His');
-                $uniqueFilename = $filename . '_' . $timestamp . '.' . $extension;
-                
-                $path = $file->storeAs('training/files', $uniqueFilename, 'public');
-                $newFiles[] = $path;
-            }
+        // 6. Process new file
+        $newFile = null;
+        if ($trainingFileInput) {
+            $originalName = pathinfo($trainingFileInput->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $trainingFileInput->getClientOriginalExtension();
+            
+            // Sanitize filename and convert to camel case
+            $sanitizedFileName = preg_replace('/[^a-zA-Z0-9\s]/', '', $originalName);
+            $camelCaseFileName = str_replace(' ', '', ucwords(str_replace('_', ' ', $sanitizedFileName)));
+            
+            $timestamp = now()->format('Ymd_His');
+            $uniqueFilename = $camelCaseFileName . '_' . $timestamp . '.' . $extension;
+
+            $newFile = $trainingFileInput->storeAs('training/files', $uniqueFilename, 'public');
         }
         
-        // 7. دمج الملفات المحتفظ بها مع الملفات الجديدة
-        $allFiles = array_merge($filesToKeep, $newFiles);
-        
-        // 8. إنشاء التفاصيل الجديدة
+        // 7. Create new details
         foreach ($programTitles as $trainingIndex => $programTitle) {
             if (empty($programTitle)) continue;
             
@@ -324,10 +318,16 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
                 'schedule_later' => $schedulesLater[$trainingIndex] ?? false,
                 'num_of_session' => ($schedulesLater[$trainingIndex] ?? false) ? ($numOfSessions[$trainingIndex] ?? null) : null,
                 'num_of_hours' => ($schedulesLater[$trainingIndex] ?? false) ? ($numOfHours[$trainingIndex] ?? null) : null,
-                'training_files' => !empty($allFiles) ? json_encode($allFiles) : null,
             ]);
             
-            // 9. إنشاء الجداول الزمنية إذا لزم الأمر
+            // 8. Create a record for the training file
+            $orgTrainingDetailFile = new OrgTrainingDetailFile([
+                'org_training_program_id' => $orgTraining->id,
+                'training_files' => $newFile ?? $fileToKeep, 
+            ]);
+            $orgTrainingDetail->files()->save($orgTrainingDetailFile);
+            
+            // 9. Create schedules if needed
             if (!($schedulesLater[$trainingIndex] ?? false)) {
                 $trainingSchedules = $schedules[$trainingIndex] ?? [];
                 
@@ -348,11 +348,11 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
             
     } catch (\Exception $e) {
         DB::rollBack();
-        \Log::error('فشل تحديث تفاصيل التدريب: ' . $e->getMessage());
+        \Log::error('Failed to update training details: ' . $e->getMessage());
         \Log::error('Stack trace: ' . $e->getTraceAsString());
         
         return redirect()->back()
-            ->with('error', 'حدث خطأ أثناء التحديث: ' . $e->getMessage())
+            ->with('error', 'An error occurred during the update: ' . $e->getMessage())
             ->withInput();
     }
 }
@@ -595,7 +595,8 @@ public function showReviewForm($orgTrainingId)
         'details',
         'programType',
         'assistants',
-    ])->findOrFail($orgTrainingId);
+    ])->findOrFail($orgTrainingId)
+    ->where('status','online');
 
     
     // الحصول على إعدادات التسجيل
@@ -656,7 +657,7 @@ public function showReviewForm($orgTrainingId)
         try {
       $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
       //يجب فحص حقل مطلوب من كل خطوة بعدها جعل التدريب منشور للتاكد انه مر على الخطوات
-      $orgTraining->update(['status' => 'published']);
+      $orgTraining->update(['status' => 'online']);
 
       return redirect()->route('orgTrainings.completed', $orgTraining->id)
         ->with('success', 'تم نشر البرنامج التدريبي بنجاح');

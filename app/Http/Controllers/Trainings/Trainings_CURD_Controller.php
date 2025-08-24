@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Trainings;
+use App\Enums\JobPositionEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TrainingCreate\StoreAdditionalSettingsRequest;
 use App\Http\Requests\TrainingCreate\StoreBasicInformationRequest;
@@ -8,6 +9,7 @@ use App\Http\Requests\TrainingCreate\StoreTrainingAssistantRequest;
 use App\Http\Requests\TrainingCreate\StoreTrainingGoalsRequest;
 use App\Models\AdditionalSetting;
 use App\Models\Country;
+use App\Models\EducationLevel;
 use App\Models\Language;
 use App\Models\programType;
 use App\Models\schedulingTrainingSessions;
@@ -18,6 +20,7 @@ use App\Models\trainingLevel;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Enums\TrainingAttendanceType;
+use App\Models\WorkSector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -108,13 +111,20 @@ public function updateBasicInformation(StoreBasicInformationRequest $request, $t
   {
     $training = TrainingProgram::findOrFail($trainingId);
     $trainingDetail = $training->detail()->firstOrNew();
+    $educationLevels = EducationLevel::all();
+    $workSectors = WorkSector::all();
+    $countries = Country::all();
+    $jobPositions = JobPositionEnum::cases();
 
     return view('trainings.goals', [
       'training' => $training,
       'learning_outcomes' => json_decode($trainingDetail->learning_outcomes ?? '[]', true),
       'requirements' => json_decode($trainingDetail->requirements ?? '[]', true),
-      'target_audience' => json_decode($trainingDetail->target_audience ?? '[]', true),
       'benefits' => json_decode($trainingDetail->benefits ?? '[]', true),
+      'educationLevels' => $educationLevels, 
+      'workSectors' => $workSectors, 
+      'countries' => $countries,
+      'jobPositions' => $jobPositions
     ]);
   }
   public function storeGoals(StoreTrainingGoalsRequest $request, $trainingId)
@@ -131,9 +141,15 @@ public function updateBasicInformation(StoreBasicInformationRequest $request, $t
       $trainingDetail->fill([
         'learning_outcomes' => json_encode($request->learning_outcomes ?? []),
         'requirements' => json_encode($request->requirements ?? []),
-        'target_audience' => json_encode($request->target_audience ?? []),
         'benefits' => json_encode($request->benefits ?? []),
-      ]);
+        
+        'education_level_id' => json_encode($request->education_level_id ?? []),
+        'work_sector_id' => json_encode($request->work_sector_id ?? []),
+        'job_position' => json_encode($request->job_position ?? []),
+        'country_id' => json_encode($request->country_id ?? []),
+        'work_status' => json_encode($request->work_status ?? []),
+    ]);
+    
       $trainingDetail->save();
 
       DB::commit();

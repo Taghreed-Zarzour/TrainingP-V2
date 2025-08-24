@@ -23,7 +23,7 @@ protected $casts = [
     'learning_outcomes'    => 'array',
     'education_level_id'   => 'array',
     'work_sector_id'       => 'array',
-      'work_status'       => 'array',
+    'work_status'       => 'array',
     'job_position'         => 'array',
     'country_id'           => 'array',
 ];
