@@ -1,15 +1,15 @@
 -- إضافة 10 متدربين في جدول users مع تفعيل البريد الإلكتروني
 INSERT INTO `users` (`name`, `email`, `email_verified_at`, `password`, `user_type_id`, `bio`, `country_id`, `city`, `phone_code`, `phone_number`, `created_at`, `updated_at`) VALUES
-('{"ar":"متدرب 1"}', 'trainee1@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 1', 215, 'Rif Dimashq', '+90', '111111111', NOW(), NOW()),
-('{"ar":"متدرب 2"}', 'trainee2@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 2', 215, 'Quneitra', '+90', '222222222', NOW(), NOW()),
-('{"ar":"متدرب 3"}', 'trainee3@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 3', 18, 'Northern', '+90', '333333333', NOW(), NOW()),
-('{"ar":"متدرب 4"}', 'trainee4@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 4', 16, 'Bilasuvar', '+90', '444444444', NOW(), NOW()),
-('{"ar":"متدرب 5"}', 'trainee5@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 5', 12, 'Vayots Dzor', '+90', '555555555', NOW(), NOW()),
-('{"ar":"متدرب 6"}', 'trainee6@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 6', 10, 'Saint George', '+90', '666666666', NOW(), NOW()),
-('{"ar":"متدرب 7"}', 'trainee7@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 7', 3, 'Tirana', '+90', '777777777', NOW(), NOW()),
-('{"ar":"متدرب 8"}', 'trainee8@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 8', 4, 'Algiers', '+90', '888888888', NOW(), NOW()),
-('{"ar":"متدرب 9"}', 'trainee9@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 9', 1, 'Kabul', '+90', '999999999', NOW(), NOW()),
-('{"ar":"متدرب 10"}', 'trainee10@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 10', 2, 'Mariehamn', '+90', '101010101', NOW(), NOW());
+('{"ar":"متدرب 1"}', 'trainee1@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 1', 163843, 'محافظة ادلب', '+90', '111111111', NOW(), NOW()),
+('{"ar":"متدرب 2"}', 'trainee2@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 2', 163843, 'محافظة ادلب', '+90', '222222222', NOW(), NOW()),
+('{"ar":"متدرب 3"}', 'trainee3@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 3', 163843, 'محافظة ادلب', '+90', '333333333', NOW(), NOW()),
+('{"ar":"متدرب 4"}', 'trainee4@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 4', 163843, 'محافظة ادلب', '+90', '444444444', NOW(), NOW()),
+('{"ar":"متدرب 5"}', 'trainee5@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 5', 163843, 'محافظة ادلب', '+90', '555555555', NOW(), NOW()),
+('{"ar":"متدرب 6"}', 'trainee6@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 6', 163843, 'محافظة ادلب', '+90', '666666666', NOW(), NOW()),
+('{"ar":"متدرب 7"}', 'trainee7@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 7', 163843, 'محافظة ادلب', '+90', '777777777', NOW(), NOW()),
+('{"ar":"متدرب 8"}', 'trainee8@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 8', 163843, 'محافظة ادلب', '+90', '888888888', NOW(), NOW()),
+('{"ar":"متدرب 9"}', 'trainee9@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 9', 163843, 'محافظة ادلب', '+90', '999999999', NOW(), NOW()),
+('{"ar":"متدرب 10"}', 'trainee10@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 3, 'نبذة عن المتدرب 10', 163843, 'محافظة ادلب', '+90', '101010101', NOW(), NOW());
 
 -- إضافة بيانات المتدربين في جدول trainees باستخدام الـ IDs التي تم إنشاؤها
 INSERT INTO `trainees` (`id`, `last_name`, `sex`, `nationality`, `work_fields`, `education_levels_id`, `fields_of_interest`, `is_working`, `training_attendance`, `created_at`, `updated_at`)
@@ -164,16 +164,16 @@ FROM `users` u WHERE u.email = 'trainee10@example.com';
 
 -- إضافة 10 منظمات في جدول users مع تفعيل البريد الإلكتروني
 INSERT INTO `users` (`name`, `email`, `email_verified_at`, `password`, `user_type_id`, `bio`, `country_id`, `city`, `phone_code`, `phone_number`, `created_at`, `updated_at`) VALUES
-('{"ar":"منظمة 1"}', 'org1@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 1', 215, 'Rif Dimashq', '+90', '111111111', NOW(), NOW()),
-('{"ar":"منظمة 2"}', 'org2@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 2', 215, 'Quneitra', '+90', '222222222', NOW(), NOW()),
-('{"ar":"منظمة 3"}', 'org3@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 3', 18, 'Northern', '+90', '333333333', NOW(), NOW()),
-('{"ar":"منظمة 4"}', 'org4@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 4', 16, 'Bilasuvar', '+90', '444444444', NOW(), NOW()),
-('{"ar":"منظمة 5"}', 'org5@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 5', 12, 'Vayots Dzor', '+90', '555555555', NOW(), NOW()),
-('{"ar":"منظمة 6"}', 'org6@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 6', 10, 'Saint George', '+90', '666666666', NOW(), NOW()),
-('{"ar":"منظمة 7"}', 'org7@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 7', 3, 'Tirana', '+90', '777777777', NOW(), NOW()),
-('{"ar":"منظمة 8"}', 'org8@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 8', 4, 'Algiers', '+90', '888888888', NOW(), NOW()),
-('{"ar":"منظمة 9"}', 'org9@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 9', 1, 'Kabul', '+90', '999999999', NOW(), NOW()),
-('{"ar":"منظمة 10"}', 'org10@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 10', 2, 'Mariehamn', '+90', '101010101', NOW(), NOW());
+('{"ar":"منظمة 1"}', 'org1@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 1', 163843, 'محافظة ادلب', '+90', '111111111', NOW(), NOW()),
+('{"ar":"منظمة 2"}', 'org2@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 2', 163843, 'محافظة ادلب', '+90', '222222222', NOW(), NOW()),
+('{"ar":"منظمة 3"}', 'org3@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 3', 163843, 'محافظة ادلب', '+90', '333333333', NOW(), NOW()),
+('{"ar":"منظمة 4"}', 'org4@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 4', 163843, 'محافظة ادلب', '+90', '444444444', NOW(), NOW()),
+('{"ar":"منظمة 5"}', 'org5@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 5', 163843, 'محافظة ادلب', '+90', '555555555', NOW(), NOW()),
+('{"ar":"منظمة 6"}', 'org6@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 6', 163843, 'محافظة ادلب', '+90', '666666666', NOW(), NOW()),
+('{"ar":"منظمة 7"}', 'org7@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 7', 163843, 'محافظة ادلب', '+90', '777777777', NOW(), NOW()),
+('{"ar":"منظمة 8"}', 'org8@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 8', 163843, 'محافظة ادلب', '+90', '888888888', NOW(), NOW()),
+('{"ar":"منظمة 9"}', 'org9@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 9', 163843, 'محافظة ادلب', '+90', '999999999', NOW(), NOW()),
+('{"ar":"منظمة 10"}', 'org10@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 4, 'نبذة عن منظمة 10', 163843, 'محافظة ادلب', '+90', '101010101', NOW(), NOW());
 
 -- إضافة بيانات المنظمات في جدول organizations باستخدام الـ IDs التي تم إنشاؤها
 INSERT INTO `organizations` (`id`, `organization_type_id`, `website`, `employee_numbers_id`, `established_year`, `annual_budgets_id`, `organization_sectors`, `created_at`, `updated_at`)
@@ -208,16 +208,16 @@ SELECT u.id, 5, 'https://org10.com', 5, 2019, 2, '[\"5\"]', NOW(), NOW() FROM `u
 
 -- إضافة 10 مساعدين في جدول users مع تفعيل البريد الإلكتروني
 INSERT INTO `users` (`name`, `email`, `email_verified_at`, `password`, `user_type_id`, `bio`, `country_id`, `city`, `phone_code`, `phone_number`, `created_at`, `updated_at`) VALUES
-('{"ar":"مساعد 1"}', 'assistant1@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 1', 215, 'Rif Dimashq', '+90', '111111111', NOW(), NOW()),
-('{"ar":"مساعد 2"}', 'assistant2@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 2', 215, 'Quneitra', '+90', '222222222', NOW(), NOW()),
-('{"ar":"مساعد 3"}', 'assistant3@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 3', 18, 'Northern', '+90', '333333333', NOW(), NOW()),
-('{"ar":"مساعد 4"}', 'assistant4@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 4', 16, 'Bilasuvar', '+90', '444444444', NOW(), NOW()),
-('{"ar":"مساعد 5"}', 'assistant5@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 5', 12, 'Vayots Dzor', '+90', '555555555', NOW(), NOW()),
-('{"ar":"مساعد 6"}', 'assistant6@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 6', 10, 'Saint George', '+90', '666666666', NOW(), NOW()),
-('{"ar":"مساعد 7"}', 'assistant7@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 7', 3, 'Tirana', '+90', '777777777', NOW(), NOW()),
-('{"ar":"مساعد 8"}', 'assistant8@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 8', 4, 'Algiers', '+90', '888888888', NOW(), NOW()),
-('{"ar":"مساعد 9"}', 'assistant9@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 9', 1, 'Kabul', '+90', '999999999', NOW(), NOW()),
-('{"ar":"مساعد 10"}', 'assistant10@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 10', 2, 'Mariehamn', '+90', '101010101', NOW(), NOW());
+('{"ar":"مساعد 1"}', 'assistant1@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 1', 163843, 'محافظة ادلب', '+90', '111111111', NOW(), NOW()),
+('{"ar":"مساعد 2"}', 'assistant2@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 2', 163843, 'محافظة ادلب', '+90', '222222222', NOW(), NOW()),
+('{"ar":"مساعد 3"}', 'assistant3@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 3', 163843, 'محافظة ادلب', '+90', '333333333', NOW(), NOW()),
+('{"ar":"مساعد 4"}', 'assistant4@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 4', 163843, 'محافظة ادلب', '+90', '444444444', NOW(), NOW()),
+('{"ar":"مساعد 5"}', 'assistant5@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 5', 163843, 'محافظة ادلب', '+90', '555555555', NOW(), NOW()),
+('{"ar":"مساعد 6"}', 'assistant6@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 6', 163843, 'محافظة ادلب', '+90', '666666666', NOW(), NOW()),
+('{"ar":"مساعد 7"}', 'assistant7@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 7', 163843, 'محافظة ادلب', '+90', '777777777', NOW(), NOW()),
+('{"ar":"مساعد 8"}', 'assistant8@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 8', 163843, 'محافظة ادلب', '+90', '888888888', NOW(), NOW()),
+('{"ar":"مساعد 9"}', 'assistant9@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 9', 163843, 'محافظة ادلب', '+90', '999999999', NOW(), NOW()),
+('{"ar":"مساعد 10"}', 'assistant10@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 2, 'نبذة عن مساعد 10', 163843, 'محافظة ادلب', '+90', '101010101', NOW(), NOW());
 
 -- إضافة بيانات المساعدين في جدول assistants باستخدام الـ IDs التي تم إنشاؤها
 INSERT INTO `assistants` (`id`, `last_name`, `sex`, `headline`, `nationality`, `years_of_experience`, `experience_areas`, `provided_services`, `specialization`, `university`, `graduation_year`, `education_levels_id`, `languages`, `created_at`, `updated_at`)
@@ -253,16 +253,16 @@ SELECT u.id, '{"ar":"الاسم 10"}', 'أنثى', 'عنوان مساعد 10', '
 
 -- إضافة 10 مدربين في جدول users مع تفعيل البريد الإلكتروني
 INSERT INTO `users` (`name`, `email`, `email_verified_at`, `password`, `user_type_id`, `bio`, `country_id`, `city`, `phone_code`, `phone_number`, `created_at`, `updated_at`) VALUES
-('{"ar":"مدرب 1"}', 'trainer1@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 1', 215, 'Rif Dimashq', '+90', '111111111', NOW(), NOW()),
-('{"ar":"مدرب 2"}', 'trainer2@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 2', 215, 'Quneitra', '+90', '222222222', NOW(), NOW()),
-('{"ar":"مدرب 3"}', 'trainer3@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 3', 18, 'Northern', '+90', '333333333', NOW(), NOW()),
-('{"ar":"مدرب 4"}', 'trainer4@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 4', 16, 'Bilasuvar', '+90', '444444444', NOW(), NOW()),
-('{"ar":"مدرب 5"}', 'trainer5@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 5', 12, 'Vayots Dzor', '+90', '555555555', NOW(), NOW()),
-('{"ar":"مدرب 6"}', 'trainer6@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 6', 10, 'Saint George', '+90', '666666666', NOW(), NOW()),
-('{"ar":"مدرب 7"}', 'trainer7@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 7', 3, 'Tirana', '+90', '777777777', NOW(), NOW()),
-('{"ar":"مدرب 8"}', 'trainer8@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 8', 4, 'Algiers', '+90', '888888888', NOW(), NOW()),
-('{"ar":"مدرب 9"}', 'trainer9@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 9', 1, 'Kabul', '+90', '999999999', NOW(), NOW()),
-('{"ar":"مدرب 10"}', 'trainer10@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 10', 2, 'Mariehamn', '+90', '101010101', NOW(), NOW());
+('{"ar":"مدرب 1"}', 'trainer1@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 1', 163843, 'محافظة ادلب', '+90', '111111111', NOW(), NOW()),
+('{"ar":"مدرب 2"}', 'trainer2@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 2', 163843, 'محافظة ادلب', '+90', '222222222', NOW(), NOW()),
+('{"ar":"مدرب 3"}', 'trainer3@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 3', 163843, 'محافظة ادلب', '+90', '333333333', NOW(), NOW()),
+('{"ar":"مدرب 4"}', 'trainer4@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 4', 163843, 'محافظة ادلب', '+90', '444444444', NOW(), NOW()),
+('{"ar":"مدرب 5"}', 'trainer5@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 5', 163843, 'محافظة ادلب', '+90', '555555555', NOW(), NOW()),
+('{"ar":"مدرب 6"}', 'trainer6@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 6', 163843, 'محافظة ادلب', '+90', '666666666', NOW(), NOW()),
+('{"ar":"مدرب 7"}', 'trainer7@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 7', 163843, 'محافظة ادلب', '+90', '777777777', NOW(), NOW()),
+('{"ar":"مدرب 8"}', 'trainer8@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 8', 163843, 'محافظة ادلب', '+90', '888888888', NOW(), NOW()),
+('{"ar":"مدرب 9"}', 'trainer9@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 9', 163843, 'محافظة ادلب', '+90', '999999999', NOW(), NOW()),
+('{"ar":"مدرب 10"}', 'trainer10@example.com', NOW(), '$2y$12$JmpXdzLlxxsUN.yWg1zKf.MQZgSPKUU46o4JFbpPsJ9ZjTQAB5SD6', 1, 'نبذة عن مدرب 10', 163843, 'محافظة ادلب', '+90', '101010101', NOW(), NOW());
 
 -- إضافة بيانات المدربين في جدول trainers باستخدام الـ IDs التي تم إنشاؤها
 INSERT INTO `trainers` (`id`, `last_name`, `sex`, `headline`, `nationality`, `work_sectors`, `provided_services`, `work_fields`, `international_exp`, `important_topics`, `hourly_wage`, `currency`, `created_at`, `updated_at`)

@@ -260,8 +260,8 @@ class CountrySeeder extends Seeder
 	(1024031,'YT','fr-YT','Mayotte','مایوت','مايوت','+262',-12.82568,45.15239),
 	(953987,'ZA','zu,xh,af,nso,en-ZA,tn,st,ts,ss,ve,nr','South Africa','افریقای جنوبی','جنوب افريقيا','+27',-29.00673,26.81484),
 	(895949,'ZM','en-ZM,bem,loz,lun,lue,ny,toi','Zambia','زامبیا','زامبيا','+260',-13.55052,28.12245),
-	(878675,'ZW','en-ZW,sn,nr,nd','Zimbabwe','زیمبابوه','زيمبابوي','+263',-18.49415,30.35458);
-INSERT INTO `countries` VALUES (8505033,'cs','cu,hu,sq,sr','Serbia and Montenegro',NULL,'صربيا والجبل الاسود','+381',0,0),
+	(878675,'ZW','en-ZW,sn,nr,nd','Zimbabwe','زیمبابوه','زيمبابوي','+263',-18.49415,30.35458),
+(8505033,'cs','cu,hu,sq,sr','Serbia and Montenegro',NULL,'صربيا والجبل الاسود','+381',0,0),
 	(8505032,'AN','nl-AN,en,es','Netherlands Antilles',NULL,'الانتيل الهولندية','+599',0,0);";
 
             DB::statement($sql);

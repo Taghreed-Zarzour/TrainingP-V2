@@ -381,7 +381,18 @@
                                         الحالة الوظيفية
                                     </div>
                                     <div class="audience-tags">
-                                        <span class="audience-tag">{{ $goals->work_status }}</span>
+@foreach ($goals->work_status as $work_status)
+    @if ($work_status)
+        <span class="audience-tag">
+            @if ($work_status === 'working')
+                يعمل
+            @elseif ($work_status === 'not_working')
+                لا يعمل
+            @endif
+        </span>
+    @endif
+@endforeach
+
                                     </div>
                                 </div>
                             @endif
