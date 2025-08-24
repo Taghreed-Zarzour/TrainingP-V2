@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('filament/auth/admin')
+            ->path('filament/admin/auth')
             ->login()
             ->authGuard('admin')
             ->colors([

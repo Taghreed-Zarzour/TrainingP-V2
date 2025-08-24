@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
 
     // تشغيل السييدرز
     $this->call([
+      AdminSeeder::class,
       CountrySeeder::class,
       ProvidedServiceSeeder::class,
       SectorSeeder::class,
