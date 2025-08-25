@@ -214,7 +214,7 @@ public function login(array $data)
                 $routeName = $routes[$user->user_type_id] ?? 'home';
                 $link = URL::temporarySignedRoute(
                     $routeName,
-                    now()->addMinutes(15),
+                    now()->addMinutes(50),
                     ['id' => $user->id] 
                 );
 
