@@ -14,6 +14,7 @@ use App\Services\TrainingAnnouncementService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Enrollment;
+use App\Models\OrgTrainingProgram;
 
 class TrainingsController extends Controller
 {
@@ -174,7 +175,16 @@ $diffInSeconds = $now->diffInSeconds($deadline);
         $trainerIds = TrainingProgram::pluck('user_id');
         $trainers = User::with('trainee')->whereIn('id', $trainerIds)->get();
 
-        return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification'));
+        $allOrgPrograms = OrgTrainingProgram::with(
+            'details',
+            'goals',
+            'registrationRequirements',
+            'assistants'
+        )
+        ->where('status', 'online')
+        ->get();
+
+        return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));
     }
 
     public function show($id)

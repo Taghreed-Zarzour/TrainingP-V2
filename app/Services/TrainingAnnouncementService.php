@@ -39,6 +39,7 @@ class TrainingAnnouncementService
                 }
 
                 $firstSession = $sessions->sortBy('session_date')->first();
+
                 if ($firstSession) {
                     $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
                     if ($startTime->isFuture()) {

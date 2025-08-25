@@ -333,6 +333,34 @@
         @endif
     </div>
 @endsection
+
+
+    {{-- <p>org taraining programs</p>
+
+    @foreach ($allOrgPrograms as $program)
+    <div class="mb-4 border p-3 rounded">
+        <h5>{{ $program->title }}</h5>
+        <h5>{{ $program->trainingClassification->name }}</h5>
+
+        <h6>{{ $program->organization->user->name }}</h6 >
+
+        @if ($program->registrationRequirements)
+            <p>Free: {{ $program->registrationRequirements->is_free ? 'Yes' : 'No' }}</p>
+            <p>Cost: {{ $program->registrationRequirements->cost }}</p>
+            <p>deadline: {{ $program->registrationRequirements->application_deadline }}</p>
+            <p>location: {{ $program->country->name }} , {{ $program->city }}</p>
+
+        @else
+            <p class="text-muted">Registration details not available.</p>
+        @endif
+        <p>num of trainings : {{ $program->details->count() }} </p>
+
+    </div>
+    @endforeach --}}
+
+
+
+
 @section('scripts')
     <script src="{{ asset('js/singleselect.js') }}"></script>
     <script>
