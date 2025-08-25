@@ -7,12 +7,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TrainerRequests\completeRegisterRequest;
 use App\Models\Country;
 use App\Models\ProvidedService;
+use App\Models\Trainer;
+use App\Models\TrainerRating;
 use App\Models\User;
 use App\Models\WorkField;
 use App\Models\WorkSector;
 use App\Services\TrainerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 
 
 class TrainerController extends Controller
@@ -22,6 +25,14 @@ class TrainerController extends Controller
   public function __construct(TrainerService $trainerService)
   {
     $this->trainerService = $trainerService;
+  }
+
+  public function index(Request $request){
+    $trainers = Trainer::with('user')->get();
+    $services = ProvidedService::pluck('name', 'id');
+    $work_fields =WorkField::pluck('name','id');
+    $ratings =  TrainerRating::get();
+    return view('user.trainer.index',compact('trainers','services','work_fields','ratings'));
   }
 
   public function showRegistrationForm($id)
@@ -44,7 +55,7 @@ class TrainerController extends Controller
 public function completeRegister(completeRegisterRequest $request, $id)
 {
     $validated = $request->validated();
-    
+
     $response = $this->trainerService->completeRegister($validated, $id);
 
     if ($response['success']) {
@@ -57,6 +68,6 @@ public function completeRegister(completeRegisterRequest $request, $id)
                ->withErrors(['error' => $response['msg']]);
     }
 }
-  
+
 
 }

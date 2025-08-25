@@ -25,7 +25,7 @@ class UserInfolist
                 TextEntry::make('userType.type')
                     ->numeric(),
                 TextEntry::make('bio'),
-                TextEntry::make('country.name_ar')
+                TextEntry::make('country.name')
                     ->label('country')
                     ->numeric(),
                 TextEntry::make('city'),

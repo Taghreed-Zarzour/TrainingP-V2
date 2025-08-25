@@ -48,7 +48,7 @@ class AssistantForm
                 Select::make('nationality')
                     ->label('Nationalities')
                     ->multiple()
-                    ->options(fn () => Country::pluck('name_ar', 'id')->toArray())
+                    ->options(fn () => Country::pluck('name', 'id')->toArray())
                     ->columnSpanFull()
                     ->required()
                     ->saveRelationshipsUsing(function ($state) {

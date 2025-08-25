@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User\Assistant;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssistantRequests\completeRegisterRequest;
+use App\Models\Assistant;
 use App\Models\Country;
 use App\Models\EducationLevel;
 use App\Models\ExperienceArea;
@@ -22,6 +23,14 @@ class AssistantController extends Controller
     {
         $this->assistantService = $assistantService;
     }
+
+    public function index(Request $request){
+        $assistants = Assistant::with('user')->get();
+        $services = ProvidedService::pluck('name', 'id');
+        $experience_areas =ExperienceArea::pluck('name','id');
+        return view('user.assistant.index',compact('assistants','services','experience_areas'));
+      }
+
 
     public function showRegistrationForm($id)
     {

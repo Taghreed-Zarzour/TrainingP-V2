@@ -59,7 +59,7 @@ class OrganizationForm
                         Select::make('country_id')
                             ->label('Country')
                             ->options(
-                                Country::pluck('name_ar', 'id')->toArray()
+                                Country::pluck('name', 'id')->toArray()
                             )
                             ->reactive()
                             ->required(),
