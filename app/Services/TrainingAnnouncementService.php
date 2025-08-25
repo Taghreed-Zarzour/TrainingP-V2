@@ -25,9 +25,9 @@ class TrainingAnnouncementService
         )
         ->where('status', 'online')
         ->get();
+        
 
         $announced = [];
-
         foreach ($allPrograms as $program) {
             // ✅ Call the method from the other service
             $completion = $this->trainingProgramServices->calculateCompletion($program);
