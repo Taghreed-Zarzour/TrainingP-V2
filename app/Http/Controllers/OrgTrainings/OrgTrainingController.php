@@ -80,8 +80,7 @@ class OrgTrainingController extends Controller
       DB::commit();
 
       // رسالة نجاح مختلفة للإنشاء والتحديث
-      $message = $isEditMode ? 'تم تحديث المعلومات الأساسية بنجاح' : 'تم حفظ المعلومات الأساسية بنجاح';
-      return redirect()->route('orgTraining.goals', $orgTraining->id)->with('success', $message);
+      return redirect()->route('orgTraining.goals', $orgTraining->id);
     } catch (\Exception $e) {
       DB::rollBack();
       \Log::error('فشل تخزين معلومات التدريب: ' . $e->getMessage());
@@ -296,21 +295,30 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
             }
         }
 
-        // 6. Process new file
-        $newFile = null;
-        if ($trainingFileInput) {
-            $originalName = pathinfo($trainingFileInput->getClientOriginalName(), PATHINFO_FILENAME);
-            $extension = $trainingFileInput->getClientOriginalExtension();
+  // 6. Process new file
+$newFile = null;
+if ($trainingFileInput) {
+    $originalName = pathinfo($trainingFileInput->getClientOriginalName(), PATHINFO_FILENAME);
+    $extension = $trainingFileInput->getClientOriginalExtension();
 
-            // Sanitize filename and convert to camel case
-            $sanitizedFileName = preg_replace('/[^a-zA-Z0-9\s]/', '', $originalName);
-            $camelCaseFileName = str_replace(' ', '', ucwords(str_replace('_', ' ', $sanitizedFileName)));
+    $sanitizedFileName = preg_replace('/[^a-zA-Z0-9\s]/', '', $originalName);
+    $camelCaseFileName = str_replace(' ', '', ucwords(str_replace('_', ' ', $sanitizedFileName)));
 
-            $timestamp = now()->format('Ymd_His');
-            $uniqueFilename = $camelCaseFileName . '_' . $timestamp . '.' . $extension;
+    $timestamp = now()->format('Ymd_His');
+    $uniqueFilename = $camelCaseFileName . '_' . $timestamp . '.' . $extension;
 
-            $newFile = $trainingFileInput->storeAs('training/files', $uniqueFilename, 'public');
-        }
+    $newFile = $trainingFileInput->storeAs('training/files', $uniqueFilename, 'public');
+}
+
+// بعد إنشاء كل التفاصيل أو قبلها، احفظ الملفات
+if ($newFile || $fileToKeep) {
+    $orgTrainingFile = new OrgTrainingDetailFile([
+        'org_training_program_id' => $orgTraining->id,
+        'training_files' => $newFile ?? $fileToKeep,
+    ]);
+    $orgTraining->files()->save($orgTrainingFile);
+}
+
 
         // 7. Create new details
         foreach ($programTitles as $trainingIndex => $programTitle) {
@@ -324,12 +332,7 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
                 'num_of_hours' => ($schedulesLater[$trainingIndex] ?? false) ? ($numOfHours[$trainingIndex] ?? null) : null,
             ]);
 
-            // 8. Create a record for the training file
-            $orgTrainingDetailFile = new OrgTrainingDetailFile([
-                'org_training_program_id' => $orgTraining->id,
-                'training_files' => $newFile ?? $fileToKeep,
-            ]);
-            $orgTrainingDetail->files()->save($orgTrainingDetailFile);
+
 
             // 9. Create schedules if needed
             if (!($schedulesLater[$trainingIndex] ?? false)) {
@@ -599,8 +602,8 @@ public function showReviewForm($orgTrainingId)
         'details',
         'programType',
         'assistants',
-    ])->findOrFail($orgTrainingId)
-    ->where('status','online');
+    ])->findOrFail($orgTrainingId);
+
 
 
     // الحصول على إعدادات التسجيل

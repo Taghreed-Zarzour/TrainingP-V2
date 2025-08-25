@@ -157,7 +157,7 @@
             <div class="info-section">
                 <h1 class="training-title m-0">{{ $program->title }}</h1>
                 <p class="trainer-name">المدرب: {{ $trainer->getTranslation('name', 'ar') }}
-                    {{ $trainer->trainer->getTranslation('last_name', 'ar') }}
+                    {{-- {{ $trainer->trainer->getTranslation('last_name', 'ar') }} --}}
 
 
                 </p>

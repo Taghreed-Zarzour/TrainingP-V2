@@ -666,7 +666,7 @@
                         </div>
                         <div class="input-group">
                             <button type="submit" class="pbtn pbtn-main piconed">
-                                <span>تأكيد نشر التدريب</span>
+                                <span>تأكيد نشر المسار التدريبي</span>
                                 <img src="{{ asset('images/arrow-left.svg') }}" alt="">
                             </button>
                         </div>

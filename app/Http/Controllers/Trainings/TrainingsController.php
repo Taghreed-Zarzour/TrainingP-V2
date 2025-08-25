@@ -149,6 +149,7 @@ $diffInSeconds = $now->diffInSeconds($deadline);
     public function index()
     {
         $programsResponse = $this->trainingAnnouncementService->index();
+
         $programs = $programsResponse['data'] ?? [];
         foreach ($programs as $program) {
             $minutes = 0;

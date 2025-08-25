@@ -67,7 +67,29 @@
                                 <span class="slider"></span>
                             </label>
                         </div>
-
+<!-- إضافة قسم لعدد الساعات والجلسات -->
+<div class="session-details-container" id="session-details" style="display: none;">
+    <div class="input-group-2col">
+        <div class="input-group">
+            <label>عدد الجلسات</label>
+<input type="number" name="num_of_session" min="1"
+    placeholder="مثال: 5" 
+    value="{{ old('num_of_session', $num_of_session ?? '') }}">
+@error('num_of_session')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+        <div class="input-group">
+            <label>عدد الساعات</label>
+<input type="number" name="num_of_hours" min="1" step="1"
+    placeholder="مثال: 10" 
+    value="{{ old('num_of_hours', isset($num_of_hours) ? number_format($num_of_hours, 0, '.', '') : '') }}">
+            @error('num_of_hours')
+                <span class="error-message">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
+</div>
                         <div class="session-fields-container">
                             @php
                                 // إذا لم يتم تحديد "تحديد الجلسات لاحقاً"، فأضف جلسة واحدة على الأقل
@@ -537,31 +559,37 @@
             });
 
             // التحكم في خيار "تحديد الجلسات لاحقًا"
-            const schedulesSwitch = document.getElementById('schedules_later');
-            const sessionContainer = document.querySelector('.session-fields-container');
-            const addSessionBtn = document.getElementById('add-session-btn');
-            const form = document.getElementById('publish-training-4-form');
+// التحكم في خيار "تحديد الجلسات لاحقًا"
+const schedulesSwitch = document.getElementById('schedules_later');
+const sessionContainer = document.querySelector('.session-fields-container');
+const addSessionBtn = document.getElementById('add-session-btn');
+const sessionDetailsContainer = document.getElementById('session-details'); // إضافة هذا السطر
+const form = document.getElementById('publish-training-4-form');
 
-            function toggleSessionFields() {
-                if (schedulesSwitch.checked) {
-                    sessionContainer.style.display = 'none';
-                    addSessionBtn.style.display = 'none';
-                } else {
-                    sessionContainer.style.display = 'block';
-                    addSessionBtn.style.display = 'inline-flex';
 
-                    // إذا لم تكن هناك جلسات معروضة، أضف جلسة واحدة
-                    if (sessionContainer.querySelectorAll('.session-group').length === 0) {
-                        document.getElementById('add-session-btn').click();
-                    }
-                }
-            }
+        
+function toggleSessionFields() {
+    if (schedulesSwitch.checked) {
+        sessionContainer.style.display = 'none';
+        addSessionBtn.style.display = 'none';
+        sessionDetailsContainer.style.display = 'block'; // إظهار حقول عدد الساعات والجلسات
+    } else {
+        sessionContainer.style.display = 'block';
+        addSessionBtn.style.display = 'inline-flex';
+        sessionDetailsContainer.style.display = 'none'; // إخفاء حقول عدد الساعات والجلسات
+        // إذا لم تكن هناك جلسات معروضة، أضف جلسة واحدة
+        if (sessionContainer.querySelectorAll('.session-group').length === 0) {
+            document.getElementById('add-session-btn').click();
+        }
+    }
+}
 
-            // استدعاء الدالة عند تحميل الصفحة
-            toggleSessionFields();
+// استدعاء الدالة عند تحميل الصفحة
+toggleSessionFields();
 
-            // استدعاء الدالة عند تغيير قيمة الخانة
-            schedulesSwitch.addEventListener('change', toggleSessionFields);
+// استدعاء الدالة عند تغيير قيمة الخانة
+schedulesSwitch.addEventListener('change', toggleSessionFields);
+
 
             // تحديث الحقول المخفية قبل إرسال النموذج
             form.addEventListener('submit', function(e) {

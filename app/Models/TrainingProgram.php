@@ -15,6 +15,8 @@ class TrainingProgram extends Model
         'user_id',
         'status',
         'schedules_later',
+            'num_of_session', 
+    'num_of_hours', 
     ];
 
     protected $casts = [
@@ -31,10 +33,34 @@ class TrainingProgram extends Model
         return $this->hasOne(TrainingDetail::class);
     }
 
-    public function assistants()
-    {
-        return $this->hasMany(trainingAssistantManagement::class);
+public function assistants()
+{
+    return $this->hasOne(trainingAssistantManagement::class);
+}
+
+// دالة مساعدة للحصول على جميع المدربين
+public function getAllTrainers()
+{
+    $trainers = [];
+    
+    if ($this->assistants) {
+        $trainers = $this->assistants->getAllTrainers();
     }
+    
+    return $trainers;
+}
+
+// دالة مساعدة للحصول على جميع المساعدين
+public function getAllAssistants()
+{
+    $assistants = [];
+    
+    if ($this->assistants) {
+        $assistants = $this->assistants->getAllAssistants();
+    }
+    
+    return $assistants;
+}
 
     public function sessions()
     {
