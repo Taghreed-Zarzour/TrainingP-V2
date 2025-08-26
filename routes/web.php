@@ -271,15 +271,6 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
     Route::get('/completed/{trainingId}', [OrgTrainingController::class, 'showCompletionPage'])->name('orgTrainings.completed');
 
   });
-
-  Route::get('/organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTraining.Show');
-
-
-
-
-
-
-
 });
 
 Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');
