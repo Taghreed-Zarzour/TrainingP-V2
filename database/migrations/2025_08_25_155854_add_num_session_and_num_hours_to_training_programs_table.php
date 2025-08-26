@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('training_programs', function (Blueprint $table) {
-            $table->enum('status',['online','stopped'])->default('stopped');
+            // إضافة حقول عدد الساعات والجلسات بعد حقل schedules_later
+            $table->integer('num_of_session')->nullable()->after('schedules_later');
+            $table->decimal('num_of_hours', 5, 1)->nullable()->after('num_of_session');
         });
     }
 
@@ -22,7 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('training_programs', function (Blueprint $table) {
-            //
+            // حذف الحقول في حالة التراجع عن الترحيل
+            $table->dropColumn(['num_of_session', 'num_of_hours']);
         });
     }
 };

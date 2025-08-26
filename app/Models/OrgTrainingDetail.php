@@ -35,4 +35,6 @@ protected $casts = [
     {
         return $this->belongsTo(User::class, 'trainer_id');
     }
+
+
 }

@@ -85,5 +85,10 @@ class OrgTrainingProgram extends Model
         return $this->belongsTo(Country::class);
     }
 
+// App\Models\OrgTrainingProgram.php
+public function files()
+{
+    return $this->hasMany(OrgTrainingDetailFile::class, 'org_training_program_id');
+}
 
 }

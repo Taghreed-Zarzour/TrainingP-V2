@@ -67,7 +67,14 @@
                         <hr />
                         
                         <div class="input-group mt-3">
-                            <label>المدرب المشارك</label>
+                            @if (!(auth()->user()->userType?->type === 'مؤسسة'))
+                                <label>المدرب المشارك</label>
+                                <div class="sub-label">اختر مدرب مشارك واحد فقط</div>
+                            @else
+                                <label>المدربون المشاركون</label>
+                                <div class="sub-label">يمكنك اختيار مجموعة من المدربين</div>
+                            @endif
+                            
                             <div class="trainers" name="trainer_ids[]">
                                 @foreach ($availableTrainers as $trainer)
                                     @if (in_array($trainer->id, $currentTrainers))
@@ -87,16 +94,24 @@
                                     @endif
                                 @endforeach
                             </div>
-                            <div class="sub-label">اذكر اسم المدرب المشارك المسؤول عن تنفيذ التدريب إلى جانب المدرب الرئيسي</div>
-                            <select class="custom-singleselect-profile" data-input-name="trainer_ids[]" data-placeholder="ابحث عن مستخدم..." data-max-selection="1">
+                            
+                            <select class="custom-singleselect-profile" 
+                                    data-input-name="trainer_ids[]" 
+                                    data-placeholder="ابحث عن مستخدم..." 
+                                    data-max-selection="{{ auth()->user()->userType?->type === 'مؤسسة' ? '0' : '1' }}">
                                 <option value="" disabled selected>ابحث عن مستخدم...</option>
                                 @foreach ($availableTrainers as $trainer)
                                     @if (!in_array($trainer->id, $currentTrainers) && $trainer->id !== Auth::id())
-                                        <option value="{{ $trainer->id }}" data-id="{{ $trainer->id }}" data-name="{{ $trainer->getTranslation('name', 'ar') }} {{ optional($trainer->trainer)->getTranslation('last_name', 'ar') }}" data-email="{{ $trainer->email }}" data-image="{{ $trainer->photo ? asset('storage/' . $trainer->photo) : asset('images/icons/user.svg') }}">
+                                        <option value="{{ $trainer->id }}" 
+                                                data-id="{{ $trainer->id }}" 
+                                                data-name="{{ $trainer->getTranslation('name', 'ar') }} {{ optional($trainer->trainer)->getTranslation('last_name', 'ar') }}" 
+                                                data-email="{{ $trainer->email }}" 
+                                                data-image="{{ $trainer->photo ? asset('storage/' . $trainer->photo) : asset('images/icons/user.svg') }}">
                                         </option>
                                     @endif
                                 @endforeach
                             </select>
+                            
                             <button type="button" class="add-more-btn" style="display: none">
                                 <img src="{{ asset('images/icons/plus-main.svg') }}" />
                                 <span>إضافة المدرب إلى التدريب</span>
@@ -106,7 +121,14 @@
                         <hr />
                         
                         <div class="input-group mt-3">
-                            <label>مساعد المدرب / الميسر</label>
+                            @if (!(auth()->user()->userType?->type === 'مؤسسة'))
+                                <label>مساعد المدرب / الميسر</label>
+                                <div class="sub-label">اختر مساعد واحد فقط</div>
+                            @else
+                                <label>مساعدو المدرب / الميسرون</label>
+                                <div class="sub-label">يمكنك اختيار مجموعة من المساعدين</div>
+                            @endif
+                            
                             <div class="trainers" name="assistant_ids[]">
                                 @foreach ($availableAssistants as $assistant)
                                     @if (in_array($assistant->id, $currentAssistants))
@@ -126,16 +148,24 @@
                                     @endif
                                 @endforeach
                             </div>
-                            <div class="sub-label">اذكر اسم مساعد المدرب أو الميسر الذي سيكون مسؤولًا عن تنظيم العملية التدريبية وتعزيز التفاعل مع المتدربين.</div>
-                            <select class="custom-singleselect-profile" data-input-name="assistant_ids[]" data-placeholder="ابحث عن مستخدم..." data-max-selection="1">
+                            
+                            <select class="custom-singleselect-profile" 
+                                    data-input-name="assistant_ids[]" 
+                                    data-placeholder="ابحث عن مستخدم..." 
+                                    data-max-selection="{{ auth()->user()->userType?->type === 'مؤسسة' ? '0' : '1' }}">
                                 <option value="" disabled selected>ابحث عن مستخدم...</option>
                                 @foreach ($availableAssistants as $assistant)
                                     @if (!in_array($assistant->id, $currentAssistants))
-                                        <option value="{{ $assistant->id }}" data-id="{{ $assistant->id }}" data-name="{{ $assistant->getTranslation('name', 'ar') }} {{ optional($assistant->assistant)->getTranslation('last_name', 'ar') }}" data-email="{{ $assistant->email }}" data-image="{{ $assistant->photo ? asset('storage/' . $assistant->photo) : asset('images/icons/user.svg') }}">
+                                        <option value="{{ $assistant->id }}" 
+                                                data-id="{{ $assistant->id }}" 
+                                                data-name="{{ $assistant->getTranslation('name', 'ar') }} {{ optional($assistant->assistant)->getTranslation('last_name', 'ar') }}" 
+                                                data-email="{{ $assistant->email }}" 
+                                                data-image="{{ $assistant->photo ? asset('storage/' . $assistant->photo) : asset('images/icons/user.svg') }}">
                                         </option>
                                     @endif
                                 @endforeach
                             </select>
+                            
                             <button type="button" class="add-more-btn" style="display: none">
                                 <img src="{{ asset('images/icons/plus-main.svg') }}" />
                                 <span>إضافة المساعد إلى التدريب</span>

@@ -194,7 +194,7 @@ class TrainingProgramServices
         
         // 2. التحقق من التفاصيل
         if ($program->detail) {
-            $detailFields = ['learning_outcomes', 'requirements', 'target_audience', 'benefits'];
+            $detailFields = ['learning_outcomes', 'requirements',  'benefits'];
             $detailCompleted = 0;
             
             foreach ($detailFields as $field) {

@@ -271,8 +271,8 @@
             </div>
             <div class="col-md-6 text-center text-md-end footer-bottom">
                 <div class="d-flex justify-content-end footer-bottom-links footer-links">
-                    <a href="#" class="ms-3">سياسة الخصوصية</a>
-                    <a href="#">شروط الاستخدام</a>
+                    <a href="{{ route('terms') }}" class="ms-3">سياسة الخصوصية</a>
+                    <a href="{{ route('terms') }}">شروط الاستخدام</a>
                 </div>
             </div>
         </div>

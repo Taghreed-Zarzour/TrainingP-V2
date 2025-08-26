@@ -65,8 +65,8 @@ public function storeBasicInformation(StoreBasicInformationRequest $request, $tr
         DB::commit();
         
         // رسالة نجاح مختلفة للإنشاء والتحديث
-        $message = $isEditMode ? 'تم تحديث المعلومات الأساسية بنجاح' : 'تم حفظ المعلومات الأساسية بنجاح';
-        return redirect()->route('training.goals', $training->id)->with('success', $message);
+
+        return redirect()->route('training.goals', $training->id);
     } catch (\Exception $e) {
         DB::rollBack();
         \Log::error('فشل تخزين معلومات التدريب: ' . $e->getMessage());
@@ -107,8 +107,9 @@ public function updateBasicInformation(StoreBasicInformationRequest $request, $t
 
 
   // ======= الخطوة 2: أهداف التدريب =======
-  public function showGoalsForm($trainingId)
-  {
+// ======= الخطوة 2: أهداف التدريب =======
+public function showGoalsForm($trainingId)
+{
     $training = TrainingProgram::findOrFail($trainingId);
     $trainingDetail = $training->detail()->firstOrNew();
     $educationLevels = EducationLevel::all();
@@ -116,17 +117,28 @@ public function updateBasicInformation(StoreBasicInformationRequest $request, $t
     $countries = Country::all();
     $jobPositions = JobPositionEnum::cases();
 
+    // تحضير بيانات الفئة المستهدفة
+    $targetAudienceData = [
+        'education_level_id' => json_decode($trainingDetail->education_level_id ?? '[]', true),
+        'work_status' => json_decode($trainingDetail->work_status ?? '[]', true),
+        'work_sector_id' => json_decode($trainingDetail->work_sector_id ?? '[]', true),
+        'job_position' => json_decode($trainingDetail->job_position ?? '[]', true),
+        'country_id' => json_decode($trainingDetail->country_id ?? '[]', true),
+    ];
+
     return view('trainings.goals', [
-      'training' => $training,
-      'learning_outcomes' => json_decode($trainingDetail->learning_outcomes ?? '[]', true),
-      'requirements' => json_decode($trainingDetail->requirements ?? '[]', true),
-      'benefits' => json_decode($trainingDetail->benefits ?? '[]', true),
-      'educationLevels' => $educationLevels, 
-      'workSectors' => $workSectors, 
-      'countries' => $countries,
-      'jobPositions' => $jobPositions
+        'training' => $training,
+        'trainingDetail' => $trainingDetail,
+        'learning_outcomes' => json_decode($trainingDetail->learning_outcomes ?? '[]', true),
+        'requirements' => json_decode($trainingDetail->requirements ?? '[]', true),
+        'benefits' => json_decode($trainingDetail->benefits ?? '[]', true),
+        'educationLevels' => $educationLevels, 
+        'workSectors' => $workSectors, 
+        'countries' => $countries,
+        'jobPositions' => $jobPositions,
+        'targetAudienceData' => $targetAudienceData
     ]);
-  }
+}
   public function storeGoals(StoreTrainingGoalsRequest $request, $trainingId)
   {
     DB::beginTransaction();
@@ -162,99 +174,93 @@ public function updateBasicInformation(StoreBasicInformationRequest $request, $t
   }
 
   // ======= الخطوة 3: إدارة الفريق =======
-  public function showTeamForm($trainingId)
-  {
+public function showTeamForm($trainingId)
+{
     $training = TrainingProgram::findOrFail($trainingId);
-
     $availableTrainers = User::whereHas('userType', function ($query) {
-      $query->where('type', 'مدرب');
+        $query->where('type', 'مدرب');
     })->get();
-
     $availableAssistants = User::whereHas('userType', function ($query) {
-      $query->where('type', 'مساعد');
+        $query->where('type', 'مساعد');
     })->get();
-
+    
     // الحصول على المدربين والمساعدين الحاليين
-    $currentTeam = $training->assistants()->get();
-    $currentTrainers = $currentTeam->whereNotNull('trainer_id')->pluck('trainer_id')->toArray();
-    $currentAssistants = $currentTeam->whereNotNull('assistant_id')->pluck('assistant_id')->toArray();
-
+    $teamManagement = $training->assistants()->first();
+    
+    $currentTrainers = [];
+    $currentAssistants = [];
+    
+    if ($teamManagement) {
+        $currentTrainers = $teamManagement->getAllTrainers();
+        $currentAssistants = $teamManagement->getAllAssistants();
+    }
+    
     return view('trainings.team', [
-      'training' => $training,
-      'availableTrainers' => $availableTrainers,
-      'availableAssistants' => $availableAssistants,
-      'currentTrainers' => $currentTrainers,
-      'currentAssistants' => $currentAssistants,
+        'training' => $training,
+        'availableTrainers' => $availableTrainers,
+        'availableAssistants' => $availableAssistants,
+        'currentTrainers' => $currentTrainers,
+        'currentAssistants' => $currentAssistants,
     ]);
-  }
+}
 
-  public function storeTeam(StoreTrainingAssistantRequest $request, $trainingId)
-  {
+public function storeTeam(StoreTrainingAssistantRequest $request, $trainingId)
+{
     DB::beginTransaction();
     try {
-      $training = TrainingProgram::findOrFail($trainingId);
-
-      // حذف الفريق القديم
-      $training->assistants()->delete();
-
-      // إضافة الفريق الجديد
-      $this->processTeamMembers($training, $request->trainer_ids, $request->assistant_ids);
-
-      DB::commit();
-      return redirect()->route('training.schedule', $training->id);
-    } catch (\Exception $e) {
-      DB::rollBack();
-      \Log::error('فشل تخزين فريق التدريب: ' . $e->getMessage());
-      return redirect()->back()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
-    }
-  }
-
-  protected function processTeamMembers($training, $trainerIds, $assistantIds)
-  {
-    // حالة وجود مدربين ومساعدين معاً
-    if (!empty($trainerIds)) {
-      foreach ($trainerIds as $trainerId) {
-        if (!empty($assistantIds)) {
-          foreach ($assistantIds as $assistantId) {
-            TrainingAssistantManagement::create([
-              'training_program_id' => $training->id,
-              'trainer_id' => $trainerId,
-              'assistant_id' => $assistantId,
-            ]);
-          }
-        } else {
-          TrainingAssistantManagement::create([
-            'training_program_id' => $training->id,
-            'trainer_id' => $trainerId,
-            'assistant_id' => null,
-          ]);
+        $training = TrainingProgram::findOrFail($trainingId);
+        $userType = auth()->user()->userType?->type;
+        
+        // البحث عن سجل الفريق الحالي أو إنشاء سجل جديد
+        $teamManagement = $training->assistants()->first();
+        
+        if (!$teamManagement) {
+            $teamManagement = new trainingAssistantManagement();
+            $teamManagement->training_program_id = $training->id;
         }
-      }
-    } elseif (!empty($assistantIds)) {
-      foreach ($assistantIds as $assistantId) {
-        TrainingAssistantManagement::create([
-          'training_program_id' => $training->id,
-          'trainer_id' => null,
-          'assistant_id' => $assistantId,
-        ]);
-      }
+        
+        // التحقق من نوع المستخدم
+        if ($userType !== 'مؤسسة') {
+            // للمدرب: يمكن اختيار مدرب مشارك واحد ومساعد واحد فقط
+            $teamManagement->trainer_id = !empty($request->trainer_ids) ? $request->trainer_ids[0] : null;
+            $teamManagement->assistant_id = !empty($request->assistant_ids) ? $request->assistant_ids[0] : null;
+            $teamManagement->trainer_ids = null;
+            $teamManagement->assistant_ids = null;
+        } else {
+            // للمؤسسة: يمكن اختيار مجموعة من المدربين والمساعدين
+            $teamManagement->trainer_id = null;
+            $teamManagement->assistant_id = null;
+            $teamManagement->trainer_ids = !empty($request->trainer_ids) ? $request->trainer_ids : null;
+            $teamManagement->assistant_ids = !empty($request->assistant_ids) ? $request->assistant_ids : null;
+        }
+        
+        $teamManagement->save();
+        
+        DB::commit();
+        return redirect()->route('training.schedule', $training->id);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        \Log::error('فشل تخزين فريق التدريب: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
     }
-  }
+}
+
 
   // ======= الخطوة 4: جدولة الجلسات =======
-  public function showScheduleForm($trainingId)
-  {
+public function showScheduleForm($trainingId)
+{
     $training = TrainingProgram::findOrFail($trainingId);
-
     // تحويل قيمة schedules_later إلى قيمة يمكن استخدامها في النموذج
     $schedulesLater = $training->schedules_later ? 1 : 0;
-
+    
     return view('trainings.schedule', [
-      'training' => $training,
-      'sessions' => $training->sessions ?? collect(), // تأكد من أنه مجموعة حتى لو كان null
-      'schedules_later' => $schedulesLater, // تمرير القيمة المحولة
+        'training' => $training,
+        'sessions' => $training->sessions ?? collect(), // تأكد من أنه مجموعة حتى لو كان null
+        'schedules_later' => $schedulesLater, // تمرير القيمة المحولة
+        'num_of_session' => $training->num_of_session, // تمرير عدد الجلسات
+        'num_of_hours' => $training->num_of_hours, // تمرير عدد الساعات
     ]);
-  }
+}
 public function storeSchedule(StoreSchedulingRequest $request, $trainingId)
 {
     DB::beginTransaction();
@@ -263,6 +269,13 @@ public function storeSchedule(StoreSchedulingRequest $request, $trainingId)
         
         // تحديث قيمة schedules_later
         $training->schedules_later = $request->boolean('schedules_later');
+        
+        // تحديث عدد الساعات والجلسات إذا تم تحديد الجلسات لاحقًا
+        if ($training->schedules_later) {
+            $training->num_of_session = $request->num_of_session;
+            $training->num_of_hours = $request->num_of_hours;
+        }
+        
         $training->save();
         
         // حذف الجدول القديم دائماً (إلا إذا تم اختيار تحديد لاحق)
@@ -503,7 +516,7 @@ public function publishTraining($trainingId)
     try {
       $training = TrainingProgram::findOrFail($trainingId);
             //يجب فحص حقل مطلوب من كل خطوة بعدها جعل التدريب منشور للتاكد انه مر على الخطوات
-      $training->update(['status' => 'published']);
+      $training->update(['status' => 'online']);
 
       return redirect()->route('training.completed', $training->id)
         ->with('success', 'تم نشر البرنامج التدريبي بنجاح');

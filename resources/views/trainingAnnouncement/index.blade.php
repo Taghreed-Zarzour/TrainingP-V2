@@ -1,9 +1,6 @@
 @extends('frontend.layouts.master')
-
 @section('title', 'التدريبات')
-
 @section('content')
-
     <!-- ✅ السطر الأول: صورة يسار + نص يمين -->
     <div class="hero-section">
         <div class="hero-text">
@@ -19,12 +16,10 @@
                 انطلق الآن، وتعلّم ما يفتح لك أبواب المستقبل.
             </p>
         </div>
-
         <div class="hero-image">
             <img src="{{ asset('images/cources/cources.svg') }}" alt="Training Image" />
         </div>
     </div>
-
     <!-- ✅ السطر الثاني: البحث + زر الفلترة -->
     <div class="container-fluid py-4 bg-white">
         <div class="row justify-content-center">
@@ -112,7 +107,6 @@
                                 </option>
                             @endforeach
                         </select>
-
                     </div>
                 </div>
                 <!-- أزرار -->
@@ -133,7 +127,7 @@
                         <svg width="22" height="22" viewBox="0 0 22 22" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
-                                d="M15.0374 11.0001C15.0375 11.3085 14.9767 11.6139 14.8586 11.8988C14.7405 12.1837 14.5674 12.4425 14.3491 12.6604L8.73743 18.2696C8.61471 18.3812 8.4537 18.4413 8.28785 18.4373C8.122 18.4334 7.96404 18.3657 7.84679 18.2483C7.72953 18.1309 7.66199 17.9729 7.65819 17.8071C7.65439 17.6412 7.71462 17.4803 7.82637 17.3576L13.4346 11.7468C13.633 11.5482 13.7444 11.279 13.7444 10.9984C13.7444 10.7177 13.633 10.4485 13.4346 10.2499L7.82551 4.64078C7.71154 4.51847 7.64949 4.35669 7.65244 4.18954C7.65539 4.02238 7.72311 3.86289 7.84132 3.74468C7.95954 3.62646 8.11903 3.55875 8.28618 3.5558C8.45334 3.55285 8.61511 3.61489 8.73743 3.72887L14.3491 9.33798C14.5676 9.55609 14.7408 9.81519 14.8589 10.1004C14.9771 10.3856 15.0377 10.6914 15.0374 11.0001Z"
+                                d="M15.0374 11.0001C15.0375 11.3085 14.9767 11.6139 14.8586 11.8988C14.7405 12.1837 14.5674 12.4425 14.3491 12.6604L8.73743 18.2696C8.61471 18.3812 8.4537 18.4413 8.28785 18.4373C8.122 18.4334 7.96404 18.3657 7.84679 18.2483C7.72953 18.1309 7.61462 17.4803 7.61537 17.3576L13.4346 11.7468C13.633 11.5482 13.7444 11.279 13.7444 10.9984C13.7444 10.7177 13.633 10.4485 13.4346 10.2499L7.82551 4.64078C7.71154 4.51847 7.64949 4.35669 7.65244 4.18954C7.65539 4.02238 7.72311 3.86289 7.84132 3.74468C7.95954 3.62646 8.11903 3.55875 8.28618 3.5558C8.45334 3.55285 8.61511 3.61489 8.73743 3.72887L14.3491 9.33798C14.5676 9.55609 14.7408 9.81519 14.8589 10.1004C14.9771 10.3856 15.0377 10.6914 15.0374 11.0001Z"
                                 fill="white" />
                         </svg>
                     </button>
@@ -150,10 +144,8 @@
         </div>
         @if (empty($programs))
             <div class="empty-state text-center py-5 col-12" style="justify-self: center;">
-
                 <h5 class="fw-bold mb-3">لا توجد برامج تدريبية متاحة حالياً</h5>
                 <p class="text-muted mb-4">يمكنك متابعتنا لمعرفة أحدث البرامج التدريبية عند توفرها</p>
-
                 @auth
                     @if (in_array(auth()->user()->user_type_id, [1, 4]))
                         <a href="{{ route('training.create') }}" class="btn custom-btn">
@@ -209,7 +201,6 @@
                                                     @php
                                                         // التحقق من وجود مدة التدريب
                                                         $durationText = '';
-
                                                         if (
                                                             isset($program->total_duration_hours) &&
                                                             $program->total_duration_hours > 0
@@ -219,7 +210,6 @@
                                                             $minutes = round(
                                                                 ($program->total_duration_hours - $hours) * 60,
                                                             );
-
                                                             if ($hours > 0 && $minutes > 0) {
                                                                 $durationText =
                                                                     $hours . ' ساعة و ' . $minutes . ' دقيقة';
@@ -251,11 +241,9 @@
                                                                     $totalMinutes += $sessionMinutes;
                                                                 }
                                                             }
-
                                                             if ($totalMinutes > 0) {
                                                                 $hours = floor($totalMinutes / 60);
                                                                 $minutes = $totalMinutes % 60;
-
                                                                 if ($hours > 0 && $minutes > 0) {
                                                                     $durationText =
                                                                         $hours . ' ساعة و ' . $minutes . ' دقيقة';
@@ -266,7 +254,6 @@
                                                                 }
                                                             }
                                                         }
-
                                                         // إذا لم يتم حساب المدة، عرض رسالة مناسبة
                                                         if (empty($durationText)) {
                                                             if ($program->schedules_later) {
@@ -275,7 +262,6 @@
                                                                 $durationText = 'قيد الإعداد';
                                                             }
                                                         }
-
                                                         echo $durationText;
                                                     @endphp
                                                 </li>
@@ -320,7 +306,137 @@
                                                         {{ $program->AdditionalSetting->currency ?? '' }}
                                                     </span>
                                                 @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
 
+    {{-- قسم المسارات التدريبية المتاحة --}}
+    <div class="container-fluid my-5" dir="rtl">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold">المسارات التدريبية المتاحة</h4>
+            @if (!empty($allOrgPrograms))
+                <div class="d-flex gap-2">
+                    <button class="arrow-btn" id="orgCarouselPrev">
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M15.0374 11.0001C15.0375 11.3085 14.9767 11.6139 14.8586 11.8988C14.7405 12.1837 14.5674 12.4425 14.3491 12.6604L8.73743 18.2696C8.61471 18.3812 8.4537 18.4413 8.28785 18.4373C8.122 18.4334 7.96404 18.3657 7.84679 18.2483C7.72953 18.1309 7.61462 17.4803 7.61537 17.3576L13.4346 11.7468C13.633 11.5482 13.7444 11.279 13.7444 10.9984C13.7444 10.7177 13.633 10.4485 13.4346 10.2499L7.82551 4.64078C7.71154 4.51847 7.64949 4.35669 7.65244 4.18954C7.65539 4.02238 7.72311 3.86289 7.84132 3.74468C7.95954 3.62646 8.11903 3.55875 8.28618 3.5558C8.45334 3.55285 8.61511 3.61489 8.73743 3.72887L14.3491 9.33798C14.5676 9.55609 14.7408 9.81519 14.8589 10.1004C14.9771 10.3856 15.0377 10.6914 15.0374 11.0001Z"
+                                fill="white" />
+                        </svg>
+                    </button>
+                    <button class="arrow-btn" id="orgCarouselNext">
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M6.96264 11.0001C6.96254 11.3085 7.02328 11.6139 7.14138 11.8988C7.25948 12.1837 7.43261 12.4425 7.65088 12.6604L13.2626 18.2696C13.3853 18.3812 13.5463 18.4413 13.7122 18.4373C13.878 18.4334 14.036 18.3657 14.1532 18.2483C14.2705 18.1309 14.338 17.9729 14.3418 17.8071C14.3456 17.6412 14.2854 17.4803 14.1736 17.3576L8.56537 11.7468C8.367 11.5482 8.25557 11.279 8.25557 10.9984C8.25557 10.7177 8.367 10.4485 8.56537 10.2499L14.1745 4.64078C14.2885 4.51847 14.3505 4.35669 14.3476 4.18954C14.3446 4.02238 14.2769 3.86289 14.1587 3.74468C14.0405 3.62646 13.881 3.55875 13.7138 3.5558C13.5467 3.55285 13.3849 3.61489 13.2626 3.72887L7.65088 9.33798C7.43241 9.55609 7.25915 9.81519 7.14105 10.1004C7.02295 10.3856 6.96232 10.6914 6.96264 11.0001Z"
+                                fill="white" />
+                        </svg>
+                    </button>
+                </div>
+            @endif
+        </div>
+        @if (empty($allOrgPrograms))
+            <div class="empty-state text-center py-5 col-12" style="justify-self: center;">
+                <h5 class="fw-bold mb-3">لا توجد مسارات تدريبية متاحة حالياً</h5>
+                <p class="text-muted mb-4">يمكنك متابعتنا لمعرفة أحدث المسارات التدريبية عند توفرها</p>
+                @auth
+                    @if (in_array(auth()->user()->user_type_id, [1, 4]))
+                        <a href="{{ route('training.create') }}" class="btn custom-btn">
+                            إنشاء مسار تدريبي جديد
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('register') }}" class="btn signup-btn m-2">إنشاء حساب</a>
+                    <a href="{{ route('login') }}" class="btn signup-btn m-2">تسجيل الدخول</a>
+                @endauth
+            </div>
+        @else
+            <div class="carousel-wrapper position-relative">
+                <div class="overflow-hidden" style="width: 100%;">
+                    <div class="d-flex flex-nowrap" id="orgCardCarousel" style="scroll-behavior: smooth; overflow-x: auto;">
+                        @foreach ($allOrgPrograms as $program)
+                            <div class="card-slide p-2">
+                                {{-- <a href="{{ route('show_org_training_program', $program->id) }}" --}}
+
+                                <a href="#"
+                                    class="text-decoration-none text-dark">
+                                    <div class="card h-100 shadow-sm rounded-4 position-relative">
+                                        <div class="d-flex flex-column justify-content-between image-custom">
+                                            <span
+                                                class="badge-position">{{ $program->trainingClassification->name ?? 'مسار تدريبي' }}</span>
+                                            <img src="{{ $program->profile_image
+                                                ? asset('storage/' . $program->profile_image)
+                                                : asset('images/cources/training-default-img.svg') }}"
+                                                class="card-img-top" alt="صورة المسار التدريبي">
+                                        </div>
+                                        <div
+                                            class="card-body d-flex flex-column justify-content-between gap-1 align-items-start">
+                                            <h6 class="fw-bold">{{ $program->title }}</h6>
+                                            <div class="trainer-info mt-2 mb-2">
+                                                @php
+                                                    $organization = $program->organization;
+                                                    $orgPhoto =
+                                                        $organization && $organization->user->photo
+                                                            ? asset('storage/' . $organization->user->photo)
+                                                            : asset('images/icons/user.svg');
+                                                @endphp
+                                                <a href="{{ route('show_organization_profile', ['id' => $organization->id]) }}"
+                                                    style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
+                                                    <img class="trainer-img" src="{{ $orgPhoto }}"
+                                                        alt="صورة المؤسسة" />
+                                                    <span>
+                                                        {{ optional($organization->user)->getTranslation('name', 'ar') }}
+                                                    </span>
+                                                </a>
+                                            </div>
+                                            <ul class="list-unstyled d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                <li class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset('images/cources/clock.svg') }}" alt="المدة">
+                                                    @php
+                                                        // عرض عدد التدريبات في المسار
+                                                        $trainingCount = $program->details ? $program->details->count() : 0;
+                                                        echo $trainingCount . ' تدريب';
+                                                    @endphp
+                                                </li>
+                                                <li class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset('images/cources/location.svg') }}"
+                                                        alt="الموقع">
+                                                    {{ $program->city ?? '---' }}
+                                                    {{ $program->country
+                                                        ? ', ' . $program->country->name
+                                                        : '' }}
+                                                </li>
+                                                @php
+                                                    \Carbon\Carbon::setLocale('ar');
+                                                @endphp
+                                                <li class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset('images/cources/calender.svg') }}"
+                                                        alt="تاريخ الانتهاء">
+                                                    ينتهي التسجيل بـ
+                                                    {{ $program->registrationRequirements && $program->registrationRequirements->application_deadline
+                                                        ? \Carbon\Carbon::parse($program->registrationRequirements->application_deadline)->locale('ar')->translatedFormat('j/F/Y')
+                                                        : '---' }}
+                                                </li>
+                                            </ul>
+                                            <div class="text-start mt-2">
+                                                @if (!$program->registrationRequirements || $program->registrationRequirements->is_free || $program->registrationRequirements->cost == 0)
+                                                    <span class="price-tag price-free">مجاني</span>
+                                                @else
+                                                    <span class="price-tag">
+                                                        {{ fmod($program->registrationRequirements->cost, 1) == 0
+                                                            ? number_format($program->registrationRequirements->cost, 0)
+                                                            : number_format($program->registrationRequirements->cost, 2) }}
+                                                        {{ $program->registrationRequirements->currency ?? '' }}
+                                                    </span>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -334,43 +450,16 @@
     </div>
 @endsection
 
-
-    {{-- <p>org taraining programs</p>
-
-    @foreach ($allOrgPrograms as $program)
-    <div class="mb-4 border p-3 rounded">
-        <h5>{{ $program->title }}</h5>
-        <h5>{{ $program->trainingClassification->name }}</h5>
-
-        <h6>{{ $program->organization->user->name }}</h6 >
-
-        @if ($program->registrationRequirements)
-            <p>Free: {{ $program->registrationRequirements->is_free ? 'Yes' : 'No' }}</p>
-            <p>Cost: {{ $program->registrationRequirements->cost }}</p>
-            <p>deadline: {{ $program->registrationRequirements->application_deadline }}</p>
-            <p>location: {{ $program->country->name }} , {{ $program->city }}</p>
-
-        @else
-            <p class="text-muted">Registration details not available.</p>
-        @endif
-        <p>num of trainings : {{ $program->details->count() }} </p>
-
-    </div>
-    @endforeach --}}
-
-
-
-
 @section('scripts')
     <script src="{{ asset('js/singleselect.js') }}"></script>
     <script>
-        //التنقل بين الكروت عن طريق الأزرار
+        //التنقل بين الكروت عن طريق الأزرار للبرامج التدريبية
         const container = document.getElementById('cardCarousel');
         const slides = Array.from(container.querySelectorAll('.card-slide'));
         const prevBtn = document.getElementById('carouselPrev');
         const nextBtn = document.getElementById('carouselNext');
         let currentIndex = 0;
-
+        
         function scrollToCurrentCard() {
             slides[currentIndex].scrollIntoView({
                 behavior: 'smooth',
@@ -378,15 +467,46 @@
                 block: 'nearest'
             });
         }
+        
         nextBtn.addEventListener('click', () => {
             currentIndex = (currentIndex + 1) % slides.length;
             scrollToCurrentCard();
         });
+        
         prevBtn.addEventListener('click', () => {
             currentIndex = (currentIndex - 1 + slides.length) % slides.length;
             scrollToCurrentCard();
         });
+        
         // للتأكد من البداية
         scrollToCurrentCard();
+        
+        //التنقل بين الكروت عن طريق الأزرار للمسارات التدريبية
+        const orgContainer = document.getElementById('orgCardCarousel');
+        const orgSlides = Array.from(orgContainer.querySelectorAll('.card-slide'));
+        const orgPrevBtn = document.getElementById('orgCarouselPrev');
+        const orgNextBtn = document.getElementById('orgCarouselNext');
+        let orgCurrentIndex = 0;
+        
+        function scrollToCurrentOrgCard() {
+            orgSlides[orgCurrentIndex].scrollIntoView({
+                behavior: 'smooth',
+                inline: 'start',
+                block: 'nearest'
+            });
+        }
+        
+        orgNextBtn.addEventListener('click', () => {
+            orgCurrentIndex = (orgCurrentIndex + 1) % orgSlides.length;
+            scrollToCurrentOrgCard();
+        });
+        
+        orgPrevBtn.addEventListener('click', () => {
+            orgCurrentIndex = (orgCurrentIndex - 1 + orgSlides.length) % orgSlides.length;
+            scrollToCurrentOrgCard();
+        });
+        
+        // للتأكد من البداية
+        scrollToCurrentOrgCard();
     </script>
 @endsection

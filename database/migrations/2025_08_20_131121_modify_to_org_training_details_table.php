@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('org_training_details', function (Blueprint $table) {
 
-          $table->boolean('schedule_later')->default(false)->after('trainer_id');
+          $table->boolean(column: 'schedule_later')->default(false)->after('trainer_id');
 
           $table->unsignedBigInteger('num_of_session')->nullable()->default(null)->after('schedule_later');;
 

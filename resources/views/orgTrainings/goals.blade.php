@@ -1,6 +1,46 @@
 @extends('frontend.layouts.master')
 @section('title', 'أهداف التدريب')
 @section('content')
+    <style>
+        /* إضافة هذه الأنماط إلى قسم الـ style */
+        .error-border {
+            border: 1px solid red !important;
+            border-radius: 12px !important;
+        }
+        .error-message {
+            color: red;
+            font-size: 13px;
+            margin-top: 5px;
+            display: block;
+        }
+        .custom-select-container .error-border {
+            border-color: red;
+        }
+        .custom-multiselect.error-border {
+            border: 1px solid red !important;
+            border-radius: 12px !important;
+        }
+        .remove-input-btn {
+            background: none;
+            border: none;
+            color: red;
+            font-size: 18px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .custom-select-container.error-border {
+    border: 1px solid red !important;
+    border-radius: 12px !important;
+}
+
+.custom-select-container.error-border .custom-multiselect {
+    border-color: transparent !important;
+}
+.error-border .custom-multiselect-wrapper{
+    border-color: transparent !important;
+
+}
+    </style>
     <main>
         <div class="publish-training-page">
             <div class="grid">
@@ -63,7 +103,7 @@
                             @endphp
                             @foreach ($learningOutcomes as $index => $outcome)
                                 <div class="{{ $index < 4 ? 'input-without-remove' : 'input-with-remove' }}">
-                                    <input type="text" name="learning_outcomes[]" required value="{{ $outcome }}"
+                                    <input type="text" name="learning_outcomes[]" value="{{ $outcome }}"
                                         placeholder="مثال: سيتمكّن المشاركون من تطوير خارطة طريق لمنتج رقمي بناءً على تحليل احتياجات السوق والمستخدمين. " />
                                     @error('learning_outcomes.' . $index)
                                         <p class="error-message">{{ $message }}</p>
@@ -110,12 +150,20 @@
                                     <div class="custom-select-container">
                                         <select name="work_status[]" id="employment-status-select"
                                             class="custom-multiselect" multiple>
-                                            <option value="working" 
-                                                {{ old('work_status', $trainingGoal->work_status) === 'working' ? 'selected' : '' }}>
+                                            <option value="working"
+                                                {{ in_array('working', old('work_status',
+                                                    is_array($trainingGoal->work_status)
+                                                        ? $trainingGoal->work_status
+                                                        : json_decode($trainingGoal->work_status ?? '[]', true)
+                                                )) ? 'selected' : '' }}>
                                                 يعمل
                                             </option>
                                             <option value="not_working"
-                                                {{ old('work_status', $trainingGoal->work_status) === 'not_working' ? 'selected' : '' }}>
+                                                {{ in_array('not_working', old('work_status',
+                                                    is_array($trainingGoal->work_status)
+                                                        ? $trainingGoal->work_status
+                                                        : json_decode($trainingGoal->work_status ?? '[]', true)
+                                                )) ? 'selected' : '' }}>
                                                 لا يعمل
                                             </option>
                                         </select>
@@ -124,7 +172,6 @@
                                         <p class="error-message">{{ $message }}</p>
                                     @enderror
                                 </div>
-
                                 <!-- السؤال الثالث: القطاع -->
                                 <div class="input-group mt-3">
                                     <label>القطاع</label>
@@ -162,7 +209,7 @@
                                                         )) ? 'selected' : '' }}>
                                                     {{ $job->value }}
                                                 </option>
-                                            @endforeach
+                                            @endforeach>
                                         </select>
                                     </div>
                                     @error('job_position')
@@ -184,7 +231,7 @@
                                                         )) ? 'selected' : '' }}>
                                                     {{ $country->name }}
                                                 </option>
-                                            @endforeach
+                                            @endforeach>
                                         </select>
                                     </div>
                                     @error('country_id')
@@ -214,135 +261,252 @@
 @section('scripts')
     <script src="{{ asset('js/mutliselect.js') }}"></script>
     <script src="{{ asset('js/singleselect.js') }}"></script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // إضافة حقول جديدة
-            document.querySelectorAll(".add-more-btn").forEach(function(btn) {
-                btn.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    const group = btn.closest(".input-group");
-                    const inputs = group.querySelectorAll('input[type="text"]');
-                    const lastInput = inputs[inputs.length - 1];
-
-                    // إنشاء حقل جديد
-                    const newInputDiv = document.createElement("div");
-                    newInputDiv.className = "input-with-remove";
-
-                    // إنشاء عنصر الإدخال
-                    const newInput = document.createElement("input");
-                    newInput.type = "text";
-                    newInput.name = lastInput.name;
-                    newInput.required = lastInput.required;
-                    newInput.placeholder = lastInput.placeholder;
-
-                    // إنشاء زر الحذف
-                    const removeBtn = document.createElement("button");
-                    removeBtn.type = "button";
-                    removeBtn.className = "remove-input-btn";
-                    removeBtn.innerHTML = "&times;";
-                    removeBtn.onclick = function() {
-                        newInputDiv.remove();
-                    };
-
-                    // تجميع العناصر
-                    newInputDiv.appendChild(newInput);
-                    newInputDiv.appendChild(removeBtn);
-
-                    // إضافة رسالة الخطأ إن وجدت
-                    const errorMsg = document.createElement("p");
-                    errorMsg.className = "error-message";
-                    newInputDiv.appendChild(errorMsg);
-
-                    // إدراج الحقل الجديد قبل زر الإضافة
-                    group.insertBefore(newInputDiv, btn);
-                });
-            });
-
-            // إضافة أزرار الحذف للحقول الموجودة مسبقًا
-            document.querySelectorAll(".input-with-remove").forEach(function(div) {
-                if (!div.querySelector(".remove-input-btn")) {
-                    const removeBtn = document.createElement("button");
-                    removeBtn.type = "button";
-                    removeBtn.className = "remove-input-btn";
-                    removeBtn.innerHTML = "&times;";
-                    removeBtn.onclick = function() {
-                        div.remove();
-                    };
-                    div.appendChild(removeBtn);
-                }
-            });
-
-            // التحقق من الصحة قبل الإرسال
-            document.getElementById('training-goals-form').addEventListener('submit', function(e) {
-                let isValid = true;
-
-                // التحقق من وجود 4 نتائج تعلم على الأقل
-                const learningOutcomes = document.querySelectorAll('input[name^="learning_outcomes"]');
-                if (learningOutcomes.length < 4) {
-                    isValid = false;
-                    alert('يجب إدخال 4 نتائج تعلم على الأقل');
-                }
-
-                // التحقق من تحديد خيار واحد على الأقل في كل سؤال من أسئلة الفئة المستهدفة
-                const targetAudienceSelects = [
-                    'education_level',
-                    'employment_status',
-                    'sector',
-                    'job_level',
-                    'nationality_region'
-                ];
-
-                targetAudienceSelects.forEach(function(selectName) {
-                    const select = document.querySelector(`select[name="${selectName}[]"]`);
-                    if (select && select.selectedOptions.length === 0) {
-                        isValid = false;
-                        select.classList.add('error-border');
-
-                        // إضافة رسالة خطأ إذا لم تكن موجودة
-                        let errorMsg = select.parentNode.nextElementSibling;
-                        if (!errorMsg || !errorMsg.classList.contains('error-message')) {
-                            errorMsg = document.createElement("p");
-                            errorMsg.className = "error-message";
-                            errorMsg.textContent = "يجب تحديد خيار واحد على الأقل";
-                            select.parentNode.parentNode.insertBefore(errorMsg, select.parentNode
-                                .nextSibling);
-                        }
-                    } else if (select) {
-                        select.classList.remove('error-border');
-                        // إزالة رسالة الخطأ إذا كانت موجودة
-                        let errorMsg = select.parentNode.nextElementSibling;
-                        if (errorMsg && errorMsg.classList.contains('error-message')) {
-                            errorMsg.remove();
-                        }
-                    }
-                });
-
-                // التحقق من الحقول المطلوبة
-                document.querySelectorAll('input[required]').forEach(input => {
-                    if (!input.value.trim()) {
-                        isValid = false;
-                        input.classList.add('error-border');
-                        const errorMsg = input.nextElementSibling;
-                        if (!errorMsg || !errorMsg.classList.contains('error-message')) {
-                            const errorElement = document.createElement('p');
-                            errorElement.className = 'error-message';
-                            errorElement.textContent = 'هذا الحقل مطلوب';
-                            input.parentNode.appendChild(errorElement);
-                        }
-                    } else {
-                        input.classList.remove('error-border');
-                        const errorMsg = input.nextElementSibling;
-                        if (errorMsg && errorMsg.classList.contains('error-message')) {
-                            errorMsg.remove();
-                        }
-                    }
-                });
-
-                if (!isValid) {
-                    e.preventDefault();
-                }
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById("training-goals-form");
+        
+        // إضافة حقول جديدة
+        document.querySelectorAll(".add-more-btn").forEach(function(btn) {
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                const group = btn.closest(".input-group");
+                const inputs = group.querySelectorAll('input[type="text"]');
+                const lastInput = inputs[inputs.length - 1];
+                
+                // إنشاء حقل جديد
+                const newInputDiv = document.createElement("div");
+                newInputDiv.className = "input-with-remove";
+                
+                // إنشاء عنصر الإدخال
+                const newInput = document.createElement("input");
+                newInput.type = "text";
+                newInput.name = lastInput.name;
+                newInput.required = lastInput.required;
+                newInput.placeholder = lastInput.placeholder;
+                
+                // إنشاء زر الحذف
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.className = "remove-input-btn";
+                removeBtn.innerHTML = "&times;";
+                removeBtn.onclick = function() {
+                    newInputDiv.remove();
+                };
+                
+                // تجميع العناصر
+                newInputDiv.appendChild(newInput);
+                newInputDiv.appendChild(removeBtn);
+                
+                // إضافة رسالة الخطأ إن وجدت
+                const errorMsg = document.createElement("p");
+                errorMsg.className = "error-message";
+                newInputDiv.appendChild(errorMsg);
+                
+                // إدراج الحقل الجديد قبل زر الإضافة
+                group.insertBefore(newInputDiv, btn);
             });
         });
+        
+        // إضافة أزرار الحذف للحقول الموجودة مسبقًا
+        document.querySelectorAll(".input-with-remove").forEach(function(div) {
+            if (!div.querySelector(".remove-input-btn")) {
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.className = "remove-input-btn";
+                removeBtn.innerHTML = "&times;";
+                removeBtn.onclick = function() {
+                    div.remove();
+                };
+                div.appendChild(removeBtn);
+            }
+        });
+        
+        // دالة إظهار رسائل الخطأ
+        function showError(input, message) {
+            // إزالة أي رسائل خطأ سابقة
+            const errorId = `error-${input.name.replace(/[^a-zA-Z0-9]/g, '-')}`;
+            const existingError = document.getElementById(errorId);
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // إضافة الحدود الحمراء
+            if (input.tagName === 'SELECT' && input.multiple) {
+                // لحقول الاختيار المتعددة، أضف الحدود الحمراء للحاوية الخارجية
+                const container = input.closest('.custom-select-container');
+                if (container) {
+                    container.classList.add("error-border");
+                }
+            } else {
+                input.classList.add("error-border");
+            }
+            
+            // إنشاء رسالة الخطأ
+            const errorMsg = document.createElement("p");
+            errorMsg.className = "error-message";
+            errorMsg.textContent = message;
+            errorMsg.id = errorId;
+            
+            // تحديد مكان إضافة رسالة الخطأ
+            const parentContainer = input.closest('.input-group') || input.closest('.custom-select-container');
+            if (parentContainer) {
+                parentContainer.appendChild(errorMsg);
+            } else {
+                input.parentNode.insertBefore(errorMsg, input.nextSibling);
+            }
+        }
+        
+        // دالة التحقق من حقول مخرجات البرنامج
+        function validateLearningOutcomes() {
+            const learningOutcomes = document.querySelectorAll('input[name^="learning_outcomes"]');
+            let isValid = true;
+            let filledOutcomes = 0;
+            
+            learningOutcomes.forEach((input, index) => {
+                // إزالة أي رسائل خطأ سابقة
+                const errorId = `error-${input.name.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
+                const existingError = document.getElementById(errorId);
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                input.classList.remove("error-border");
+                
+                // التحقق من أن الحقل ليس فارغًا
+                if (!input.value.trim()) {
+                    isValid = false;
+                    
+                    // إضافة حدود حمراء
+                    input.classList.add("error-border");
+                    
+                    // إضافة رسالة الخطأ تحت الحقل
+                    const errorMsg = document.createElement("p");
+                    errorMsg.className = "error-message";
+                    errorMsg.textContent = 'هذا الحقل مطلوب';
+                    errorMsg.id = errorId;
+                    
+                    // البحث عن الحاوية المناسبة لإضافة رسالة الخطأ
+                    const parentContainer = input.closest('.input-without-remove') || input.closest('.input-with-remove');
+                    if (parentContainer) {
+                        parentContainer.appendChild(errorMsg);
+                    } else {
+                        input.parentNode.insertBefore(errorMsg, input.nextSibling);
+                    }
+                } else {
+                    filledOutcomes++;
+                }
+            });
+            
+            // التحقق من وجود 4 نتائج تعلم على الأقل (بدون رسالة عامة)
+            if (filledOutcomes < 4) {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // دالة التحقق من صحة الحقل
+        function validateField(field) {
+            let isValid = true;
+            
+            // إزالة أي رسائل خطأ سابقة
+            const errorId = `error-${field.name.replace(/[^a-zA-Z0-9]/g, '-')}`;
+            const existingError = document.getElementById(errorId);
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // إزالة الحدود الحمراء
+            if (field.tagName === 'SELECT' && field.multiple) {
+                const container = field.closest('.custom-select-container');
+                if (container) {
+                    container.classList.remove("error-border");
+                }
+            } else {
+                field.classList.remove("error-border");
+            }
+            
+            // التحقق من حقول الإدخال النصية
+            if (field.tagName === 'INPUT' && field.type === 'text' && field.hasAttribute('required')) {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    showError(field, 'هذا الحقل مطلوب');
+                }
+            }
+            
+            // التحقق من القوائم المنسدلة
+            if (field.tagName === 'SELECT' && field.multiple) {
+                if (field.selectedOptions.length === 0) {
+                    isValid = false;
+                    showError(field, 'يجب تحديد خيار واحد على الأقل');
+                }
+            }
+            
+            return isValid;
+        }
+        
+        // دالة التحقق الشامل عند الإرسال
+        function validateForm() {
+            let isValid = true;
+            
+            // التحقق من حقول مخرجات البرنامج
+            if (!validateLearningOutcomes()) {
+                isValid = false;
+            }
+            
+            // التحقق من حقول الفئة المستهدفة
+            const targetAudienceSelects = [
+                'education_level_id[]',
+                'work_status[]',
+                'work_sector_id[]',
+                'job_position[]',
+                'country_id[]'
+            ];
+            
+            targetAudienceSelects.forEach(function(selectName) {
+                const select = document.querySelector(`select[name="${selectName}"]`);
+                if (select) {
+                    if (!validateField(select)) {
+                        isValid = false;
+                    }
+                }
+            });
+            
+            return isValid;
+        }
+        
+        // إضافة أحداث التحقق للحقول عند فقدان التركيز
+        document.querySelectorAll('input[required]').forEach(input => {
+            input.addEventListener('blur', function() {
+                validateField(this);
+            });
+        });
+        
+        document.querySelectorAll('select[multiple]').forEach(select => {
+            select.addEventListener('change', function() {
+                validateField(this);
+            });
+        });
+        
+        // التحقق من صحة النموذج عند الإرسال
+        form.addEventListener("submit", function(e) {
+            // التحقق من جميع الحقول عند الإرسال
+            const isValid = validateForm();
+            
+            // منع إرسال النموذج إذا كان غير صالح
+            if (!isValid) {
+                e.preventDefault();
+                console.log("❌ الفورم فيه حقول ناقصة، الإرسال توقف");
+                
+                // التمرير إلى أول حقل غير صالح
+                const firstError = document.querySelector('.error-border');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else {
+                console.log("✅ الفورم جاهز، رح ينرسل");
+            }
+        });
+    });
     </script>
 @endsection
