@@ -16,8 +16,8 @@ class OrgTrainingSchedule extends Model
         'session_end_time',
     ];
 
-    public function trainingDetail()
+    public function trainingProgram()
     {
-        return $this->belongsTo(OrgTrainingDetail::class, 'org_training_detail_id');
+        return $this->belongsTo(OrgTrainingDetail::class, 'org_training_program_id');
     }
 }

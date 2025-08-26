@@ -91,5 +91,9 @@ public function files()
 {
     return $this->hasMany(OrgTrainingDetailFile::class, 'org_training_program_id');
 }
+public function trainingSchedules()
+    {
+        return $this->hasMany(OrgTrainingSchedule::class, 'org_training_prgram_id');
+    }
 
 }
