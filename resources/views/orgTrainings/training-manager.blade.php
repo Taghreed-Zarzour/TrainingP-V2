@@ -103,6 +103,100 @@
             display: flex;
             gap: 0.4rem;
         }
+
+        #editPopup {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.popup-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+.popup-content {
+    position: relative;
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 400px;
+    max-width: 90%;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    animation: fadeIn 0.2s ease;
+}
+
+.popup-close {
+    position: absolute;
+    top: 10px; right: 12px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #2980b9;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+.btn-secondary {
+    background: #7f8c8d;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #616e70;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
     </style>
 </head>
 <body>
@@ -110,6 +204,31 @@
     {{-- Program Header --}}
     <div class="card">
         <h1>{{ $OrgProgram->title }}</h1>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="{{ asset('storage/' . $OrgProgram->registrationRequirements->training_image) }}" alt="Training Image" width="200" height="200">
+
+            <div style="margin-top: 10px;">
+                <!-- Edit Button -->
+                <form action="{{ route('orgImage.update', $OrgProgram->registrationRequirements->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <input type="file" name="training_image" required>
+                    <button type="submit" class="btn btn-primary">Update Image</button>
+                </form>
+
+
+                <!-- Delete Button -->
+                <form action="{{ route('orgImage.delete', $OrgProgram->registrationRequirements->id)  }}" method="POST" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this image?')">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <p><strong>Description:</strong> {{ $OrgProgram->program_description }}</p>
         <p><strong>Level:</strong> {{ $OrgProgram->trainingLevel->name }}</p>
         <p><strong>Max trainees:</strong> {{ $OrgProgram->registrationRequirements->max_trainees }}</p>
@@ -134,7 +253,7 @@
                     <div class="program-title">{{ $program->program_title }}</div>
                     <div class="action-buttons">
                         <a href="" class="btn btn-edit">Edit</a>
-                        <form action="{{ route('org.training.manager.destroy', $program->id)}}" method="POST" style="display:inline;">
+                        <form action="{{ route('orgTrainingsManager.destroy', $program->id)}}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-delete">Delete</button>
@@ -143,23 +262,40 @@
                 </div>
                 <div class="trainer">👤 Trainer: {{ $program->Trainer->name }}</div>
 
-                <table>
+                <table class="table">
                     <thead>
                         <tr>
                             <th>Date</th>
                             <th>Time</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($program->trainingSchedules as $session)
-                            <tr>
-                                <td>{{ \Carbon\Carbon::parse($session->session_date)->format('d M Y') }}</td>
-                                <td>{{ $session->session_start_time }} - {{ $session->session_end_time }}</td>
+                            <tr id="row-{{ $session->id }}">
+                                <td class="session-date" data-raw-date="{{ $session->session_date }}">
+                                    {{ \Carbon\Carbon::parse($session->session_date)->format('d M Y') }}
+                                </td>
+
+                                <td class="session-time">{{ $session->session_start_time }} - {{ $session->session_end_time }}</td>
+                                <td>
+                                    <span class="tr-status-badge
+                                        @if ($sessionStatuses[$session->id] == 'مكتمل') tr-status-completed
+                                        @elseif($sessionStatuses[$session->id] == 'قيد التقدم') tr-status-in-progress
+                                        @else tr-status-not-started @endif">
+                                        {{ $sessionStatuses[$session->id] ?? 'غير محدد' }}
+                                    </span>
+                                </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="" class="btn btn-edit">Edit</a>
-                                        <form action="" method="POST" style="display:inline;">
+                                        <!-- Edit button -->
+                                        <button type="button" class="btn btn-edit" data-session-id="{{ $session->id }}">
+                                            Edit
+                                        </button>
+
+                                        <!-- Delete button -->
+                                        <form action="{{ route('orgSessions.destroy', $session->id) }}" method="POST" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-delete">Delete</button>
@@ -170,9 +306,41 @@
                         @endforeach
                     </tbody>
                 </table>
+
+
+                </div>
+            @endforeach
+        </div>
+
+
+<!-- Popup container -->
+<div id="editPopup" style="display:none;">
+    <div class="popup-overlay"></div>
+    <div class="popup-content">
+        <button id="closePopup" class="popup-close">&times;</button>
+        <h3>Edit Session</h3>
+        <form action="{{ route('orgSessions.update', $session->id) }}" id="popupForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" name="session_date" class="form-control" required>
             </div>
-        @endforeach
+            <div class="form-group">
+                <label>Start Time</label>
+                <input type="time" name="session_start_time" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>End Time</label>
+                <input type="time" name="session_end_time" class="form-control" required>
+            </div>
+            <div class="popup-actions">
+                <button type="button" id="cancelPopup" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
     </div>
+</div>
 
 
     <div class="card">
@@ -258,6 +426,120 @@
 
     </div>
 
+
+
+
+    <div class="card p-4">
+        <h1 class="mb-4">ميسرو البرنامج</h1>
+
+        <!-- Add Assistant Button -->
+        <div class="mb-3 text-end">
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#assistantsList" aria-expanded="false" aria-controls="assistantsList">
+                إضافة ميسر
+            </button>
+        </div>
+        <br>
+
+
+       <!-- Hidden List -->
+<div class="collapse" id="assistantsList">
+    <div class="card card-body">
+        <h5 class="mb-3">اختر ميسر:</h5>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>الاسم</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($assistants as $assistant)
+                    <tr>
+                        <td>{{ $assistant->name }} {{ $assistant->last_name }}</td>
+                        <td>
+                            <form action="{{ route('orgAssistant.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="assistant_id" value="{{ $assistant->id }}">
+                                <input type="hidden" name="orgTraining_id" value="{{ $OrgProgram->id }}">
+                                <button type="submit" class="btn btn-success btn-sm">اختيار</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
+        @if($OrgProgram->assistantUsers->count())
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>الاسم</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>رقم الهاتف</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($OrgProgram->assistantUsers as $assistant)
+                        <tr>
+                            <td>{{ $assistant->name }} {{ $assistant->assistant->last_name }}</td>
+                            <td>{{ $assistant->email }}</td>
+                            <td>{{ $assistant->phone_number }}</td>
+                            <td>
+                                <!-- Delete Button -->
+                                <form action="{{ route('orgAssistant.destroy', ['assistant_id'=> $assistant->id, 'orgTraining_id'=>$OrgProgram->id]) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="btn btn-sm"
+                                            style="background-color: #dc3545; color: white;"
+                                            onclick="return confirm('هل أنت متأكد من حذف هذا الميسر؟')">
+                                        حذف
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p>لا توجد ميسرو.</p>
+        @endif
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const popup = document.getElementById('editPopup');
+            const form = document.getElementById('popupForm');
+            const closeBtn = document.getElementById('closePopup');
+            const cancelBtn = document.getElementById('cancelPopup');
+
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const sessionId = this.dataset.sessionId;
+                    const row = document.querySelector(`#row-${sessionId}`);
+
+                    const dateStr = row.querySelector('.session-date').dataset.rawDate || row.querySelector('.session-date').innerText;
+                    const timeRange = row.querySelector('.session-time').innerText.split(' - ');
+                    const startTime = timeRange[0];
+                    const endTime = timeRange[1];
+
+                    form.querySelector('[name="session_date"]').value = dateStr; // YYYY-MM-DD
+                    form.querySelector('[name="session_start_time"]').value = startTime;
+                    form.querySelector('[name="session_end_time"]').value = endTime;
+                    popup.style.display = 'flex';
+                });
+            });
+
+            // Close popup
+            closeBtn.addEventListener('click', () => popup.style.display = 'none');
+            cancelBtn.addEventListener('click', () => popup.style.display = 'none');
+            popup.addEventListener('click', e => { if(e.target === e.currentTarget) popup.style.display = 'none'; });
+        });
+        </script>
 
 
 

@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\OrgTrainings;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\orgTrainingProgram\storeOrgAssistantRequset;
+use App\Http\Requests\orgTrainingProgram\updateSchedulingRequest;
 use App\Models\Assistant;
 use App\Models\Country;
 use App\Models\EducationLevel;
 use App\Models\Enrollment;
 use App\Models\Language;
+use App\Models\OrgAssistantManagement;
+use App\Models\OrgRegistrationAndRequirement;
 use App\Models\OrgTrainingDetail;
 use App\Models\OrgTrainingProgram;
+use App\Models\OrgTrainingSchedule;
 use App\Models\programType;
 use App\Models\schedulingTrainingSessions;
 use App\Models\SessionAttendance;
@@ -24,6 +29,7 @@ use App\Services\OrgTrainingManagerService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class OrgTrainingManagerController extends Controller
 {
@@ -53,7 +59,7 @@ class OrgTrainingManagerController extends Controller
             'details',
             'goals',
             'registrationRequirements',
-            'assistants'
+            'assistants',
         )->where('status', 'online')->findOrFail($id);
 
         $trainingClassificationIds =  $OrgProgram->org_training_classification_id;
@@ -68,15 +74,6 @@ class OrgTrainingManagerController extends Controller
       // المشاهدات
     //   $program->increment('views');
 
-//       $programTypes = programType::pluck('name', 'id');
-//       $languages = Language::pluck('name', 'id');
-//       $classifications = TrainingClassification::pluck('name', 'id');
-//       $levels = trainingLevel::pluck('name', 'id');
-//       $countries = Country::pluck('name', 'id');
-
-//       // المدرب
-//       $trainerId = TrainingProgram::where('id', $id)->value('user_id');
-//       $trainer = User::find($trainerId);
 
 //       // المسجلون
 //       $participantIds = Enrollment::where('training_programs_id', $id)->pluck('trainee_id');
@@ -85,12 +82,6 @@ class OrgTrainingManagerController extends Controller
 //       // المتدربون
 //       $traineeIds = Enrollment::where('training_programs_id', $id)->where('status', 'accepted')->pluck('trainee_id');
 //       $trainees = Trainee::whereIn('id', $traineeIds)->get();
-
-//       // مساعدو المدرب
-//       $assistantLinks = trainingAssistantManagement::where('training_program_id', $id)->with('assistant')->get();
-//       $assistants = $assistantLinks->pluck('assistant')->filter(); // filter() تحذف كل null
-
-//       $availableAssistants = Assistant::all();
 
 //       //نسبة الحضور
 //       $totalSessions = schedulingTrainingSessions::where('training_program_id', $id)->pluck('id');
@@ -109,41 +100,37 @@ class OrgTrainingManagerController extends Controller
 //         $attendanceStats[$trainee->id] = $percentage;
 //       }
 
-//       //حالة الجلسة وعدد الحضور لكل جلسة
-//       $sessionStatuses = [];
-//       $sessionAttendanceCounts = [];
-//       $now = Carbon::now();
+      //حالة الجلسة لكل جلسة
+      $sessionStatuses = [];
+      $sessionAttendanceCounts = [];
+      $now = Carbon::now();
+        foreach($OrgProgram->details as $detail){
+            foreach ($detail->trainingSchedules as $session) {
+                $date = $session->session_date;
+                $startTime = $session->session_start_time;
+                $endTime = $session->session_end_time;
 
-//       foreach ($program->sessions as $session) {
-//         $date = $session->session_date;
-//         $startTime = $session->session_start_time;
-//         $endTime = $session->session_end_time;
+                $sessionStart = Carbon::createFromFormat('Y-m-d H:i:s', "$date $startTime");
+                $sessionEnd = Carbon::createFromFormat('Y-m-d H:i:s', "$date $endTime");
 
-//         $sessionStart = Carbon::createFromFormat('Y-m-d H:i:s', "$date $startTime");
-//         $sessionEnd = Carbon::createFromFormat('Y-m-d H:i:s', "$date $endTime");
+                if ($sessionEnd->lessThan($sessionStart)) {
+                $sessionEnd->addDay();
+                }
 
-//         if ($sessionEnd->lessThan($sessionStart)) {
-//           $sessionEnd->addDay();
-//         }
+                if ($now->lt($sessionStart)) {
+                $status = 'لم تبدأ';
+                } elseif ($now->between($sessionStart, $sessionEnd)) {
+                $status = 'قيد التقدم';
+                } else {
+                $status = 'مكتمل';
+                }
 
-//         if ($now->lt($sessionStart)) {
-//           $status = 'لم تبدأ';
-//         } elseif ($now->between($sessionStart, $sessionEnd)) {
-//           $status = 'قيد التقدم';
-//         } else {
-//           $status = 'مكتمل';
-//         }
+                $sessionStatuses[$session->id] = $status;
+            }
+        }
 
-//         $sessionStatuses[$session->id] = $status;
-
-
-//         $attendeeCount = SessionAttendance::where('session_id', $session->id)
-//           ->where('attended', 1)
-//           ->count();
-
-//         $sessionAttendanceCounts[$session->id] = $attendeeCount;
-//       }
-
+        //Assistants
+        $assistants= User::where('user_type_id',2)->with('assistant')->get();
 //       //نسبة الحضور العامة
 //       $totalSessionsCount = count($totalSessions);
 //       $totalTraineesCount = count($trainees);
@@ -163,14 +150,9 @@ class OrgTrainingManagerController extends Controller
         'work_sectors',
         'orgTrainingClassification',
         'education_levels',
-        // 'countries',
-        // 'trainer',
-        // 'participants',
-        // 'trainees',
-        // 'assistants',
-        // 'availableAssistants',
+        'assistants',
         // 'attendanceStats',
-        // 'sessionStatuses',
+        'sessionStatuses',
         // 'sessionAttendanceCounts',
         // 'overallAttendancePercentage',
       ));
@@ -185,6 +167,84 @@ class OrgTrainingManagerController extends Controller
       return redirect()->back()->with('deleted', true);
 
     }
+
+    public function deleteOrgSession($id){
+
+    $session = OrgTrainingSchedule::findOrFail($id);
+    $session->delete();
+
+    return redirect()->back()->with('success', 'تم حذف الجلسة بنجاح');
+    }
+
+    public function updateOrgSession(updateSchedulingRequest $request, $id){
+        $session = OrgTrainingSchedule::findOrFail($id);
+
+        $data= $request->validated();
+
+        $session->update($data);
+        $session->save();
+
+        return redirect()->back()->with('success', 'Session updated successfully.');
+    }
+
+
+    public function updateOrgImage(Request $request, $id)
+{
+    $settings = OrgRegistrationAndRequirement::findOrFail($id);
+
+    if ($request->hasFile('training_image')) {
+        $originalName = $request->file('training_image')->getClientOriginalName();
+        $path = 'training/training_image/' . $originalName;
+
+        $request->file('training_image')->storeAs('training/training_image', $originalName, 'public');
+
+        if ($settings->training_image) {
+            Storage::disk('public')->delete($settings->training_image);
+        }
+
+        $settings->training_image = $path;
+        $settings->save();
+    }
+
+    return redirect()->back()->with('success', 'Training image updated successfully.');
+}
+
+public function deleteOrgImage($id)
+{
+    $settings = OrgRegistrationAndRequirement::findOrFail($id);
+
+    if ($settings->training_image) {
+        Storage::disk('public')->delete($settings->training_image);
+        $settings->training_image = null;
+        $settings->save();
+    }
+
+    return redirect()->back()->with('success', 'Training image deleted successfully.');
+}
+
+public function deleteOrgAssistant($orgTraining_id, $assistant_id)
+{
+    $assistant = OrgAssistantManagement::where('assistant_id',$assistant_id)
+                ->where('org_training_program_id',$orgTraining_id)->first();
+
+    $assistant->delete();
+
+    return redirect()->back()->with('success', 'تم حذف الجلسة بنجاح');
+}
+
+public function storeOrgAssistant(storeOrgAssistantRequset $request)
+{
+    $data = $request->validated();
+
+    $assistantManager = OrgAssistantManagement::create([
+        'org_training_program_id' => $data['orgTraining_id'],
+        'assistant_id' => $data['assistant_id']
+    ]);
+
+    $assistantManager->save();
+
+    return redirect()->back()->with('success', 'تمت إضافة الميسر بنجاح');
+}
 
 
 
