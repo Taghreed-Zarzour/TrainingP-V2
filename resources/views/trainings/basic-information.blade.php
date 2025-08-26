@@ -1,10 +1,6 @@
 @extends('frontend.layouts.master')
 @section('title', 'معلومات البرنامج الأساسية')
-@section('css')
-    <link rel="stylesheet" href="{{ asset('css/singleselect.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/validation-styles.css') }}">
-  
-@endsection
+
 
 @section('content')
   <style>

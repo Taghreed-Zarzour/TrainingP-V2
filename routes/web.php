@@ -280,7 +280,7 @@ Route::get('/org/trainings/show/{id}',[OrgTrainingController::class, 'show'])->n
 Route::get('/org/trainings/show/program/{id}',[OrgTrainingController::class, 'showProgram'])->name('org.training.show.program');
 Route::get('/trainings/announcements/show/{id}', [TrainingsController::class, 'show'])->name('show_trainings_announcements');
 Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
-Route::get('/assistants', [AssistantController::class, 'index'])->name('trainers.index');
+Route::get('/assistants', [AssistantController::class, 'index'])->name('assistants.index');
 
 //profiles users
   Route::get('/show-trainer-profile/{id?}', [TrainerProfileController::class, 'showProfile'])->name('show_trainer_profile');

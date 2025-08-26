@@ -21,8 +21,7 @@ class StoreSchedulingRequest extends FormRequest
      */
 
   public function rules()
-{
-    return [
+{  return [
         'program_title' => 'required|array',
         'program_title.*' => 'required|string|max:255',
         'trainer_id' => 'required|array',
@@ -36,6 +35,8 @@ class StoreSchedulingRequest extends FormRequest
         'schedules' => 'nullable|array',
         'training_files' => 'nullable|array',
         'training_files.*' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,txt,jpg,jpeg,png,bmp,gif,svg,webp,mp4,mov,avi,mp3,wav,zip,rar|max:20480',
+        'existing_training_files' => 'nullable|array',
+        'existing_training_files.*' => 'nullable|string',
     ];
 }
 

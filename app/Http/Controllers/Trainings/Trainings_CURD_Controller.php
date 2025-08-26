@@ -345,13 +345,12 @@ public function storeSchedule(StoreSchedulingRequest $request, $trainingId)
       ]);
   }
 
-  public function storeSettings(StoreAdditionalSettingsRequest $request, $trainingId)
+public function storeSettings(StoreAdditionalSettingsRequest $request, $trainingId)
 {
     DB::beginTransaction();
     try {
         $training = TrainingProgram::findOrFail($trainingId);
         
-        // استخدام firstOrCreate هنا عند الحفظ فقط
         $settings = $training->AdditionalSetting()->firstOrCreate([
             'training_program_id' => $trainingId,
         ], [
@@ -361,7 +360,7 @@ public function storeSchedule(StoreSchedulingRequest $request, $trainingId)
             'max_trainees' => 20,
             'training_files' => json_encode([]),
             'welcome_message' => "شكرًا لتسجيلك في التدريب. يسعدنا أن تكون/ي جزءًا من هذا البرنامج، ونتطلع إلى رحلة مليئة بالتعلّم  والتطوير.
-سيتم مراجعة طلبك وإشعارك بالقبول أو الاعتذار في أقرب وقت، لذا تأكد/ي من متابعة بريدك الإلكتروني أو الإشعارات داخل المنصة.", // إضافة رسالة ترحيبية افتراضية
+سيتم مراجعة طلبك وإشعارك بالقبول أو الاعتذار في أقرب وقت، لذا تأكد/ي من متابعة بريدك الإلكتروني أو الإشعارات داخل المنصة.",
         ]);
         
         $data = $request->validated();
@@ -409,32 +408,52 @@ public function storeSchedule(StoreSchedulingRequest $request, $trainingId)
         return redirect()->back()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
     }
 }
-  protected function processTrainingFiles($request, $settings)
-  {
+protected function processTrainingFiles($request, $settings)
+{
     $trainingFiles = [];
-
-    // الحفاظ على الملفات الموجودة إذا لم يتم تحميل ملفات جديدة
+    
+    // الحصول على الملفات الحالية
     if ($settings->training_files) {
-      $trainingFiles = is_string($settings->training_files)
-        ? json_decode($settings->training_files, true)
-        : $settings->training_files;
+        $trainingFiles = is_string($settings->training_files)
+            ? json_decode($settings->training_files, true)
+            : $settings->training_files;
     }
-
+    
+    // حذف الملفات المحددة
+    if ($request->has('files_to_delete')) {
+        $filesToDelete = $request->files_to_delete;
+        
+        foreach ($filesToDelete as $fileToDelete) {
+            // البحث عن الملف في المصفوفة الحالية
+            $key = array_search($fileToDelete, $trainingFiles);
+            
+            if ($key !== false) {
+                // حذف الملف من التخزين
+                Storage::disk('public')->delete($trainingFiles[$key]);
+                
+                // حذف الملف من المصفوفة
+                unset($trainingFiles[$key]);
+            }
+        }
+        
+        // إعادة فهرسة المصفوفة
+        $trainingFiles = array_values($trainingFiles);
+    }
+    
     // إضافة الملفات الجديدة
     if ($request->hasFile('training_files')) {
-      foreach ($request->file('training_files') as $file) {
-$filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-$extension = $file->getClientOriginalExtension();
-$timestamp = now()->format('Ymd_His');
-$uniqueFilename = $filename . '_' . $timestamp . '.' . $extension;
-
-$path = $file->storeAs('training/files', $uniqueFilename, 'public');
-$trainingFiles[] = $path;
-      }
+        foreach ($request->file('training_files') as $file) {
+            $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $timestamp = now()->format('Ymd_His');
+            $uniqueFilename = $filename . '_' . $timestamp . '.' . $extension;
+            $path = $file->storeAs('training/files', $uniqueFilename, 'public');
+            $trainingFiles[] = $path;
+        }
     }
-
+    
     return $trainingFiles;
-  }
+}
 
   // ======= الخطوة 6: المراجعة النهائية =======
 public function showReviewForm($trainingId)

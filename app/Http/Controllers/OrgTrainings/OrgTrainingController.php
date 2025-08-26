@@ -198,8 +198,25 @@ public function showtrainingDetailForm($orgTrainingId)
     $trainings = collect();
     $schedulesLater = false;
 
-    // جمع الملفات من كل التفاصيل
+    // جمع الملفات من جدول org_training_detail_files
     $allTrainingFiles = [];
+    $trainingFilesRecord = OrgTrainingDetailFile::where('org_training_program_id', $orgTrainingId)->first();
+    
+    if ($trainingFilesRecord && $trainingFilesRecord->training_files) {
+        // معالجة البيانات سواء كانت JSON أو array أو string
+        if (is_string($trainingFilesRecord->training_files)) {
+            // محاولة تحليل JSON
+            $decoded = json_decode($trainingFilesRecord->training_files, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $allTrainingFiles = $decoded;
+            } else {
+                // إذا فشل تحليل JSON، افترض أنه مسار ملف واحد
+                $allTrainingFiles = [$trainingFilesRecord->training_files];
+            }
+        } elseif (is_array($trainingFilesRecord->training_files)) {
+            $allTrainingFiles = $trainingFilesRecord->training_files;
+        }
+    }
 
     foreach ($orgTrainingDetails as $detail) {
         $schedules = OrgTrainingSchedule::where('org_training_detail_id', $detail->id)->get();
@@ -207,14 +224,6 @@ public function showtrainingDetailForm($orgTrainingId)
 
         if ($scheduleLater) {
             $schedulesLater = true;
-        }
-
-        // جمع الملفات من هذا التفصيل
-        if ($detail->training_files) {
-            $files = is_string($detail->training_files) ? json_decode($detail->training_files, true) : $detail->training_files;
-            if (is_array($files)) {
-                $allTrainingFiles = array_merge($allTrainingFiles, $files);
-            }
         }
 
         $trainings->push([
@@ -250,8 +259,9 @@ public function showtrainingDetailForm($orgTrainingId)
         'orgTrainingDetails' => $orgTrainingDetails,
         'trainingFiles' => $allTrainingFiles, // تمرير الملفات للـ view
     ]);
-}
-public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingId)
+  }
+  
+  public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingId)
 {
     DB::beginTransaction();
     try {
@@ -263,10 +273,6 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
         // 2. Collect old files from all details
         $oldFiles = [];
         foreach ($oldDetails as $detail) {
-            if ($detail->training_files) {
-                $oldFiles[] = $detail->training_files; // Assume it's a single file path
-            }
-
             // Delete associated schedules
             OrgTrainingSchedule::where('org_training_detail_id', $detail->id)->delete();
             $detail->delete();
@@ -279,48 +285,61 @@ public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingI
         $numOfSessions = $request->num_of_session ?? [];
         $numOfHours = $request->num_of_hours ?? [];
         $schedules = $request->schedules ?? [];
-        $trainingFileInput = $request->file('training_file'); // Single file input
+        $trainingFileInputs = $request->file('training_files'); // Multiple files input
 
         // 4. Get list of files to keep
-        $fileToKeep = $request->input('existing_training_file'); // Single file input
+        $filesToKeep = $request->input('existing_training_files', []);
 
         if (!is_array($programTitles) || !is_array($trainerIds)) {
             throw new \Exception('Invalid input format for program titles or trainer IDs.');
         }
 
         // 5. Delete old files not kept
-        foreach ($oldFiles as $oldFile) {
-            if ($oldFile !== $fileToKeep) {
-                Storage::disk('public')->delete($oldFile);
+        $oldTrainingFiles = OrgTrainingDetailFile::where('org_training_program_id', $trainingId)->get();
+        foreach ($oldTrainingFiles as $oldFile) {
+            $oldFilePaths = is_string($oldFile->training_files) 
+                ? json_decode($oldFile->training_files, true) 
+                : $oldFile->training_files;
+            
+            if (is_array($oldFilePaths)) {
+                foreach ($oldFilePaths as $oldFilePath) {
+                    if (!in_array($oldFilePath, $filesToKeep)) {
+                        Storage::disk('public')->delete($oldFilePath);
+                    }
+                }
+            }
+            $oldFile->delete();
+        }
+
+        // 6. Process new files
+        $newFiles = [];
+        if ($trainingFileInputs) {
+            foreach ($trainingFileInputs as $file) {
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $extension = $file->getClientOriginalExtension();
+
+                $sanitizedFileName = preg_replace('/[^a-zA-Z0-9\s]/', '', $originalName);
+                $camelCaseFileName = str_replace(' ', '', ucwords(str_replace('_', ' ', $sanitizedFileName)));
+
+                $timestamp = now()->format('Ymd_His');
+                $uniqueFilename = $camelCaseFileName . '_' . $timestamp . '.' . $extension;
+
+                $newFile = $file->storeAs('training/files', $uniqueFilename, 'public');
+                $newFiles[] = $newFile;
             }
         }
 
-  // 6. Process new file
-$newFile = null;
-if ($trainingFileInput) {
-    $originalName = pathinfo($trainingFileInput->getClientOriginalName(), PATHINFO_FILENAME);
-    $extension = $trainingFileInput->getClientOriginalExtension();
+        // 7. Save files to org_training_detail_files table - تحويل المصفوفة إلى JSON
+        $allFiles = array_merge($filesToKeep, $newFiles);
+        
+        if (!empty($allFiles)) {
+            $orgTrainingFile = OrgTrainingDetailFile::updateOrCreate(
+                ['org_training_program_id' => $orgTraining->id],
+                ['training_files' => json_encode($allFiles)] // تحويل المصفوفة إلى JSON
+            );
+        }
 
-    $sanitizedFileName = preg_replace('/[^a-zA-Z0-9\s]/', '', $originalName);
-    $camelCaseFileName = str_replace(' ', '', ucwords(str_replace('_', ' ', $sanitizedFileName)));
-
-    $timestamp = now()->format('Ymd_His');
-    $uniqueFilename = $camelCaseFileName . '_' . $timestamp . '.' . $extension;
-
-    $newFile = $trainingFileInput->storeAs('training/files', $uniqueFilename, 'public');
-}
-
-// بعد إنشاء كل التفاصيل أو قبلها، احفظ الملفات
-if ($newFile || $fileToKeep) {
-    $orgTrainingFile = new OrgTrainingDetailFile([
-        'org_training_program_id' => $orgTraining->id,
-        'training_files' => $newFile ?? $fileToKeep,
-    ]);
-    $orgTraining->files()->save($orgTrainingFile);
-}
-
-
-        // 7. Create new details
+        // 8. Create new details
         foreach ($programTitles as $trainingIndex => $programTitle) {
             if (empty($programTitle)) continue;
 
@@ -331,8 +350,6 @@ if ($newFile || $fileToKeep) {
                 'num_of_session' => ($schedulesLater[$trainingIndex] ?? false) ? ($numOfSessions[$trainingIndex] ?? null) : null,
                 'num_of_hours' => ($schedulesLater[$trainingIndex] ?? false) ? ($numOfHours[$trainingIndex] ?? null) : null,
             ]);
-
-
 
             // 9. Create schedules if needed
             if (!($schedulesLater[$trainingIndex] ?? false)) {
@@ -597,14 +614,12 @@ public function showReviewForm($orgTrainingId)
         $orgTrainingId = $orgTrainingId->id;
     }
 
-
     $orgTraining = OrgTrainingProgram::with([
         'details',
         'programType',
         'assistants',
+        'files' // إضافة العلاقة مع ملفات التدريب
     ])->findOrFail($orgTrainingId);
-
-
 
     // الحصول على إعدادات التسجيل
     $settings = $orgTraining->registrationRequirements()->firstOrNew([
@@ -642,6 +657,66 @@ public function showReviewForm($orgTrainingId)
             : $settings->training_image;
     }
 
+  // الحصول على ملفات التدريب من الجدول الجديد
+$training_files = [];
+if ($orgTraining->files && $orgTraining->files->count() > 0) {
+    foreach ($orgTraining->files as $file) {
+        // تحقق من وجود خاصية training_files في كل ملف
+        if (isset($file->training_files)) {
+            $filesData = $file->training_files;
+            
+            // معالجة البيانات سواء كانت JSON أو array أو string
+            if (is_string($filesData)) {
+                // محاولة تحليل JSON
+                $decoded = json_decode($filesData, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    if (is_array($decoded)) {
+                        foreach ($decoded as $item) {
+                            if (is_array($item) && isset($item['path'])) {
+                                $training_files[] = $item;
+                            } elseif (is_string($item)) {
+                                $training_files[] = [
+                                    'path' => $item,
+                                    'name' => basename($item)
+                                ];
+                            }
+                        }
+                    } else {
+                        $training_files[] = [
+                            'path' => $decoded,
+                            'name' => basename($decoded)
+                        ];
+                    }
+                } else {
+                    // إذا فشل تحليل JSON، افترض أنه مسار ملف واحد
+                    $training_files[] = [
+                        'path' => $filesData,
+                        'name' => basename($filesData)
+                    ];
+                }
+            } elseif (is_array($filesData)) {
+                foreach ($filesData as $item) {
+                    if (is_array($item) && isset($item['path'])) {
+                        $training_files[] = $item;
+                    } elseif (is_string($item)) {
+                        $training_files[] = [
+                            'path' => $item,
+                            'name' => basename($item)
+                        ];
+                    }
+                }
+            }
+        }
+        // بديل: إذا كان الملف يحتوي على خاصية path مباشرة
+        elseif (isset($file->path)) {
+            $training_files[] = [
+                'path' => $file->path,
+                'name' => $file->name ?? basename($file->path)
+            ];
+        }
+    }
+}
+
     // رسالة ترحيب افتراضية
     if (!$settings->welcome_message) {
         $settings->welcome_message = "شكرًا لتسجيلك في البرنامج. يسعدنا أن تكون/ي جزءًا من هذا البرنامج، ونتطلع إلى رحلة مليئة بالتعلّم  والتطوير.
@@ -652,7 +727,8 @@ public function showReviewForm($orgTrainingId)
         'training' => $orgTraining,
         'settings' => $settings,
         'countries' => Country::all(),
-        'training_files' => $training_image,
+        'training_image' => $training_image,
+        'training_files' => $training_files, // تمرير ملفات التدريب
         'submissionMethod' => $submissionMethod,
         'requirements' => $requirements,
         'benefits' => $benefits,
@@ -663,9 +739,9 @@ public function showReviewForm($orgTrainingId)
 
         try {
       $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
-      //يجب فحص حقل مطلوب من كل خطوة بعدها جعل التدريب منشور للتاكد انه مر على الخطوات
-      $orgTraining->update(['status' => 'online']);
 
+      $orgTraining->update(['status' => 'online']);
+    
       return redirect()->route('orgTrainings.completed', $orgTraining->id)
         ->with('success', 'تم نشر البرنامج التدريبي بنجاح');
     } catch (\Exception $e) {

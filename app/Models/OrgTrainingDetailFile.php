@@ -15,7 +15,9 @@ class OrgTrainingDetailFile extends Model
         'org_training_program_id',
         'training_files',
     ];
-
+    protected $casts = [
+        'training_files' => 'array', // هذا سيقوم بتحويل JSON إلى array والعكس تلقائياً
+    ];
     
 
     public function trainingProgram()

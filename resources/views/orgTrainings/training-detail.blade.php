@@ -284,38 +284,45 @@ select.error-border {
                                     <input type="file" class="training-files-input visually-hidden"
                                         name="training_files[]" multiple>
                                 </div>
-                                <div class="training-files-preview" style="display: none;">
-                                    @php
-                                        $trainingFiles = $trainingFiles ?? [];
-                                    @endphp
-                                    @if (!empty($trainingFiles))
-                                        @foreach ($trainingFiles as $file)
-                                            @php
-                                                // التحقق من نوع البيانات
-                                                $filePath = '';
-                                                $fileName = '';
+                            <div class="training-files-preview" style="display: none;">
+    @php
+        // تأكد من أن trainingFiles هي مصفوفة
+        $trainingFiles = is_array($trainingFiles ?? []) ? $trainingFiles : [];
+        
+        // إذا كانت نصاً، حولها إلى مصفوفة
+        if (is_string($trainingFiles)) {
+            $decoded = json_decode($trainingFiles, true);
+            $trainingFiles = (json_last_error() === JSON_ERROR_NONE) ? $decoded : [$trainingFiles];
+        }
+    @endphp
+    
+    @if (!empty($trainingFiles))
+        @foreach ($trainingFiles as $file)
+            @php
+                // التحقق من نوع البيانات
+                $filePath = '';
+                $fileName = '';
 
-                                                if (is_array($file)) {
-                                                    // إذا كان مصفوفة، حاول الحصول على المسار أو الاسم
-                                                    $filePath = $file['path'] ?? '';
-                                                    $fileName =
-                                                        $file['name'] ??
-                                                        ($filePath ? basename($filePath) : 'ملف غير معروف');
-                                                } elseif (is_string($file)) {
-                                                    // إذا كان نصًا، استخدمه كمسار
-                                                    $filePath = $file;
-                                                    $fileName = basename($file);
-                                                }
-                                            @endphp
-                                            <div class="training-files-preview-file" data-file-path="{{ $filePath }}">
-                                                <span>{{ $fileName }}</span>
-                                                <input type="hidden" name="existing_training_files[]"
-                                                    value="{{ $filePath }}" class="existing-file-input">
-                                                <button type="button" class="remove-training-file">&times;</button>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
+                if (is_array($file)) {
+                    // إذا كان مصفوفة، حاول الحصول على المسار أو الاسم
+                    $filePath = $file['path'] ?? '';
+                    $fileName = $file['name'] ?? ($filePath ? basename($filePath) : 'ملف غير معروف');
+                } elseif (is_string($file)) {
+                    // إذا كان نصاً، استخدمه كمسار
+                    $filePath = $file;
+                    $fileName = basename($file);
+                }
+            @endphp
+            @if (!empty($filePath))
+                <div class="training-files-preview-file" data-file-path="{{ $filePath }}">
+                    <span>{{ $fileName }}</span>
+                    <input type="hidden" name="existing_training_files[]" value="{{ $filePath }}" class="existing-file-input">
+                    <button type="button" class="remove-training-file">&times;</button>
+                </div>
+            @endif
+        @endforeach
+    @endif
+</div>
                                 <div id="real-files-container"></div>
                                 <button type="button" class="add-training-files add-more-training profile-image-btn"
                                     style="display:none;">إضافة المزيد</button>

@@ -21,7 +21,8 @@ class OrgTrainingProgram extends Model
         'program_presentation_method',
         'org_training_classification_id',
         'program_description',
-        'is_edit_mode'
+        'is_edit_mode',
+        'status',
     ];
 
     protected $casts = [
@@ -72,7 +73,7 @@ class OrgTrainingProgram extends Model
 
     public function trainingLevel()
     {
-        return $this->belongsTo(TrainingLevel::class, 'training_level_id');
+        return $this->belongsTo(trainingLevel::class, 'training_level_id');
     }
     
         public function programType()

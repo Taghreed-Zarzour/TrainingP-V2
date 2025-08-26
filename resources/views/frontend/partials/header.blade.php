@@ -65,6 +65,16 @@
                     <li class="nav-item {{ request()->is('trainings*') ? 'active' : '' }}">
                         <a class="nav-link nav-font pb-0" href="{{ route('trainings_announcements') }}">التدريبات</a>
                     </li>
+
+                    
+                    <li class="nav-item {{ request()->is('trainers.index') ? 'active' : '' }}">
+                        <a class="nav-link nav-font pb-0" href="{{ route('trainers.index') }}">المدربون</a>
+                    </li>
+
+                    
+                    <li class="nav-item {{ request()->is('assistants.index') ? 'active' : '' }}">
+                        <a class="nav-link nav-font pb-0" href="{{ route('assistants.index') }}">المساعدون</a>
+                    </li>
                 </ul>
 
                 <!-- الروابط بحسب حالة تسجيل الدخول -->
@@ -188,10 +198,16 @@
                                         </a>
                                     </li>
                                 @elseif(auth()->user()->user_type_id == 4)
+                                <li>
+                                        <a class="dropdown-item" href="{{ route('trainings.index') }}">
+                                            <img src="{{ asset('images/profile-menu/files.svg') }}" />
+                                            إدارة التدريبات
+                                        </a>
+                                    </li>
                                     <li>
                                         <a class="dropdown-item" href="#">
                                             <img src="{{ asset('images/profile-menu/files.svg') }}" />
-                                            إدارة البرامج التدريبية
+                                            إدارة المسارات التدريبية
                                         </a>
                                     </li>
                                 @endif
