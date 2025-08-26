@@ -10,7 +10,7 @@ class OrgTrainingDetail extends Model
 
     protected $fillable = [
         'program_title',
-        'org_training_program_id',
+        'org_training_detail_id',
         'trainer_id',
         'schedule_later',
         'num_of_session',
@@ -23,7 +23,10 @@ class OrgTrainingDetail extends Model
         return $this->belongsTo(OrgTrainingProgram::class, 'org_training_program_id');
     }
 
-    
+    public function trainingSchedules()
+    {
+        return $this->hasMany(OrgTrainingSchedule::class, 'org_training_detail_id');
+    }
 
     public function trainer()
     {

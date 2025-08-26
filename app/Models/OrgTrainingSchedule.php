@@ -10,7 +10,7 @@ class OrgTrainingSchedule extends Model
 
     protected $table = 'org_training_schedules';
     protected $fillable = [
-        'org_training_program_id',
+        'org_training_detail_id',
         'session_date',
         'session_start_time',
         'session_end_time',
@@ -18,6 +18,6 @@ class OrgTrainingSchedule extends Model
 
     public function trainingProgram()
     {
-        return $this->belongsTo(OrgTrainingDetail::class, 'org_training_program_id');
+        return $this->belongsTo(OrgTrainingDetail::class, 'org_training_detail_id');
     }
 }
