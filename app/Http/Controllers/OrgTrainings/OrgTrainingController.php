@@ -313,29 +313,33 @@ public function showtrainingDetailForm($orgTrainingId)
 
         // 6. Process new files
         $newFiles = [];
+
         if ($trainingFileInputs) {
             foreach ($trainingFileInputs as $file) {
                 $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                 $extension = $file->getClientOriginalExtension();
 
+                // Sanitize and create a unique filename
                 $sanitizedFileName = preg_replace('/[^a-zA-Z0-9\s]/', '', $originalName);
                 $camelCaseFileName = str_replace(' ', '', ucwords(str_replace('_', ' ', $sanitizedFileName)));
 
                 $timestamp = now()->format('Ymd_His');
                 $uniqueFilename = $camelCaseFileName . '_' . $timestamp . '.' . $extension;
 
-                $newFile = $file->storeAs('training/files', $uniqueFilename, 'public');
-                $newFiles[] = $newFile;
+                // Store the file and add to newFiles array
+                $newFilePath = $file->storeAs('training/files', $uniqueFilename, 'public');
+                $newFiles[] = $newFilePath; // Store the path of the new file
             }
         }
 
-        // 7. Save files to org_training_detail_files table - تحويل المصفوفة إلى JSON
+        // Merge existing files with newly uploaded files
         $allFiles = array_merge($filesToKeep, $newFiles);
-        
+
+        // Save files to org_training_detail_files table
         if (!empty($allFiles)) {
-            $orgTrainingFile = OrgTrainingDetailFile::updateOrCreate(
+            OrgTrainingDetailFile::updateOrCreate(
                 ['org_training_program_id' => $orgTraining->id],
-                ['training_files' => json_encode($allFiles)] // تحويل المصفوفة إلى JSON
+                ['training_files' => json_encode($allFiles)] // Convert array to JSON
             );
         }
 

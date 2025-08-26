@@ -252,17 +252,17 @@ public function storeOrgAssistant(storeOrgAssistantRequset $request)
     public function stopSharing($id)
     {
       $this->OrgTrainingManagerService->stopSharing($id);
-      return redirect()->route('trainings.index')->with('stopped', true);
+      return redirect()->route('orgTrainings.index')->with('stopped', true);
     }
     public function rePublish($id)
     {
       $this->OrgTrainingManagerService->rePublish($id);
-      return redirect()->route('trainings.index')->with('online', true);
+      return redirect()->route('orgTrainings.index')->with('online', true);
     }
     public function showStoppedPrograms()
     {
       $stoppedPrograms = $this->OrgTrainingManagerService->displayStoppedTraining()->get();
 
-      return view('trainings.stopped', compact('stoppedPrograms'));
+      return view('orgTrainings.index', compact('stoppedPrograms'));
     }
 }

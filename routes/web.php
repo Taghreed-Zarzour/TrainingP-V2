@@ -273,6 +273,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   });
 
+
   Route::get('organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTrainingsManager.index');
   Route::get('organization-training-manager/{id}', [OrgTrainingManagerController::class, 'show'])->name('orgTrainingsManager.show');
   Route::get('organization-training-manager/destroy/{id}', [OrgTrainingManagerController::class, 'destroy'])->name('orgTrainingsManager.destroy');
@@ -284,6 +285,10 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::delete('organization-training-manager/delete-assistant/{orgTraining_id}/{assistant_id}', [OrgTrainingManagerController::class, 'deleteOrgAssistant'])
   ->name('orgAssistant.destroy');
 
+
+  Route::post('/stop-sharing/{id}', [OrgTrainingManagerController::class, 'stopSharing'])->name('stopSharing');
+  Route::post('/re-publish/{id}', [OrgTrainingManagerController::class, 'rePublish'])->name('rePublish');
+  Route::get('/stopped', [OrgTrainingManagerController::class, 'showStoppedPrograms'])->name('stopped');
 
 });
 
