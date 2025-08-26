@@ -123,16 +123,19 @@
         <label>العدد الأقصى للمتدربين<span class="required">*</span></label>
         <label class="switch">
             <input type="checkbox" name="unlimited_trainees" id="unlimited_trainees" value="1"
-                {{ old('unlimited_trainees', $settings->max_trainees == 0 ? true : false) ? 'checked' : '' }}>
-            <span class="slider"></span>
+    {{ old('unlimited_trainees', isset($settings->max_trainees) && $settings->max_trainees == 0 ? true : false) ? 'checked' : '' }}>
+
+    <span class="slider"></span>
             <span class="switch-label">لا يوجد عدد محدد</span>
         </label>
     </div>
     <div class="sub-label">
         حدد الحد الأعلى لعدد المشاركين في التدريب
     </div>
-    <div id="max-trainees-wrapper" style="{{ old('unlimited_trainees', $settings->max_trainees == 0 ? true : false) ? 'display: none;' : '' }}">
-        <input type="number" name="max_trainees" value="{{ old('max_trainees', $settings->max_trainees == 0 ? 20 : $settings->max_trainees) }}"
+<div id="max-trainees-wrapper"
+    style="{{ old('unlimited_trainees', isset($settings->max_trainees) && $settings->max_trainees == 0 ? true : false) ? 'display: none;' : '' }}">
+        <input type="number" name="max_trainees" value="{{ old('max_trainees', isset($settings->max_trainees) && $settings->max_trainees == 0 ? '' : $settings->max_trainees) }}"
+
             placeholder="مثال: 20" class="@error('max_trainees') error-border @enderror" 
             @if (!(old('unlimited_trainees', $settings->max_trainees == 0 ? true : false))) required @endif />
         @error('max_trainees')
@@ -366,7 +369,7 @@
                     maxTraineesWrapper.style.display = 'block';
                     maxTraineesInput.setAttribute('required', 'required');
                     if (!maxTraineesInput.value) {
-                        maxTraineesInput.value = 20; // القيمة الافتراضية
+                        maxTraineesInput.value = ''; // القيمة الافتراضية
                     }
                 }
             });
@@ -494,7 +497,7 @@ document.getElementById('unlimited_trainees').addEventListener('change', functio
         maxTraineesWrapper.style.display = 'block';
         maxTraineesInput.setAttribute('required', 'required');
         if (maxTraineesInput.value === '0') {
-            maxTraineesInput.value = '20'; // القيمة الافتراضية
+            maxTraineesInput.value = ''; // القيمة الافتراضية
         }
     }
 });

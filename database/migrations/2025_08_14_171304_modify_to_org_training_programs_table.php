@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('org_training_programs', function (Blueprint $table) {
-            $table->enum('status',['online','offline'])->default('online');
+            $table->enum('status',['online','offline']);
         });
     }
 

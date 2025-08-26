@@ -2525,6 +2525,7 @@ footer .absolute .terms-conditions a {
 .trainer-account-page .reviews .general-rating {
     display: flex;
     justify-content: space-between;
+    width: 100%;
 }
 
 .trainer-account-page .reviews .general-rating .ratings-details {

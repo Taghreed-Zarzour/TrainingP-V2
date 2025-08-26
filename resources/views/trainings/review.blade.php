@@ -65,15 +65,41 @@
                                         <h5>المدرب: {{ auth()->user()->getTranslation('name', 'ar') }} {{ auth()->user()->trainer?->getTranslation('last_name', 'ar') }}</h5>
                                     </div>
                                 @endif
-                                
-                                @if (!empty($training->assistants) && $training->assistants->whereNotNull('trainer_id')->count() > 0)
-                                    <h5 class="clickable-title" onclick="window.location.href='{{ route('training.team', $training->id) }}'">
-                                        المدرب المشارك:
-                                        @foreach ($training->assistants->whereNotNull('trainer_id')->pluck('trainer') as $trainer)
-                                            {{ $trainer->getTranslation('name', 'ar') }} {{ $trainer->trainer?->getTranslation('last_name', 'ar') }}
-                                        @endforeach
-                                    </h5>
+@if (!empty($training) && method_exists($training, 'assistants') && $training->assistants()->exists())
+    <h5 class="clickable-title" onclick="window.location.href='{{ route('training.team', $training->id) }}'">
+
+          @if (!(auth()->user()->userType?->type === 'مؤسسة'))
+        المدرب المشارك:
+@else
+            المدربون المشاركون:
+<br>
                                 @endif
+        @php
+            $allTrainerIds = [];
+            $assistants = $training->assistants()->get(); // الحصول على المجموعة بشكل صريح
+            
+            foreach ($assistants as $assistant) {
+                if (method_exists($assistant, 'getAllTrainers')) {
+                    $trainerIds = $assistant->getAllTrainers();
+                    if (is_array($trainerIds)) {
+                        $allTrainerIds = array_merge($allTrainerIds, $trainerIds);
+                    }
+                }
+            }
+            
+            $allTrainerIds = array_unique($allTrainerIds);
+            $trainers = collect();
+            
+            if (!empty($allTrainerIds)) {
+                $trainers = \App\Models\User::whereIn('id', $allTrainerIds)->get();
+            }
+        @endphp
+        
+        @foreach ($trainers as $trainer)
+            {{ $trainer->getTranslation('name', 'ar') }} {{ $trainer->trainer?->getTranslation('last_name', 'ar') }} <br>
+        @endforeach
+    </h5>
+@endif
                             </div>
                             <div class="training-details">
                                 @if (!empty($training->language))
@@ -283,9 +309,29 @@
                                 </div>
                                 <div class="info-block-content">
                                     @if ($training->schedules_later)
-                                        <div class="no-sessions-message">
-                                            سيتم تحديد الجلسات لاحقاً بعد اكتمال عدد المشاركين.
-                                        </div>
+                                      
+
+                                          
+
+    
+                <div class="info-block-content-item">
+                    <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+                    <div class="info-block-content-item-title">
+                      عدد الجلسات  {{$training->num_of_session}} جلسة
+                    </div>
+                </div>
+
+  <div class="info-block-content-item">
+    <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+    <div class="info-block-content-item-title">
+        عدد الساعات {{ rtrim(rtrim(number_format($training->num_of_hours, 1), '0'), '.') }} ساعة
+    </div>
+</div>
+
+
+
+
+                                  
                                     @elseif (empty($training->sessions) || $training->sessions->count() == 0)
                                         <div class="no-sessions-message">
                                             لم يتم إضافة جلسات بعد. يمكنك إضافتها لاحقاً من خلال صفحة تعديل التدريب.
@@ -319,25 +365,33 @@
                                 </div>
                             </div>
                             
-                            @if (!empty($training->assistants) && $training->assistants->whereNotNull('assistant_id')->count() > 0)
-                                <div class="info-block">
-                                    <div class="info-block-title clickable-title" onclick="window.location.href='{{ route('training.team', $training->id) }}'">
-                                        <span>مساعدو المدرب (الميسرون)</span>
-                                    </div>
-                                    <div class="info-block-content">
-                                        @foreach ($training->assistants->whereNotNull('assistant_id')->pluck('assistant') as $assistant)
-                                            <div class="trainer-profile">
-                                                @if (!empty($assistant->photo))
-                                                    <img src="{{ asset('storage/' . $assistant->photo) }}" alt="صورة المساعد" class="tr-trainee-avatar">
-                                                @else
-                                                    <img src="{{ asset('images/icons/user.svg') }}" alt="مساعد" class="tr-trainee-avatar">
-                                                @endif
-                                                <p>{{ $assistant->getTranslation('name', 'ar') }} {{ $assistant->assistant?->getTranslation('last_name', 'ar') }}</p>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
+                        @if (!empty($training) && $training->assistants)
+    @php
+        $assistant = $training->assistants;
+        $allAssistantIds = method_exists($assistant, 'getAllAssistants') ? $assistant->getAllAssistants() : [];
+        $assistantsList = !empty($allAssistantIds) ? \App\Models\User::whereIn('id', $allAssistantIds)->get() : collect();
+    @endphp
+    
+    @if ($assistantsList->count() > 0)
+        <div class="info-block">
+            <div class="info-block-title clickable-title" onclick="window.location.href='{{ route('training.team', $training->id) }}'">
+                <span>مساعدو المدرب (الميسرون)</span>
+            </div>
+            <div class="info-block-content">
+                @foreach ($assistantsList as $assistant)
+                    <div class="trainer-profile">
+                        @if (!empty($assistant->photo))
+                            <img src="{{ asset('storage/' . $assistant->photo) }}" alt="صورة المساعد" class="tr-trainee-avatar">
+                        @else
+                            <img src="{{ asset('images/icons/user.svg') }}" alt="مساعد" class="tr-trainee-avatar">
+                        @endif
+                        <p>{{ $assistant->getTranslation('name', 'ar') }} {{ $assistant->assistant?->getTranslation('last_name', 'ar') }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+@endif
                             
                             @if (!empty($training_files))
                                 <div class="info-block">

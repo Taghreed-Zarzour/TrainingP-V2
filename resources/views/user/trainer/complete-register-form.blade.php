@@ -255,7 +255,7 @@
                                                         data-iso="{{ strtolower($country->iso2) }}">
                                                         <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
                                                             class="flag-img">
-                                                        <span class="flag-code">+{{ $country->phonecode }}</span>
+                                                        <span class="flag-code">{{ $country->phonecode }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -264,7 +264,7 @@
                                         <div class="divider-line"></div>
                                         <!-- رمز الدولة -->
                                         <div class="code-box" id="phoneCode" dir="ltr">
-                                            +{{ old('phone_code', '90') }}</div>
+                                            {{ old('phone_code', '+90') }}</div>
                                         <!-- حقل الإدخال -->
                                         <input type="text" id="phone_number" name="phone_number" required
                                             class="flex-grow-1 border-0 ps-2 phone-input" pattern="[0-9]{6,15}"
@@ -677,8 +677,8 @@
                 const iso = item.getAttribute("data-iso");
                 const code = item.getAttribute("data-code");
                 selectedFlag.src = `/flags/${iso}.svg`;
-                phoneCode.textContent = `+${code}`;
-                phoneCodeInput.value = `+${code}`; // تحديث الحقل المخفي
+                phoneCode.textContent = `${code}`;
+                phoneCodeInput.value = `${code}`; // تحديث الحقل المخفي
                 flagOptions.style.display = "none";
                 isDropdownOpen = false;
             });

@@ -620,24 +620,43 @@
                                 </div>
                             </div>
                         @endif
-                        @if (!empty($training_files))
-                            <div class="info-block">
-                                <div class="info-block-title clickable-title"
-                                    onclick="window.location.href='{{ route('orgTraining.settings', $training->id) }}'">
-                                    <span>مرفقات التدريب</span>
-                                </div>
-                                <div class="info-block-content">
-                                    @foreach ($training_files as $file)
-                                        <div class="info-block-content-item">
-                                            <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
-                                            <div class="info-block-content-item-title" dir="ltr">
-                                                <a href="{{ asset('storage/' . $file) }}" target="_blank">{{ basename($file) }}</a>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
+                      @if (!empty($training_files) && count($training_files) > 0)
+    <div class="info-block">
+        <div class="info-block-title clickable-title"
+            onclick="window.location.href='{{ route('orgTraining.trainingDetail', $training->id) }}'">
+            <span>مرفقات التدريب</span>
+        </div>
+        <div class="info-block-content">
+            @foreach ($training_files as $file)
+                @php
+                    // التحقق من نوع البيانات
+                    $filePath = '';
+                    $fileName = '';
+
+                    if (is_array($file)) {
+                        // إذا كان مصفوفة، حاول الحصول على المسار أو الاسم
+                        $filePath = $file['path'] ?? '';
+                        $fileName = $file['name'] ?? ($filePath ? basename($filePath) : 'ملف غير معروف');
+                    } elseif (is_string($file)) {
+                        // إذا كان نصاً، استخدمه كمسار
+                        $filePath = $file;
+                        $fileName = basename($file);
+                    }
+                @endphp
+                @if (!empty($filePath))
+                    <div class="info-block-content-item">
+                        <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+                        <div class="info-block-content-item-title" dir="ltr">
+                            <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="file-link">
+                                {{ $fileName }}
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+    </div>
+@endif
                         @if (!empty($settings) && !empty($settings->payment_method))
                             <div class="info-block">
                                 <div class="info-block-title clickable-title"
@@ -666,7 +685,7 @@
                         </div>
                         <div class="input-group">
                             <button type="submit" class="pbtn pbtn-main piconed">
-                                <span>تأكيد نشر التدريب</span>
+                                <span>تأكيد نشر المسار التدريبي</span>
                                 <img src="{{ asset('images/arrow-left.svg') }}" alt="">
                             </button>
                         </div>

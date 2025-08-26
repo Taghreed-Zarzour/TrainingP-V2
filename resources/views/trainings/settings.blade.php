@@ -311,24 +311,24 @@
                                     <input type="file" class="training-files-input visually-hidden"
                                         name="training_files[]" multiple>
                                 </div>
-                                <div class="training-files-preview" style="display: none;">
-                                    @php
-                                        $trainingFiles = $settings->training_files ?? [];
-                                        if (is_string($trainingFiles)) {
-                                            $trainingFiles = json_decode($trainingFiles, true);
-                                        }
-                                    @endphp
-                                    @if (!empty($trainingFiles))
-                                        @foreach ($trainingFiles as $file)
-                                            <div class="training-files-preview-file">
-                                                <span>{{ basename($file) }}</span>
-                                                <input type="hidden" name="existing_training_files[]"
-                                                    value="{{ $file }}">
-                                                <button type="button" class="remove-training-file">&times;</button>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
+<div class="training-files-preview" style="display: none;">
+    @php
+        $trainingFiles = $settings->training_files ?? [];
+        if (is_string($trainingFiles)) {
+            $trainingFiles = json_decode($trainingFiles, true);
+        }
+    @endphp
+    @if (!empty($trainingFiles))
+        @foreach ($trainingFiles as $file)
+            <div class="training-files-preview-file" data-file-path="{{ $file }}">
+                <span>{{ basename($file) }}</span>
+                <input type="hidden" name="existing_training_files[]" value="{{ $file }}">
+                <input type="hidden" name="files_to_delete[]" value="" class="file-delete-input">
+                <button type="button" class="remove-training-file">&times;</button>
+            </div>
+        @endforeach
+    @endif
+</div>
                                 <div id="real-files-container"></div>
                                 <button type="button" class="add-training-files add-more-training profile-image-btn"
                                     style="display:none;">إضافة المزيد</button>
@@ -500,67 +500,80 @@
             });
 
             // إدارة ملفات التدريب
-            const wrapper = document.querySelector(".training-files-wrapper[data-multiple='true']");
-            if (wrapper) {
-                const fileInput = wrapper.querySelector(".training-files-input");
-                const selectBtn = wrapper.querySelector(".select-training-files");
-                const defaultView = wrapper.querySelector(".training-files-default");
-                const previewContainer = wrapper.querySelector(".training-files-preview");
-                const addMoreBtn = wrapper.querySelector(".add-more-training");
-
-                selectBtn.addEventListener("click", () => fileInput.click());
-                addMoreBtn.addEventListener("click", () => fileInput.click());
-
-                fileInput.addEventListener("change", () => {
-                    if (fileInput.files.length > 0) {
-                        addFiles(Array.from(fileInput.files));
-                        fileInput.value = "";
-                    }
-                });
-
-                function addFiles(files) {
-                    const realFilesContainer = document.getElementById("real-files-container");
-                    files.forEach(file => {
-                        const fileDiv = document.createElement("div");
-                        fileDiv.className = "training-files-preview-file";
-                        fileDiv.innerHTML = `
-                            <span>${file.name}</span>
-                            <button type="button" class="remove-training-file">&times;</button>
-                        `;
-                        const input = document.createElement("input");
-                        input.type = "file";
-                        input.name = "training_files[]";
-                        input.className = "visually-hidden";
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(file);
-                        input.files = dataTransfer.files;
-                        realFilesContainer.appendChild(input);
-                        fileDiv.querySelector(".remove-training-file").addEventListener("click", () => {
-                            fileDiv.remove();
-                            input.remove();
-                            toggleView();
-                        });
-                        previewContainer.appendChild(fileDiv);
-                    });
-                    toggleView();
-                }
-
-                function toggleView() {
-                    const hasFiles = previewContainer.querySelectorAll(".training-files-preview-file").length > 0;
-                    defaultView.style.display = hasFiles ? "none" : "flex";
-                    previewContainer.style.display = hasFiles ? "flex" : "none";
-                    addMoreBtn.style.display = hasFiles ? "inline-block" : "none";
-                }
-
-                previewContainer.querySelectorAll(".remove-training-file").forEach(btn => {
-                    btn.addEventListener("click", function() {
-                        this.closest(".training-files-preview-file").remove();
-                        toggleView();
-                    });
-                });
-
+// إدارة ملفات التدريب
+const wrapper = document.querySelector(".training-files-wrapper[data-multiple='true']");
+if (wrapper) {
+    const fileInput = wrapper.querySelector(".training-files-input");
+    const selectBtn = wrapper.querySelector(".select-training-files");
+    const defaultView = wrapper.querySelector(".training-files-default");
+    const previewContainer = wrapper.querySelector(".training-files-preview");
+    const addMoreBtn = wrapper.querySelector(".add-training-files");
+    
+    selectBtn.addEventListener("click", () => fileInput.click());
+    addMoreBtn.addEventListener("click", () => fileInput.click());
+    
+    fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+            addFiles(Array.from(fileInput.files));
+            fileInput.value = "";
+        }
+    });
+    
+    function addFiles(files) {
+        const realFilesContainer = document.getElementById("real-files-container");
+        files.forEach(file => {
+            const fileDiv = document.createElement("div");
+            fileDiv.className = "training-files-preview-file";
+            fileDiv.innerHTML = `
+                <span>${file.name}</span>
+                <button type="button" class="remove-training-file">&times;</button>
+            `;
+            const input = document.createElement("input");
+            input.type = "file";
+            input.name = "training_files[]";
+            input.className = "visually-hidden";
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            input.files = dataTransfer.files;
+            realFilesContainer.appendChild(input);
+            
+            fileDiv.querySelector(".remove-training-file").addEventListener("click", () => {
+                fileDiv.remove();
+                input.remove();
                 toggleView();
-            }
+            });
+            
+            previewContainer.appendChild(fileDiv);
+        });
+        toggleView();
+    }
+    
+    function toggleView() {
+        const hasFiles = previewContainer.querySelectorAll(".training-files-preview-file").length > 0;
+        defaultView.style.display = hasFiles ? "none" : "flex";
+        previewContainer.style.display = hasFiles ? "flex" : "none";
+        addMoreBtn.style.display = hasFiles ? "inline-block" : "none";
+    }
+    
+    // تعديل معالجة حذف الملفات الموجودة مسبقاً
+    previewContainer.querySelectorAll(".remove-training-file").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const fileDiv = this.closest(".training-files-preview-file");
+            const filePathInput = fileDiv.querySelector("input[name='existing_training_files[]']");
+            const deleteInput = fileDiv.querySelector("input[name='files_to_delete[]']");
+            
+            // تعيين مسار الملف المراد حذفه
+            deleteInput.value = filePathInput.value;
+            
+            // إخفاء عنصر الملف بدلاً من حذفه
+            fileDiv.style.display = "none";
+            
+            toggleView();
+        });
+    });
+    
+    toggleView();
+}
 
             // إدارة الصورة التعريفية
             const profileWrapper = document.querySelector(".profile-image-wrapper");

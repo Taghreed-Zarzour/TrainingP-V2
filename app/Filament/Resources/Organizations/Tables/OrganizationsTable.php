@@ -51,7 +51,7 @@ class OrganizationsTable
                         if (!is_array($branch) || !isset($branch['country_id'], $branch['city'])) {
                             return '—';
                         }
-                        $countryName = Country::find((int) $branch['country_id'])?->name_ar ?? 'Unknown';
+                        $countryName = Country::find((int) $branch['country_id'])?->name ?? 'Unknown';
                         $city = $branch['city'] ?? 'Unknown';
 
                         return "{$city}, {$countryName}";

@@ -56,7 +56,7 @@ class UserForm
                 Select::make('country_id')
                     ->label('country')
                     ->options(
-                        Country::pluck('name_ar', 'id')->toArray()
+                        Country::pluck('name', 'id')->toArray()
                     )
                     ->reactive()
                     ->required(),

@@ -72,7 +72,7 @@ Route::middleware('auth:web')->get('/logout', [AuthController::class, 'logout'])
 Route::post('/resend-verification-email/{id}', [AuthController::class, 'resendVerificationEmail'])->name('resend-verification-email');
 
 Route::get('/link-expired', function () {
-  return view('link-expired'); 
+  return view('link-expired');
 })->name('link.expired');
 
 Route::middleware(['check.link.expiration'])->group(function () {
@@ -240,7 +240,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
 
   Route::prefix('org-training')->group(function () {
-    
+
   Route::get('/start-create-training', function () {
       return view('orgTrainings.start_org_trainings');
   })->name('startCreateOrgTrainings');
@@ -275,7 +275,12 @@ Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedbac
 
 
 Route::get('/trainings/announcements', [TrainingsController::class, 'index'])->name('trainings_announcements');
+
+Route::get('/org/trainings/show/{id}',[OrgTrainingController::class, 'show'])->name('org.training.show');
+Route::get('/org/trainings/show/program/{id}',[OrgTrainingController::class, 'showProgram'])->name('org.training.show.program');
 Route::get('/trainings/announcements/show/{id}', [TrainingsController::class, 'show'])->name('show_trainings_announcements');
+Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
+Route::get('/assistants', [AssistantController::class, 'index'])->name('assistants.index');
 
 //profiles users
   Route::get('/show-trainer-profile/{id?}', [TrainerProfileController::class, 'showProfile'])->name('show_trainer_profile');

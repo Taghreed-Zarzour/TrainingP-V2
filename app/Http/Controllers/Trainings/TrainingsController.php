@@ -14,11 +14,12 @@ use App\Services\TrainingAnnouncementService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Enrollment;
+use App\Models\OrgTrainingProgram;
 
 class TrainingsController extends Controller
 {
     protected $trainingAnnouncementService;
-    
+
     public function __construct(TrainingAnnouncementService $trainingAnnouncementService)
     {
         $this->trainingAnnouncementService = $trainingAnnouncementService;
@@ -34,7 +35,7 @@ class TrainingsController extends Controller
         'أسبوع' => ['أسبوع', 'أسبوعين', 'أسابيع'],
         'شهر'   => ['شهر', 'شهرين', 'أشهر'],
     ];
-    
+
     if (!isset($forms[$word])) {
         return $word; // في حال ما وجدنا الكلمة
     }
@@ -148,8 +149,8 @@ $diffInSeconds = $now->diffInSeconds($deadline);
     public function index()
     {
         $programsResponse = $this->trainingAnnouncementService->index();
+
         $programs = $programsResponse['data'] ?? [];
-        
         foreach ($programs as $program) {
             $minutes = 0;
             if ($program->sessions) {
@@ -165,32 +166,41 @@ $diffInSeconds = $now->diffInSeconds($deadline);
                 }
             }
             $program->total_duration_hours = round($minutes / 60, 2);
-            
+
             // حساب حالة التسجيل لكل برنامج
             $deadline = $program->AdditionalSetting->application_deadline ?? null;
             $program->registration_status = $this->calculateRegistrationStatus($deadline);
         }
-        
+
         $program_classification = TrainingClassification::all();
         $trainerIds = TrainingProgram::pluck('user_id');
         $trainers = User::with('trainee')->whereIn('id', $trainerIds)->get();
-        
-        return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification'));
+
+        $allOrgPrograms = OrgTrainingProgram::with(
+            'details',
+            'goals',
+            'registrationRequirements',
+            'assistants'
+        )
+        ->where('status', 'online')
+        ->get();
+dd($allOrgPrograms);
+        return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));
     }
 
     public function show($id)
     {
         $program = $this->trainingAnnouncementService->getById($id);
-        
+
         if (!$program) {
             return redirect()->route('trainings.index')->with('error', 'التدريب المطلوب غير موجود');
         }
-        
+
         // حساب حالة التسجيل
         $deadline = $program->AdditionalSetting->application_deadline ?? null;
         $registrationStatus = $this->calculateRegistrationStatus($deadline);
         $remainingText = $registrationStatus['text'];
-        
+
 
             // تحديد ما إذا انتهى موعد التسجيل
     $training_has_ended = false;
@@ -202,7 +212,7 @@ $diffInSeconds = $now->diffInSeconds($deadline);
         $session_day = [];
         $session_duration = [];
         $date_display = [];
-        
+
         if ($program->sessions) {
             foreach ($program->sessions as $session) {
                 $start = Carbon::createFromTimeString($session->session_start_time);
@@ -217,13 +227,13 @@ $diffInSeconds = $now->diffInSeconds($deadline);
                 $date_display[] = Carbon::parse($session->session_date)->translatedFormat('d F');
             }
         }
-        
+
         // الحصول على بيانات المدرب
         $trainer = null;
         if ($program->user_id) {
             $trainer = User::find($program->user_id);
         }
-        
+
         // الحصول على المساعدين
         $assistantUsers = collect();
         if ($program->id) {
@@ -232,7 +242,7 @@ $diffInSeconds = $now->diffInSeconds($deadline);
                 ->get();
             $assistantUsers = $assistantLinks->pluck('assistant')->filter();
         }
-        
+
         // التحقق من تسجيل المستخدم
         $has_enrolled = false;
         $enrollment = null;
@@ -240,12 +250,12 @@ $diffInSeconds = $now->diffInSeconds($deadline);
             $has_enrolled = Enrollment::where('trainee_id', auth()->id())
                 ->where('training_programs_id', $id)
                 ->exists();
-                
+
             $enrollment = Enrollment::where('trainee_id', auth()->id())
                 ->where('training_programs_id', $id)
                 ->first();
         }
-        
+
         // حساب تقييم المدرب
         $averageTrainerRating = 0;
         if ($trainer && $trainer->trainer && $trainer->trainer->ratings) {
@@ -253,7 +263,7 @@ $diffInSeconds = $now->diffInSeconds($deadline);
             $criteria = ['clarity', 'interaction', 'organization'];
             $totalRatings = 0;
             $totalSum = 0;
-            
+
             foreach ($ratings as $rating) {
                 foreach ($criteria as $criterion) {
                     if (isset($rating->$criterion)) {
@@ -263,10 +273,10 @@ $diffInSeconds = $now->diffInSeconds($deadline);
                     }
                 }
             }
-            
+
             $averageTrainerRating = $totalRatings > 0 ? round($totalSum / $totalRatings, 1) : 0;
         }
-        
+
         return view('trainingAnnouncement.show', compact(
             'program',
             'trainer',
