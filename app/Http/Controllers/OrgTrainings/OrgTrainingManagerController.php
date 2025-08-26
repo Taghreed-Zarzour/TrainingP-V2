@@ -38,7 +38,7 @@ class OrgTrainingManagerController extends Controller
   public function index()
   {
       $categorized = $this->OrgTrainingManagerService->categorizePrograms();
-      return view('trainings.index', [
+      return view('orgTrainings.index', [
           'drafts' => $categorized['draft'] ?? [],
           'announced' => $categorized['announced'] ?? [],
           'ongoing' => $categorized['ongoing'] ?? [],

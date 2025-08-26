@@ -219,7 +219,7 @@ public function showtrainingDetailForm($orgTrainingId)
     }
 
     foreach ($orgTrainingDetails as $detail) {
-        $schedules = OrgTrainingSchedule::where('org_training_program_id', $orgTraining->id)->get();
+        $schedules = OrgTrainingSchedule::where('org_training_detail_id', $detail->id)->get();
         $scheduleLater = $detail->schedule_later;
 
         if ($scheduleLater) {
@@ -274,7 +274,7 @@ public function showtrainingDetailForm($orgTrainingId)
         $oldFiles = [];
         foreach ($oldDetails as $detail) {
             // Delete associated schedules
-            OrgTrainingSchedule::where('org_training_program_id', $orgTraining->id)->delete();
+            OrgTrainingSchedule::where('org_training_detail_id', $detail->id)->delete();
             $detail->delete();
         }
 
@@ -357,7 +357,7 @@ public function showtrainingDetailForm($orgTrainingId)
 
                 foreach ($trainingSchedules as $schedule) {
                     if (!empty($schedule['date']) && !empty($schedule['start_time']) && !empty($schedule['end_time'])) {
-                        $orgTraining->trainingSchedules()->create([
+                        $orgTrainingDetail->trainingSchedules()->create([
                             'session_date' => $schedule['date'],
                             'session_start_time' => $schedule['start_time'],
                             'session_end_time' => $schedule['end_time'],
@@ -762,8 +762,7 @@ public function show($id){
         'details',
         'goals',
         'registrationRequirements',
-        'assistants',
-        'trainingSchedules'
+        'assistants'
     )->where('status', 'online')->findOrFail($id);
 
     $eduaction_levels_ids =  $OrgProgram->goals->first()->education_level_id;
@@ -773,7 +772,7 @@ public function show($id){
     $work_sectors = WorkSector::whereIn('id',$work_sector_ids)->pluck('name');
 
     $grandTotalMinutes = 0;
-    foreach ($OrgProgram as $program) {
+    foreach ($OrgProgram->details as $program) {
         foreach ($program->trainingSchedules as $session) {
             $grandTotalMinutes += \Carbon\Carbon::parse($session->session_start_time)
                 ->diffInMinutes(\Carbon\Carbon::parse($session->session_end_time));
