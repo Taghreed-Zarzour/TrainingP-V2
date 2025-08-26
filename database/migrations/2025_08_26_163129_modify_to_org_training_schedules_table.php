@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('org_training_schedules', function (Blueprint $table) {
             $table->dropForeign(['org_training_detail_id']);
-            $table->dropColumn('org_training_detail_id');
+            $table->dropColumn('org_training_program_id');
 
             $table->foreignId('org_training_program_id')
             ->references('id')
