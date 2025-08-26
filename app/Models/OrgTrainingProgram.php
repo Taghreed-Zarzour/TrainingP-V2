@@ -93,7 +93,7 @@ public function files()
 }
 public function trainingSchedules()
     {
-        return $this->hasMany(OrgTrainingSchedule::class, 'org_training_prgram_id');
+        return $this->hasMany(OrgTrainingSchedule::class, 'org_training_program_id');
     }
 
 }

@@ -187,6 +187,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
     // صفحة الإكمال
     Route::get('/{trainingId}/completed', [Trainings_CURD_Controller::class, 'showCompletionPage'])->name('training.completed');
 
+
 });
 
 
@@ -270,9 +271,6 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
     Route::get('/completed/{trainingId}', [OrgTrainingController::class, 'showCompletionPage'])->name('orgTrainings.completed');
 
   });
-
-  Route::get('myTraining/{id}/manager',[OrgTrainingManagerController::class,'show'])->name('org.training.manager');
-  Route::delete('myTraining/{id}/manager/delete',[OrgTrainingManagerController::class,'destroy'])->name('org.training.manager.destroy');
 });
 
 Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');

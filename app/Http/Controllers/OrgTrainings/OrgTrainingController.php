@@ -219,7 +219,7 @@ public function showtrainingDetailForm($orgTrainingId)
     }
 
     foreach ($orgTrainingDetails as $detail) {
-        $schedules = OrgTrainingSchedule::where('org_training_detail_id', $detail->id)->get();
+        $schedules = OrgTrainingSchedule::where('org_training_program_id', $orgTraining->id)->get();
         $scheduleLater = $detail->schedule_later;
 
         if ($scheduleLater) {
@@ -274,7 +274,7 @@ public function showtrainingDetailForm($orgTrainingId)
         $oldFiles = [];
         foreach ($oldDetails as $detail) {
             // Delete associated schedules
-            OrgTrainingSchedule::where('org_training_detail_id', $detail->id)->delete();
+            OrgTrainingSchedule::where('org_training_program_id', $orgTraining->id)->delete();
             $detail->delete();
         }
 
@@ -357,7 +357,7 @@ public function showtrainingDetailForm($orgTrainingId)
 
                 foreach ($trainingSchedules as $schedule) {
                     if (!empty($schedule['date']) && !empty($schedule['start_time']) && !empty($schedule['end_time'])) {
-                        $orgTrainingDetail->trainingSchedules()->create([
+                        $orgTraining->trainingSchedules()->create([
                             'session_date' => $schedule['date'],
                             'session_start_time' => $schedule['start_time'],
                             'session_end_time' => $schedule['end_time'],

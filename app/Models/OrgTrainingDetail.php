@@ -15,12 +15,9 @@ class OrgTrainingDetail extends Model
         'schedule_later',
         'num_of_session',
         'num_of_hours',
-        'training_files',
+
     ];
 
-protected $casts = [
-    'training_files' => 'array',
-];
     public function trainingProgram()
     {
         return $this->belongsTo(OrgTrainingProgram::class, 'org_training_program_id');
