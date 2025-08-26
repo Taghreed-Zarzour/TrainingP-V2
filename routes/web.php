@@ -274,7 +274,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   });
 
   Route::get('/organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTrainingsManager.index');
-
+  Route::post('/stop-sharing/{id}', [OrgTrainingManagerController::class, 'stopSharing'])->name('stopSharing');
+  Route::post('/re-publish/{id}', [OrgTrainingManagerController::class, 'rePublish'])->name('rePublish');
+  Route::get('/stopped', [OrgTrainingManagerController::class, 'showStoppedPrograms'])->name('stopped');
 });
 
 Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');

@@ -43,26 +43,32 @@ class OrgTrainingManagerService
 
         // Calculate total session duration
         $totalMinutes = 0;
-        if ($program->details && $program->details->trainingSchedules) {
-            foreach ($program->details->trainingSchedules as $session) {
-                try {
-                    $startParts = explode(':', $session->session_start_time);
-                    $endParts = explode(':', $session->session_end_time);
-                    if (count($startParts) >= 2 && count($endParts) >= 2) {
-                        $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
-                        $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
-                        $diff = max(0, $endInMinutes - $startInMinutes);
-                        $totalMinutes += $diff;
+        if ($program->details) {
+            foreach ($program->details as $detail) {
+                if ($detail->trainingSchedules) {
+                    foreach ($detail->trainingSchedules as $session) {
+                        try {
+                            $startParts = explode(':', $session->session_start_time);
+                            $endParts = explode(':', $session->session_end_time);
+                            if (count($startParts) >= 2 && count($endParts) >= 2) {
+                                $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
+                                $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
+                                $diff = max(0, $endInMinutes - $startInMinutes);
+                                $totalMinutes += $diff;
+                            }
+                        } catch (\Exception $e) {
+                            continue;
+                        }
                     }
-                } catch (\Exception $e) {
-                    continue;
                 }
             }
         }
         $program->total_session_duration_minutes = $totalMinutes;
 
         // Check for sessions
-        $hasSessions = $program->details && $program->details->trainingSchedules && $program->details->trainingSchedules->count() > 0;
+        $hasSessions = $program->details && $program->details->some(function ($detail) {
+            return $detail->trainingSchedules && $detail->trainingSchedules->count() > 0;
+        });
 
         // Categorize programs
         if ($program->completion_percentage < 100) {
@@ -76,48 +82,54 @@ class OrgTrainingManagerService
                 continue;
             }
 
-            $firstSession = $program->details->trainingSchedules->sortBy('session_date')->first();
-            if ($firstSession) {
-                $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                if ($startTime->isFuture()) {
-                    $announced[] = $program;
-                    continue;
-                }
-            }
-        }
-
-        if ($program->completion_percentage === 100 && $hasSessions) {
-            $firstSession = $program->details->trainingSchedules->sortBy('session_date')->first();
-            $lastSession = $program->details->trainingSchedules->sortByDesc('session_date')->first();
-
-            if ($firstSession && $lastSession) {
-                try {
+            foreach ($program->details as $detail) {
+                $firstSession = $detail->trainingSchedules->sortBy('session_date')->first();
+                if ($firstSession) {
                     $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                    $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
-
-                    if ($now->between($startTime, $endTime)) {
-                        $ongoing[] = $program;
-                        continue;
+                    if ($startTime->isFuture()) {
+                        $announced[] = $program;
+                        continue 2; // Continue to the next program
                     }
-                } catch (\Exception $e) {
-                    $draft[] = $program;
-                    continue;
                 }
             }
         }
 
         if ($program->completion_percentage === 100 && $hasSessions) {
-            $lastSession = $program->details->trainingSchedules->sortByDesc('session_date')->first();
-            if ($lastSession) {
-                try {
-                    $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
-                    if ($now->greaterThan($endTime)) {
-                        $completed[] = $program;
-                        continue;
+            foreach ($program->details as $detail) {
+                $firstSession = $detail->trainingSchedules->sortBy('session_date')->first();
+                $lastSession = $detail->trainingSchedules->sortByDesc('session_date')->first();
+
+                if ($firstSession && $lastSession) {
+                    try {
+                        $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                        $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
+
+                        if ($now->between($startTime, $endTime)) {
+                            $ongoing[] = $program;
+                            continue 2; // Continue to the next program
+                        }
+                    } catch (\Exception $e) {
+                        $draft[] = $program;
+                        continue 2; // Continue to the next program
                     }
-                } catch (\Exception $e) {
-                    $draft[] = $program;
-                    continue;
+                }
+            }
+        }
+
+        if ($program->completion_percentage === 100 && $hasSessions) {
+            foreach ($program->details as $detail) {
+                $lastSession = $detail->trainingSchedules->sortByDesc('session_date')->first();
+                if ($lastSession) {
+                    try {
+                        $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
+                        if ($now->greaterThan($endTime)) {
+                            $completed[] = $program;
+                            continue 2; // Continue to the next program
+                        }
+                    } catch (\Exception $e) {
+                        $draft[] = $program;
+                        continue 2; // Continue to the next program
+                    }
                 }
             }
         }
@@ -133,26 +145,32 @@ class OrgTrainingManagerService
 
         // Calculate total session duration
         $totalMinutes = 0;
-        if ($program->details && $program->details->trainingSchedules) {
-            foreach ($program->details->trainingSchedules as $session) {
-                try {
-                    $startParts = explode(':', $session->session_start_time);
-                    $endParts = explode(':', $session->session_end_time);
-                    if (count($startParts) >= 2 && count($endParts) >= 2) {
-                        $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
-                        $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
-                        $diff = max(0, $endInMinutes - $startInMinutes);
-                        $totalMinutes += $diff;
+        if ($program->details) {
+            foreach ($program->details as $detail) {
+                if ($detail->trainingSchedules) {
+                    foreach ($detail->trainingSchedules as $session) {
+                        try {
+                            $startParts = explode(':', $session->session_start_time);
+                            $endParts = explode(':', $session->session_end_time);
+                            if (count($startParts) >= 2 && count($endParts) >= 2) {
+                                $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
+                                $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
+                                $diff = max(0, $endInMinutes - $startInMinutes);
+                                $totalMinutes += $diff;
+                            }
+                        } catch (\Exception $e) {
+                            continue;
+                        }
                     }
-                } catch (\Exception $e) {
-                    continue;
                 }
             }
         }
         $program->total_session_duration_minutes = $totalMinutes;
 
         // Check for sessions
-        $hasSessions = $program->details && $program->details->trainingSchedules && $program->details->trainingSchedules->count() > 0;
+        $hasSessions = $program->details && array_reduce($program->details, function ($carry, $detail) {
+            return $carry || ($detail->trainingSchedules && $detail->trainingSchedules->count() > 0);
+        }, false);
 
         // Only completed programs are considered stopped
         if ($program->completion_percentage === 100) {
@@ -201,19 +219,22 @@ public function calculateCompletion(OrgTrainingProgram $program)
         $completedWeight += ($basicPercentage / 100) * $weights['basic_info'];
     }
 
-    // 2. Check details
-    if ($program->details) {
+    if ($program->details && $program->details->count() > 0) {
         $detailFields = ['program_title', 'trainer_id'];
         $detailCompleted = 0;
-
-        foreach ($detailFields as $field) {
-            if (!empty($program->details->$field)) {
-                $detailCompleted++;
+    
+        foreach ($program->details as $detail) {
+            foreach ($detailFields as $field) {
+                if (!empty($detail->$field)) {
+                    $detailCompleted++;
+                }
             }
         }
-
-        $detailPercentage = ($detailCompleted / count($detailFields)) * 100;
+    
+        // Calculate the percentage based on the number of details
+        $detailPercentage = ($detailCompleted / (count($detailFields) * $program->details->count())) * 100;
         $completedWeight += ($detailPercentage / 100) * $weights['details'];
+
     }
 
     // 3. Check settings
@@ -231,7 +252,7 @@ public function calculateCompletion(OrgTrainingProgram $program)
             }
         }
 
-        // If the training is paid, cost and currency must be specified
+        // Check if the training is paid
         if (!$program->registrationRequirements->is_free) {
             if (!empty($program->registrationRequirements->cost) && !empty($program->registrationRequirements->currency)) {
                 $settingCompleted++;
@@ -240,39 +261,60 @@ public function calculateCompletion(OrgTrainingProgram $program)
 
         $settingPercentage = ($settingCompleted / count($settingFields)) * 100;
         $completedWeight += ($settingPercentage / 100) * $weights['settings'];
+
     }
 
     // 4. Check sessions
-    if ($program->details && $program->details->trainingSchedules && $program->details->trainingSchedules->count() > 0) {
+    if ($program->details && $program->details->count() > 0) {
         $validSessions = 0;
-        foreach ($program->details->trainingSchedules as $session) {
-            if (!empty($session->session_date) && 
-                !empty($session->session_start_time) && 
-                !empty($session->session_end_time)) {
-                $validSessions++;
+        foreach ($program->details as $detail) {
+            if ($detail->trainingSchedules && $detail->trainingSchedules->count() > 0) {
+                foreach ($detail->trainingSchedules as $session) {
+                    if (!empty($session->session_date) && 
+                        !empty($session->session_start_time) && 
+                        !empty($session->session_end_time)) {
+                        $validSessions++;
+                    }
+                }
             }
         }
-        $sessionsPercentage = ($validSessions / $program->details->trainingSchedules->count()) * 100;
+        $sessionsPercentage = ($validSessions / ($program->details->sum(function ($detail) {
+            return $detail->trainingSchedules->count();
+        }))) * 100;
         $completedWeight += ($sessionsPercentage / 100) * $weights['sessions'];
     } else {
         $completedWeight += $weights['sessions'];
     }
 
-    // 5. Check goals
-    if ($program->goals) {
-        $goalFields = ['learning_outcomes', 'education_level_id', 'work_status',
-                        'work_sector_id', 'job_position', 'country_id'
-                    ];
-        $goalCompleted = 0;
 
+    // 5. Check goals
+    // Check goals
+if ($program->goals && $program->goals->count() > 0) {
+    $goalFields = ['learning_outcomes', 'education_level_id', 'work_status',
+                   'work_sector_id', 'job_position', 'country_id'];
+    $goalCompleted = 0;
+    
+    // Iterate through each goal
+    foreach ($program->goals as $goal) {
+        $completedFields = 0;
+
+        // Check each field for the current goal
         foreach ($goalFields as $field) {
-            if (!empty($program->goals->$field)) {
-                $goalCompleted++;
+            if (!empty($goal->$field)) {
+                $completedFields++;
             }
         }
 
-        $goalPercentage = ($goalCompleted / count($goalFields)) * 100;
-        $completedWeight += ($goalPercentage / 100) * $weights['goals'];
+        // Calculate completion for this goal
+        $goalPercentage = ($completedFields / count($goalFields)) * 100;
+        $goalCompleted += $goalPercentage; // Accumulate the percentage
+    }
+
+    // Average the goal completion percentage across all goals
+    $averageGoalPercentage = $goalCompleted / $program->goals->count();
+    $completedWeight += ($averageGoalPercentage / 100) * $weights['goals'];
+
+
     } else {
         // If goals are not set, consider them incomplete
         $completedWeight += 0; // Or add the full weight if desired
@@ -281,7 +323,6 @@ public function calculateCompletion(OrgTrainingProgram $program)
     $overallPercentage = ($completedWeight / $totalWeight) * 100;
     return intval($overallPercentage);
 }
-
 
     public function stopSharing($id){
         $program = OrgTrainingProgram::findOrFail($id);
@@ -297,9 +338,8 @@ public function calculateCompletion(OrgTrainingProgram $program)
     public function displayStoppedTraining(){
         $organizationId = Auth::id();
         return OrgTrainingProgram::with([
-            'organization', 'goals', 'details', 'assistants'
-            ,'assistantUsers','registrationRequirements','language','trainingClassification',
-            'trainingLevel','programType','country','files' ,'trainingSchedules'
+            'goals', 'details', 'assistants',
+            'assistantUsers', 'registrationRequirements',   
             ])
             ->where('organization_id', $organizationId)
             ->where('status','stopped');
@@ -308,9 +348,8 @@ public function calculateCompletion(OrgTrainingProgram $program)
     {
         $organizationId = Auth::id();
         return OrgTrainingProgram::with([
-            'organization', 'goals', 'details', 'assistants'
-            ,'assistantUsers','registrationRequirements','language','trainingClassification',
-            'trainingLevel','programType','country','files','trainingSchedules'
+            'goals', 'details', 'assistants',
+            'assistantUsers', 'registrationRequirements',
         ])->where('organization_id', $organizationId)->findOrFail($id);
     }
     
