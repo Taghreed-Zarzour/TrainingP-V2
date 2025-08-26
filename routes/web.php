@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingController;
+use App\Http\Controllers\OrgTrainings\OrgTrainingManagerController;
 use App\Http\Controllers\Trainings\TrainingsController;
 use App\Http\Controllers\User\Organization\OrganizationProfileController;
 use App\Http\Controllers\User\partnershipController;
@@ -186,6 +187,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
     // صفحة الإكمال
     Route::get('/{trainingId}/completed', [Trainings_CURD_Controller::class, 'showCompletionPage'])->name('training.completed');
 
+
 });
 
 
@@ -269,6 +271,15 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
     Route::get('/completed/{trainingId}', [OrgTrainingController::class, 'showCompletionPage'])->name('orgTrainings.completed');
 
   });
+
+  Route::get('/organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTraining.Show');
+
+
+
+
+
+
+
 });
 
 Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');

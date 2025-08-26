@@ -16,17 +16,18 @@ class OrgTrainingManagerController extends Controller
       $this->OrgTrainingManagerService = $OrgTrainingManagerService;
     }
   
-  public function index()
-  {
-      $categorized = $this->OrgTrainingManagerService->categorizePrograms();
-      return view('trainings.index', [
-          'drafts' => $categorized['draft'] ?? [],
-          'announced' => $categorized['announced'] ?? [],
-          'ongoing' => $categorized['ongoing'] ?? [],
-          'completed' => $categorized['completed'] ?? [],
-          'stoppedPrograms' => $categorized['stopped'] ?? [],
-      ]);
-  }
+    public function index()
+    {
+        $categorized = $this->OrgTrainingManagerService->categorizePrograms();
+
+        return view('orgTrainings.index', [
+            'drafts' => $categorized['draft'] ?? [],
+            'announced' => $categorized['announced'] ?? [],
+            'ongoing' => $categorized['ongoing'] ?? [],
+            'completed' => $categorized['completed'] ?? [],
+            'stoppedPrograms' => $categorized['stopped'] ?? [],
+        ]);
+    }
   
     public function show($id)
     {

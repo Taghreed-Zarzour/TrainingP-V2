@@ -9,174 +9,168 @@ use Illuminate\Support\Facades\Auth;
 class OrgTrainingManagerService
 {
     public function categorizePrograms()
-    {
-        $organizationId = Auth::id();
-        
-        // جلب التدريبات النشطة (online) والمتوقفة (stopped)
-        $activePrograms = OrgTrainingProgram::with([
-            'organization', 'goals', 'details', 'assistants'
-            ,'assistantUsers','registrationRequirements','language','trainingClassification',
-            'trainingLevel','programType','country','files','trainingSchedules'
-            ])
-            ->where('organization_id', $organizationId)
-            ->where('status', 'online') 
-            ->get();
-            
-        $stoppedPrograms = OrgTrainingProgram::with([
-            'organization', 'goals', 'details', 'assistants',
-            'assistantUsers','registrationRequirements','language','trainingClassification',
-            'trainingLevel','programType','country','files','trainingSchedules'
+{
+    $organizationId = Auth::id();
+
+    // Retrieve active (online) and stopped training programs
+    $activePrograms = OrgTrainingProgram::with([
+        'goals', 'details', 'assistants',
+        'assistantUsers', 'registrationRequirements', 
+        'trainingSchedules'
+    ])
+    ->where('organization_id', $organizationId)
+    ->where('status', 'online')
+    ->get();
+
+    $stoppedPrograms = OrgTrainingProgram::with([
+        'goals', 'details', 'assistants',
+        'assistantUsers', 'registrationRequirements', 
+        'trainingSchedules'
         ])
-            ->where('user_id', $organizationId)
-            ->where('status', 'stopped') 
-            ->get();
-            
-        $draft = [];
-        $announced = [];
-        $ongoing = [];
-        $completed = [];
-        $stopped = [];
-        $now = now();
-        
-        // معالجة التدريبات النشطة
-        foreach ($activePrograms as $program) {
-            // حساب نسبة الإكمال
-            $program->completion_percentage = $this->calculateCompletion($program);
-            
-            // حساب الوقت الكلي للجلسات
-            $totalMinutes = 0;
-            foreach ($program->sessions as $session) {
-                try {
-                    $startParts = explode(':', $session->session_start_time);
-                    $endParts = explode(':', $session->session_end_time);
-                    if (count($startParts) >= 2 && count($endParts) >= 2) {
-                        $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
-                        $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
-                        $diff = max(0, $endInMinutes - $startInMinutes);
-                        $totalMinutes += $diff;
-                    }
-                } catch (\Exception $e) {
-                    continue;
+    ->where('organization_id', $organizationId)
+    ->where('status', 'stopped')
+    ->get();
+    
+    $draft = [];
+    $announced = [];
+    $ongoing = [];
+    $completed = [];
+    $stopped = [];
+    $now = now();
+    // Process active training programs
+    foreach ($activePrograms as $program) {
+        // Calculate completion percentage
+        $program->completion_percentage = $this->calculateCompletion($program);
+
+        // Calculate total session duration
+        $totalMinutes = 0;
+        foreach ($program->trainingSchedules as $session) {
+            try {
+                $startParts = explode(':', $session->session_start_time);
+                $endParts = explode(':', $session->session_end_time);
+                if (count($startParts) >= 2 && count($endParts) >= 2) {
+                    $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
+                    $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
+                    $diff = max(0, $endInMinutes - $startInMinutes);
+                    $totalMinutes += $diff;
                 }
+            } catch (\Exception $e) {
+                continue;
             }
-            $program->total_session_duration_minutes = $totalMinutes;
-            
-            // التحقق من وجود جلسات
-            $hasSessions = $program->sessions && $program->sessions->count() > 0;
-            
-            // 1. التدريبات قيد الإنشاء (غير مكتملة)
-            if ($program->completion_percentage < 100) {
-                $draft[] = $program;
+        }
+        $program->total_session_duration_minutes = $totalMinutes;
+        
+        // Check for sessions
+        $hasSessions = $program->trainingSchedules && $program->trainingSchedules->count() > 0;
+        
+        // Categorize programs
+        if ($program->completion_percentage < 100) {
+            $draft[] = $program;
+            continue;
+        }
+        
+        if ($program->completion_percentage === 100) {
+            if (!$hasSessions || ($program->AdditionalSetting && $program->AdditionalSetting->schedule_later)) {
+                $announced[] = $program;
                 continue;
             }
             
-            // 2. التدريبات المعلنة (مكتملة 100% ولم تبدأ بعد)
-            if ($program->completion_percentage === 100) {
-                // إذا لم تكن هناك جلسات أو تم اختيار تحديد الجلسات لاحقاً، فهي معلنة
-                if (!$hasSessions || ($program->AdditionalSetting && $program->AdditionalSetting->schedule_later)) {
+            $firstSession = $program->trainingSchedules->sortBy('session_date')->first();
+            if ($firstSession) {
+                $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                if ($startTime->isFuture()) {
                     $announced[] = $program;
                     continue;
                 }
-                
-                // إذا كانت هناك جلسات، تحقق من تاريخ أول جلسة
-                $firstSession = $program->sessions->sortBy('session_date')->first();
-                if ($firstSession) {
-                    $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                    if ($startTime->isFuture()) {
-                        $announced[] = $program;
-                        continue;
-                    }
-                }
             }
-            
-            // 3. التدريبات الجارية (مكتملة 100% والجلسات بدأت ولم تنتهِ)
-            if ($program->completion_percentage === 100 && $hasSessions) {
-                $firstSession = $program->sessions->sortBy('session_date')->first();
-                $lastSession = $program->sessions->sortByDesc('session_date')->first();
-                
-                if ($firstSession && $lastSession) {
-                    try {
-                        $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                        $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
-                        
-                        if ($now->between($startTime, $endTime)) {
-                            $ongoing[] = $program;
-                            continue;
-                        }
-                    } catch (\Exception $e) {
-                        $draft[] = $program;
-                        continue;
-                    }
-                }
-            }
-            
-            // 4. التدريبات المكتملة (مكتملة 100% وانتهت جميع الجلسات)
-            if ($program->completion_percentage === 100 && $hasSessions) {
-                $lastSession = $program->sessions->sortByDesc('session_date')->first();
-                if ($lastSession) {
-                    try {
-                        $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
-                        if ($now->greaterThan($endTime)) {
-                            $completed[] = $program;
-                            continue;
-                        }
-                    } catch (\Exception $e) {
-                        $draft[] = $program;
-                        continue;
-                    }
-                }
-            }
-            
-            // لأي حالة ما انصنفت، نحطها بالمسودات كخيار آمن
-            $draft[] = $program;
         }
         
-        // معالجة التدريبات المتوقفة
-        foreach ($stoppedPrograms as $program) {
-            // حساب نسبة الإكمال
-            $program->completion_percentage = $this->calculateCompletion($program);
+        if ($program->completion_percentage === 100 && $hasSessions) {
+            $firstSession = $program->trainingSchedules->sortBy('session_date')->first();
+            $lastSession = $program->trainingSchedules->sortByDesc('session_date')->first();
             
-            // حساب الوقت الكلي للجلسات
-            $totalMinutes = 0;
-            foreach ($program->sessions as $session) {
+            if ($firstSession && $lastSession) {
                 try {
-                    $startParts = explode(':', $session->session_start_time);
-                    $endParts = explode(':', $session->session_end_time);
-                    if (count($startParts) >= 2 && count($endParts) >= 2) {
-                        $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
-                        $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
-                        $diff = max(0, $endInMinutes - $startInMinutes);
-                        $totalMinutes += $diff;
+                    $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                    $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
+                    
+                    if ($now->between($startTime, $endTime)) {
+                        $ongoing[] = $program;
+                        continue;
                     }
                 } catch (\Exception $e) {
+                    $draft[] = $program;
                     continue;
                 }
             }
-            $program->total_session_duration_minutes = $totalMinutes;
-            
-            // التحقق من وجود جلسات
-            $hasSessions = $program->sessions && $program->sessions->count() > 0;
-            
-            // فقط التدريبات المكتملة 100% تعتبر متوقفة عن الإعلان
-            if ($program->completion_percentage === 100) {
-                $stopped[] = $program;
-            } else {
-                $draft[] = $program;
+        }
+        
+        if ($program->completion_percentage === 100 && $hasSessions) {
+            $lastSession = $program->trainingSchedules->sortByDesc('session_date')->first();
+            if ($lastSession) {
+                try {
+                    $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
+                    if ($now->greaterThan($endTime)) {
+                        $completed[] = $program;
+                        continue;
+                    }
+                } catch (\Exception $e) {
+                    $draft[] = $program;
+                    continue;
+                }
             }
         }
         
-        return compact('draft', 'announced', 'ongoing', 'completed', 'stopped');
+        // Default to draft if no category matched
+        $draft[] = $program;
     }
+    
+    // Process stopped training programs
+    foreach ($stoppedPrograms as $program) {
+        // Calculate completion percentage
+        $program->completion_percentage = $this->calculateCompletion($program);
+        
+        // Calculate total session duration
+        $totalMinutes = 0;
+        foreach ($program->trainingSchedules as $session) {
+            try {
+                $startParts = explode(':', $session->session_start_time);
+                $endParts = explode(':', $session->session_end_time);
+                if (count($startParts) >= 2 && count($endParts) >= 2) {
+                    $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
+                    $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
+                    $diff = max(0, $endInMinutes - $startInMinutes);
+                    $totalMinutes += $diff;
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+        $program->total_session_duration_minutes = $totalMinutes;
+        
+        // Check for sessions
+        $hasSessions = $program->trainingSchedules && $program->trainingSchedules->count() > 0;
+        
+        // Only completed programs are considered stopped
+        if ($program->completion_percentage === 100) {
+            $stopped[] = $program;
+        } else {
+            $draft[] = $program;
+        }
+    }
+    
+    return compact('draft', 'announced', 'ongoing', 'completed', 'stopped');
+}
     
     // حساب نسبة اكتمال التدريب بشكل احترافي
     public function calculateCompletion(OrgTrainingProgram $program)
     {
         // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب (تم تعديل الأوزان)
         $weights = [
-            'basic_info' => 9,      // المعلومات الأساسية (الاسم، الوصف، إلخ) — قللنا الوزن
+            'basic_info' => 10,      // المعلومات الأساسية (الاسم، الوصف، إلخ) — قللنا الوزن
             'details' => 2,         // التفاصيل (المخرجات، المتطلبات، الفئة المستهدفة، المزايا) — زدنا الوزن
             'settings' => 8,        // الإعدادات (السعر، الموعد النهائي، الحد الأقصى للمتدربين، إلخ) — زدنا الوزن
-            'sessions' => 0,        // الجلسات — زدنا الوزن
+            'sessions' => 3,        // الجلسات — زدنا الوزن
             'goals' => 6,
         ];
         
@@ -185,10 +179,10 @@ class OrgTrainingManagerService
         
         // 1. التحقق من المعلومات الأساسية
         $basicFields = [
-            'title', 'language_id', 'country',
+            'title', 'language_id', 'country_id',
             'city', 'address_in_detail','training_level_id',
-            'program_type', 'program_presentation_method_id',
-            'program_description'
+            'program_type', 'program_presentation_method',
+            'program_description','org_training_classification_id'
         ];
         
         $basicCompleted = 0;
@@ -247,24 +241,23 @@ class OrgTrainingManagerService
         }
         
         // 4. التحقق من الجلسات
-        if ($program->details->trainingSchedules && $program->details->trainingSchedules->count() > 0) {
+        if ($program->trainingSchedules && $program->trainingSchedules->count() > 0) {
             $validSessions = 0;
-            foreach ($program->details->trainingSchedules as $session) {
+            foreach ($program->trainingSchedules as $session) {
                 if (!empty($session->session_date) && 
                     !empty($session->session_start_time) && 
                     !empty($session->session_end_time)) {
                     $validSessions++;
                 }
             }
-            
-            $sessionsPercentage = ($validSessions / $program->sessions->count()) * 100;
+            $sessionsPercentage = ($validSessions / $program->trainingSchedules->count()) * 100;
             $completedWeight += ($sessionsPercentage / 100) * $weights['sessions'];
         } else {
             $completedWeight += $weights['sessions'];
         }
 
         if ($program->goals) {
-            $goalFields = ['learning_outcomes', 'education_level', 'work_status',
+            $goalFields = ['learning_outcomes', 'education_level_id', 'work_status',
                             'work_sector_id','job_position','country_id'
                         ];
             $goalCompleted = 0;
