@@ -273,7 +273,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   });
 
-  Route::get('organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTrainingsManager.index');
+  Route::get('/organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTrainingsManager.index');
 
 });
 
