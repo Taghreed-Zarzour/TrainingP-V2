@@ -23,10 +23,7 @@ class OrgTrainingDetail extends Model
         return $this->belongsTo(OrgTrainingProgram::class, 'org_training_program_id');
     }
 
-    public function trainingSchedules()
-    {
-        return $this->hasMany(OrgTrainingSchedule::class, 'org_training_detail_id');
-    }
+    
 
     public function trainer()
     {

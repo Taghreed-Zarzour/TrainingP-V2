@@ -762,7 +762,8 @@ public function show($id){
         'details',
         'goals',
         'registrationRequirements',
-        'assistants'
+        'assistants',
+        'trainingSchedules'
     )->where('status', 'online')->findOrFail($id);
 
     $eduaction_levels_ids =  $OrgProgram->goals->first()->education_level_id;
@@ -772,7 +773,7 @@ public function show($id){
     $work_sectors = WorkSector::whereIn('id',$work_sector_ids)->pluck('name');
 
     $grandTotalMinutes = 0;
-    foreach ($OrgProgram->details as $program) {
+    foreach ($OrgProgram as $program) {
         foreach ($program->trainingSchedules as $session) {
             $grandTotalMinutes += \Carbon\Carbon::parse($session->session_start_time)
                 ->diffInMinutes(\Carbon\Carbon::parse($session->session_end_time));
