@@ -678,6 +678,48 @@ public function showReviewForm($orgTrainingId)
   }
 
 
+public function show($id){
+    $OrgProgram = OrgTrainingProgram::with(
+        'details',
+        'goals',
+        'registrationRequirements',
+        'assistants'
+    )->where('status', 'online')->findOrFail($id);
+
+    $eduaction_levels_ids =  $OrgProgram->goals->first()->education_level_id;
+    $education_levels = EducationLevel::whereIn('id',$eduaction_levels_ids)->pluck('name');
+
+    $work_sector_ids =  $OrgProgram->goals->first()->work_sector_id;
+    $work_sectors = WorkSector::whereIn('id',$work_sector_ids)->pluck('name');
+
+    $grandTotalMinutes = 0;
+    foreach ($OrgProgram->details as $program) {
+        foreach ($program->trainingSchedules as $session) {
+            $grandTotalMinutes += \Carbon\Carbon::parse($session->session_start_time)
+                ->diffInMinutes(\Carbon\Carbon::parse($session->session_end_time));
+        }
+    }
+    return view('orgTrainings.show',compact('OrgProgram','education_levels','work_sectors','grandTotalMinutes'));
+
+}
+
+public function showProgram($id)
+{
+    $program = OrgTrainingDetail::findOrFail($id)->load('Trainer', 'trainingSchedules','trainingProgram');
+
+    $orgProgram = OrgTrainingProgram::where('id', $program->org_training_program_id)->first();
+
+    $grandTotalMinutes = 0;
+    foreach ($orgProgram->details as $detail) {
+        foreach ($detail->trainingSchedules as $session) {
+            $grandTotalMinutes += \Carbon\Carbon::parse($session->session_start_time)
+                ->diffInMinutes(\Carbon\Carbon::parse($session->session_end_time));
+        }
+    }
+
+    return view('orgTrainings.show-program', compact('program','orgProgram','grandTotalMinutes'));
+}
+
 
 }
 

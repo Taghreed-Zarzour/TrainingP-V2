@@ -275,6 +275,9 @@ Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedbac
 
 
 Route::get('/trainings/announcements', [TrainingsController::class, 'index'])->name('trainings_announcements');
+
+Route::get('/org/trainings/show/{id}',[OrgTrainingController::class, 'show'])->name('org.training.show');
+Route::get('/org/trainings/show/program/{id}',[OrgTrainingController::class, 'showProgram'])->name('org.training.show.program');
 Route::get('/trainings/announcements/show/{id}', [TrainingsController::class, 'show'])->name('show_trainings_announcements');
 Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
 Route::get('/assistants', [AssistantController::class, 'index'])->name('trainers.index');

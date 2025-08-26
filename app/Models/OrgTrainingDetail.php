@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class OrgTrainingDetail extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'program_title',
         'org_training_program_id',
@@ -23,14 +23,14 @@ protected $casts = [
 ];
     public function trainingProgram()
     {
-        return $this->belongsTo(OrgTrainingProgram::class);
+        return $this->belongsTo(OrgTrainingProgram::class, 'org_training_program_id');
     }
-    
+
     public function trainingSchedules()
     {
         return $this->hasMany(OrgTrainingSchedule::class, 'org_training_detail_id');
     }
-    
+
     public function trainer()
     {
         return $this->belongsTo(User::class, 'trainer_id');
