@@ -146,35 +146,37 @@ $diffInSeconds = $now->diffInSeconds($deadline);
     }
 }
 
-    public function index()
-    {
-        $programsResponse = $this->trainingAnnouncementService->index();
+public function index()
+{
+    $programsResponse = $this->trainingAnnouncementService->index();
 
-        $programs = $programsResponse['data'] ?? [];
-        foreach ($programs as $program) {
-            $minutes = 0;
-            if ($program->sessions) {
-                foreach ($program->sessions as $session) {
-                    $start = Carbon::createFromTimeString($session->session_start_time);
-                    $end = Carbon::createFromTimeString($session->session_end_time);
-                    $adjustedEnd = $end->copy();
-                    if ($adjustedEnd->lessThanOrEqualTo($start)) {
-                        $adjustedEnd->addDay();
-                    }
-                    $diff = $adjustedEnd->diffInMinutes($start, true);
-                    $minutes += $diff;
+    $programs = $programsResponse['data'] ?? [];
+    foreach ($programs as $program) {
+        $minutes = 0;
+        if ($program->sessions) {
+            foreach ($program->sessions as $session) {
+                $start = Carbon::createFromTimeString($session->session_start_time);
+                $end = Carbon::createFromTimeString($session->session_end_time);
+                $adjustedEnd = $end->copy();
+                if ($adjustedEnd->lessThanOrEqualTo($start)) {
+                    $adjustedEnd->addDay();
                 }
+                $diff = $adjustedEnd->diffInMinutes($start, true);
+                $minutes += $diff;
             }
-            $program->total_duration_hours = round($minutes / 60, 2);
-
-            // حساب حالة التسجيل لكل برنامج
-            $deadline = $program->AdditionalSetting->application_deadline ?? null;
-            $program->registration_status = $this->calculateRegistrationStatus($deadline);
         }
+        $program->total_duration_hours = round($minutes / 60, 2);
 
-        $program_classification = TrainingClassification::all();
-        $trainerIds = TrainingProgram::pluck('user_id');
-        $trainers = User::with('trainee')->whereIn('id', $trainerIds)->get();
+        // حساب حالة التسجيل لكل برنامج
+        $deadline = $program->AdditionalSetting->application_deadline ?? null;
+        $program->registration_status = $this->calculateRegistrationStatus($deadline);
+    }
+
+    $program_classification = TrainingClassification::all();
+    $trainerIds = TrainingProgram::pluck('user_id');
+    $trainers = User::with('trainee')->whereIn('id', $trainerIds)->get();
+
+    $currentDateTime = now(); // الحصول على الوقت الحالي
 
         $allOrgPrograms = OrgTrainingProgram::with(
             'details',
@@ -184,7 +186,7 @@ $diffInSeconds = $now->diffInSeconds($deadline);
         )
         ->where('status', 'online')
         ->get();
-// dd($allOrgPrograms);
+dd($allOrgPrograms);
         return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));
     }
 

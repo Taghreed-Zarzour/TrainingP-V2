@@ -337,10 +337,15 @@ public function showtrainingDetailForm($orgTrainingId)
 
         // Save files to org_training_detail_files table
         if (!empty($allFiles)) {
-            OrgTrainingDetailFile::updateOrCreate(
-                ['org_training_program_id' => $orgTraining->id],
-                ['training_files' => json_encode($allFiles)] // Convert array to JSON
-            );
+            foreach ($allFiles as $file) {
+                $orgTrainingDetailFile = new OrgTrainingDetailFile(); // Create a new instance
+                $orgTrainingDetailFile->fill([
+                    'org_training_program_id' => $orgTraining->id,
+                    'training_files' => $file
+                ]);
+                $orgTrainingDetailFile->save(); // Save the instance to the database
+            }
+            
         }
 
         // 8. Create new details
@@ -388,32 +393,39 @@ public function showtrainingDetailForm($orgTrainingId)
 /**
  * معالجة ملفات التدريب
  */
-  protected function processTrainingFiles($request, $settings)
-  {
+protected function processTrainingFiles($request, $settings)
+{
     $trainingFiles = [];
 
     // الحفاظ على الملفات الموجودة إذا لم يتم تحميل ملفات جديدة
     if ($settings->training_files) {
-      $trainingFiles = is_string($settings->training_files)
-        ? json_decode($settings->training_files, true)
-        : $settings->training_files;
+        $trainingFiles = is_string($settings->training_files)
+            ? json_decode($settings->training_files, true)
+            : $settings->training_files;
     }
 
     // إضافة الملفات الجديدة
     if ($request->hasFile('training_files')) {
-      foreach ($request->file('training_files') as $file) {
-$filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-$extension = $file->getClientOriginalExtension();
-$timestamp = now()->format('Ymd_His');
-$uniqueFilename = $filename . '_' . $timestamp . '.' . $extension;
+        foreach ($request->file('training_files') as $file) {
+            $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $timestamp = now()->format('Ymd_His');
+            $uniqueFilename = $filename . '_' . $timestamp . '.' . $extension;
 
-$path = $file->storeAs('training/files', $uniqueFilename, 'public');
-$trainingFiles[] = $path;
-      }
+            $path = $file->storeAs('training/files', $uniqueFilename, 'public');
+            $trainingFiles[] = $path;
+        }
     }
 
+    // تخزين الملفات في قاعدة البيانات
+    $storedFiles = implode("\n", $trainingFiles); // كل مسار في سطر منفصل
+
+    // تحديث إعدادات قاعدة البيانات
+    $settings->training_files = $storedFiles; // تأكد من أن لديك الحقل المناسب
+    $settings->save(); // حفظ التغييرات في قاعدة البيانات
+
     return $trainingFiles;
-  }
+}
 
 /**
  * التأكد من وجود مفتاح المصفوفة
