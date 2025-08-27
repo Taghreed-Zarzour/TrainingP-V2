@@ -146,48 +146,68 @@ $diffInSeconds = $now->diffInSeconds($deadline);
     }
 }
 
-    public function index()
-    {
-        $programsResponse = $this->trainingAnnouncementService->index();
+public function index()
+{
+    $programsResponse = $this->trainingAnnouncementService->index();
 
-        $programs = $programsResponse['data'] ?? [];
-        foreach ($programs as $program) {
-            $minutes = 0;
-            if ($program->sessions) {
-                foreach ($program->sessions as $session) {
-                    $start = Carbon::createFromTimeString($session->session_start_time);
-                    $end = Carbon::createFromTimeString($session->session_end_time);
-                    $adjustedEnd = $end->copy();
-                    if ($adjustedEnd->lessThanOrEqualTo($start)) {
-                        $adjustedEnd->addDay();
-                    }
-                    $diff = $adjustedEnd->diffInMinutes($start, true);
-                    $minutes += $diff;
+    $programs = $programsResponse['data'] ?? [];
+    foreach ($programs as $program) {
+        $minutes = 0;
+        if ($program->sessions) {
+            foreach ($program->sessions as $session) {
+                $start = Carbon::createFromTimeString($session->session_start_time);
+                $end = Carbon::createFromTimeString($session->session_end_time);
+                $adjustedEnd = $end->copy();
+                if ($adjustedEnd->lessThanOrEqualTo($start)) {
+                    $adjustedEnd->addDay();
                 }
+                $diff = $adjustedEnd->diffInMinutes($start, true);
+                $minutes += $diff;
             }
-            $program->total_duration_hours = round($minutes / 60, 2);
-
-            // حساب حالة التسجيل لكل برنامج
-            $deadline = $program->AdditionalSetting->application_deadline ?? null;
-            $program->registration_status = $this->calculateRegistrationStatus($deadline);
         }
+        $program->total_duration_hours = round($minutes / 60, 2);
 
-        $program_classification = TrainingClassification::all();
-        $trainerIds = TrainingProgram::pluck('user_id');
-        $trainers = User::with('trainee')->whereIn('id', $trainerIds)->get();
-
-        $allOrgPrograms = OrgTrainingProgram::with(
-            'details',
-            'goals',
-            'registrationRequirements',
-            'assistants'
-        )
-        ->where('status', 'online')
-        ->get();
-dd($allOrgPrograms);
-        return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));
+        // حساب حالة التسجيل لكل برنامج
+        $deadline = $program->AdditionalSetting->application_deadline ?? null;
+        $program->registration_status = $this->calculateRegistrationStatus($deadline);
     }
 
+    $program_classification = TrainingClassification::all();
+    $trainerIds = TrainingProgram::pluck('user_id');
+    $trainers = User::with('trainee')->whereIn('id', $trainerIds)->get();
+
+    $currentDateTime = now(); // الحصول على الوقت الحالي
+
+    $allOrgPrograms = OrgTrainingProgram::with(
+        'details',
+        'goals',
+        'registrationRequirements',
+        'assistants'
+    )
+    ->where('status', 'online')
+    ->get()
+    ->filter(function ($program) use ($currentDateTime) {
+        // الحصول على التاريخ الحالي
+        $currentDate = $currentDateTime->toDateString(); // تحويل الوقت الحالي إلى تاريخ فقط
+    
+        if ($program->details && $program->details->count() > 0) {
+            foreach ($program->details as $detail) {
+                if ($detail->trainingSchedules && $detail->trainingSchedules->count() > 0) {
+                    $lastSession = $detail->trainingSchedules->last();
+                    
+                    // استخدام session_date للحصول على تاريخ الجلسة
+                    $sessionDate = $lastSession->session_date; // تأكد من أن هذا التاريخ بالتنسيق الصحيح
+                    
+                    // تحقق مما إذا كانت الجلسة تنتهي بعد التاريخ الحالي
+                    return $sessionDate > $currentDate; // استخدم > للتأكد من أن الجلسة بعد اليوم
+                }
+            }
+        }
+        return false; // إذا لم يكن هناك تفاصيل أو جلسات، اعتبر البرنامج غير صالح
+    });
+
+    return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));
+}
     public function show($id)
     {
         $program = $this->trainingAnnouncementService->getById($id);
