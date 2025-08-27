@@ -193,6 +193,14 @@ h3 {
     background: #616e70;
 }
 
+.btn-attendance {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-left: 5px;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
@@ -268,6 +276,7 @@ h3 {
                             <th>Date</th>
                             <th>Time</th>
                             <th>Status</th>
+                            <th>Attendance number</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -287,6 +296,7 @@ h3 {
                                         {{ $sessionStatuses[$session->id] ?? 'غير محدد' }}
                                     </span>
                                 </td>
+                                <td >{{ $sessionAttendanceCounts[$session->id] ?? 0 }}</td>
                                 <td>
                                     <div class="action-buttons">
                                         <!-- Edit button -->
@@ -300,14 +310,18 @@ h3 {
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-delete">Delete</button>
                                         </form>
+
+                                        <!-- Attendance button -->
+                                        <a href="{{ route('orgSession.attendance', $session->id) }}" class="btn btn-attendance">
+                                            تحديد الحضور
+                                        </a>
                                     </div>
                                 </td>
+
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-
-
                 </div>
             @endforeach
         </div>
@@ -342,6 +356,15 @@ h3 {
     </div>
 </div>
 
+
+<div class="card">
+    <h3 class="card-header">الاحصائيات</h3>
+    <p><strong>views:</strong> {{ $OrgProgram->views }}</p>
+    <p><strong>participants count:</strong> {{ count($participants) }}</p>
+    <p><strong>trainees count:</strong> {{ count($trainees)}}</p>
+    <p><strong>Overall Attendance percentage:</strong> {{ $overallAttendancePercentage}}</p>
+
+</div>
 
     <div class="card">
         <h1>معلومات المسار</h1>
@@ -509,6 +532,72 @@ h3 {
         @endif
     </div>
 
+    <div class="card">
+        <h3>المتقدمون</h3>
+        @foreach($participants as $participant)
+            <div class="border p-3 mb-3">
+                <strong>{{ $participant->user->name }} {{ $participant->last_name }}</strong>
+
+
+                    <form action="{{ route('participants.handleAction', [$OrgProgram->id, $participant->id]) }}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="action" value="accept">
+                        <input type="hidden" name="is_org" value="true"> <!-- or "false" if it's a regular program -->
+                        <button type="submit" class="btn btn-success btn-sm">قبول</button>
+                    </form>
+
+                    <form action="{{ route('participants.handleAction', [$OrgProgram->id, $participant->id]) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="is_org" value="true"> <!-- أو "false" حسب نوع البرنامج -->
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit">رفض</button>
+                    </form>
+
+                    <form action="{{ route('participants.submitReason', [$OrgProgram->id, $participant->id]) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="is_org" value="true">
+                        <input type="text" name="rejection_reason" class="form-control" placeholder="سبب الرفض">
+                        <button type="submit" class="btn btn-warning">حفظ السبب</button>
+                    </form>
+
+                    <form action="{{ route('participants.bulkAccept', $OrgProgram->id) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="is_org" value="true"> <!-- or "false" -->
+                        <button type="submit" class="btn btn-success">قبول جميع المتدربين</button>
+                    </form>
+            </div>
+        @endforeach
+    </div>
+
+
+    <div class="card">
+        <h3 class="card-header">المتدربون</h3>
+        <div class="card-body">
+            @forelse($trainees as $trainee)
+                <div class="border rounded p-3 mb-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>الاسم:</strong> {{ $trainee->user->name }} {{ $trainee->last_name }}<br>
+                            <strong>البريد الإلكتروني:</strong> {{ $trainee->user->email }}<br>
+                            <strong>رقم الهاتف:</strong> {{ $trainee->user->phone_number }}
+                            <strong>نسبة الحضور</strong>{{ $attendanceStats[$trainee->id] ?? '0' }}%
+                        </div>
+                        <div>
+                            <form action="{{ route('acceptedTrainee.delete', [$trainee->id, $OrgProgram->id]) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذا المتدرب؟')">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="is_org" value="true"> {{-- or "false" --}}
+                                <button type="submit" class="btn btn-danger btn-sm">حذف</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <p class="text-muted">لا يوجد متدربون مسجلون حتى الآن.</p>
+            @endforelse
+        </div>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -540,6 +629,7 @@ h3 {
             popup.addEventListener('click', e => { if(e.target === e.currentTarget) popup.style.display = 'none'; });
         });
         </script>
+
 
 
 

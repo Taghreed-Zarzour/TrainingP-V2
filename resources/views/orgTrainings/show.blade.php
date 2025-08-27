@@ -94,7 +94,12 @@
         <p><strong>Language:</strong> {{ $OrgProgram->language->name }}</p>
         <p><strong>Description:</strong> {{ $OrgProgram->program_description }}</p>
         <p><strong>Created by:</strong> {{ $OrgProgram->organization->user->name }}</p>
-        <p><strong>Join Now:</strong> <span class="highlight">${{ $OrgProgram->registrationRequirements->cost }}</span></p>
+        <form action="{{ route('orgEnrollment.enroll', ['OrgProgram_id' => $OrgProgram->id]) }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-primary">سجل الآن</button>
+        </form>
+
+
     </div>
 
     {{-- Program Info --}}
@@ -257,7 +262,7 @@
     </div>
 
 
-    
+
 
 </body>
 </html>

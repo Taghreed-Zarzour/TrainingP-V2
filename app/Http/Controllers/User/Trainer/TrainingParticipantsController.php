@@ -13,10 +13,15 @@ class TrainingParticipantsController extends Controller
     public function handleAction(Request $request, $programId, $participantId)
 {
     $action = $request->input('action');
+    $isOrgProgram = $request->input('is_org', false);
 
-    $enrollment = Enrollment::where('trainee_id', $participantId)
-                            ->where('training_programs_id', $programId)
-                            ->firstOrFail();
+    $query = Enrollment::where('trainee_id', $participantId);
+    if ($isOrgProgram) {
+        $query->where('org_training_programs_id', $programId);
+    } else {
+        $query->where('training_programs_id', $programId);
+    }
+    $enrollment = $query->firstOrFail();
 
     if ($action === 'accept') {
         $enrollment->status = 'accepted';
@@ -32,37 +37,62 @@ class TrainingParticipantsController extends Controller
 public function submitReason(rejectParticipantRequst $request, $programId, $participantId)
 {
 
-    $enrollment = Enrollment::where('trainee_id',$participantId)->where('training_programs_id', $programId)
-                            ->where('status','rejected')->firstOrFail();
+    $isOrgProgram = $request->input('is_org', false);
+
+    $query = Enrollment::where('trainee_id', $participantId)
+                       ->where('status', 'rejected');
+
+    if ($isOrgProgram) {
+        $query->where('org_training_programs_id', $programId);
+    } else {
+        $query->where('training_programs_id', $programId);
+    }
+
+    $enrollment = $query->firstOrFail();
 
     $enrollment->rejection_reason = $request->input('rejection_reason');
     $enrollment->save();
+
 
     return redirect()->back()->with('success', 'تم حفظ سبب الرفض بنجاح.');
 }
 
 
 
-public function bulkAccept($programId)
+public function bulkAccept(Request $request, $programId)
 {
-    $enrollments = Enrollment::where('training_programs_id', $programId)->where('status','pending')->get();
+    $isOrgProgram = $request->input('is_org', false);
+    $query = Enrollment::where('status', 'pending');
 
-    foreach ($enrollments as $enrollment) {
-        $enrollment->status = 'accepted';
-        $enrollment->save();
+    if ($isOrgProgram) {
+        $query->where('org_training_programs_id', $programId);
+    } else {
+        $query->where('training_programs_id', $programId);
     }
 
-    return back()->with('success', 'تم قبول جميع المتدربين بنجاح ');
+    $enrollments = $query->get();
+    foreach ($enrollments as $enrollment) {
+        $enrollment->update(['status' => 'accepted']);
+    }
+
+    return back()->with('success', 'تم قبول جميع المتدربين بنجاح.');
 }
 
-public function deleteAcceptedTrainee($trainee_id, $program_id){
 
-    $traineeEnrollment = Enrollment::where('trainee_id',$trainee_id)->where('training_programs_id',$program_id)->first();
-    $traineeEnrollment->status = 'rejected';
-    $traineeEnrollment->save();
+public function deleteAcceptedTrainee(Request $request, $trainee_id, $program_id)
+{
+    $isOrgProgram = $request->input('is_org', false);
+    $query = Enrollment::where('trainee_id', $trainee_id);
 
-    return back()->with('success', 'تم حذف المتدرب بنجاح');
-
+    if ($isOrgProgram) {
+        $query->where('org_training_programs_id', $program_id);
+    } else {
+        $query->where('training_programs_id', $program_id);
+    }
+    $traineeEnrollment = $query->firstOrFail();
+    $traineeEnrollment->update(['status' => 'rejected']);
+    
+    return back()->with('success', 'تم حذف المتدرب بنجاح.');
 }
 
 }

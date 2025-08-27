@@ -66,5 +66,11 @@ class Trainee extends Model
                     ->withPivot('status', 'registered_at', 'rejection_reason');
     }
 
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class, 'trainee_id');
+    }
+
+
 }
 

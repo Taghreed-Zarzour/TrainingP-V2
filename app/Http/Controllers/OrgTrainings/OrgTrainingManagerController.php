@@ -12,6 +12,7 @@ use App\Models\Enrollment;
 use App\Models\Language;
 use App\Models\OrgAssistantManagement;
 use App\Models\OrgRegistrationAndRequirement;
+use App\Models\OrgSessionAttendance;
 use App\Models\OrgTrainingDetail;
 use App\Models\OrgTrainingProgram;
 use App\Models\OrgTrainingSchedule;
@@ -25,6 +26,7 @@ use App\Models\trainingLevel;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\WorkSector;
+use App\Services\EnrollmentService;
 use App\Services\OrgTrainingManagerService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -33,12 +35,16 @@ use Illuminate\Support\Facades\Storage;
 
 class OrgTrainingManagerController extends Controller
 {
+
+    protected $enrollmentService;
     protected $OrgTrainingManagerService;
     protected $stepKeys = ['program', 'detail', 'setting', 'sessions'];
 
-    public function __construct(OrgTrainingManagerService $OrgTrainingManagerService)
+
+    public function __construct(OrgTrainingManagerService $OrgTrainingManagerService, EnrollmentService $enrollmentService)
     {
       $this->OrgTrainingManagerService = $OrgTrainingManagerService;
+      $this->enrollmentService = $enrollmentService;
     }
 
   public function index()
@@ -71,34 +77,41 @@ class OrgTrainingManagerController extends Controller
         $work_sector_ids =  $OrgProgram->goals->first()->work_sector_id;
         $work_sectors = WorkSector::whereIn('id',$work_sector_ids)->pluck('name');
 
-      // المشاهدات
-    //   $program->increment('views');
 
 
-//       // المسجلون
-//       $participantIds = Enrollment::where('training_programs_id', $id)->pluck('trainee_id');
-//       $participants = Trainee::whereIn('id', $participantIds)->get();
+      // المسجلون
+      $participantIds = Enrollment::where('org_training_programs_id', $id)->pluck('trainee_id');
+      $participants = Trainee::whereIn('id', $participantIds)
+    ->with(['enrollments' => function ($query) use ($id) {
+        $query->where('org_training_programs_id', $id);
+    }])->get();
 
-//       // المتدربون
-//       $traineeIds = Enrollment::where('training_programs_id', $id)->where('status', 'accepted')->pluck('trainee_id');
-//       $trainees = Trainee::whereIn('id', $traineeIds)->get();
 
-//       //نسبة الحضور
-//       $totalSessions = schedulingTrainingSessions::where('training_program_id', $id)->pluck('id');
-//       $attendanceStats = [];
+    // المتدربون
+    $traineeIds = Enrollment::where('org_training_programs_id', $id)->where('status', 'accepted')->pluck('trainee_id');
+    $trainees = Trainee::whereIn('id', $traineeIds)->get();
 
-//       foreach ($trainees as $trainee) {
-//         $attendedSessions = SessionAttendance::where('trainee_id', $trainee->id)
-//           ->where('attended', 1)
-//           ->whereIn('session_id', $totalSessions)
-//           ->count();
+    //نسبة الحضور
+    $totalSessions = OrgTrainingSchedule::whereHas('trainingProgram', function ($query) use($id){
+        $query->whereHas('trainingProgram',function($query)use($id){
+            $query->where('org_training_program_id',$id);
+        });
+    })->pluck('id');
 
-//   $sessionCount = count($totalSessions);
-//   $percentage = $sessionCount > 0
-//       ? round(($attendedSessions / $sessionCount) * 100, 2)
-//       : 0;
-//         $attendanceStats[$trainee->id] = $percentage;
-//       }
+      $attendanceStats = [];
+
+      foreach ($trainees as $trainee) {
+        $attendedSessions = OrgSessionAttendance::where('trainee_id', $trainee->id)
+          ->where('attended', 1)
+          ->whereIn('session_id', $totalSessions)
+          ->count();
+
+  $sessionCount = count($totalSessions);
+  $percentage = $sessionCount > 0
+      ? round(($attendedSessions / $sessionCount) * 100, 2)
+      : 0;
+        $attendanceStats[$trainee->id] = $percentage;
+      }
 
       //حالة الجلسة لكل جلسة
       $sessionStatuses = [];
@@ -126,24 +139,31 @@ class OrgTrainingManagerController extends Controller
                 }
 
                 $sessionStatuses[$session->id] = $status;
+
+                $attendeeCount = OrgSessionAttendance::where('session_id', $session->id)
+                ->where('attended', 1)
+                ->count();
+
+              $sessionAttendanceCounts[$session->id] = $attendeeCount;
             }
         }
 
-        //Assistants
-        $assistants= User::where('user_type_id',2)->with('assistant')->get();
-//       //نسبة الحضور العامة
-//       $totalSessionsCount = count($totalSessions);
-//       $totalTraineesCount = count($trainees);
-//       $totalExpectedAttendance = $totalSessionsCount * $totalTraineesCount;
-//       $totalActualAttendance = SessionAttendance::whereIn('session_id', $totalSessions)
-//         ->where('attended', 1)
-//         ->count();
+    //Assistants
+    $assistants= User::where('user_type_id',2)->with('assistant')->get();
 
-//       if ($totalExpectedAttendance > 0) {
-//         $overallAttendancePercentage = round(($totalActualAttendance / $totalExpectedAttendance) * 100, 2);
-//       } else {
-//         $overallAttendancePercentage = 0;
-//       }
+    //نسبة الحضور العامة
+      $totalSessionsCount = count($totalSessions);
+      $totalTraineesCount = count($trainees);
+      $totalExpectedAttendance = $totalSessionsCount * $totalTraineesCount;
+      $totalActualAttendance = OrgSessionAttendance::whereIn('session_id', $totalSessions)
+        ->where('attended', 1)
+        ->count();
+
+      if ($totalExpectedAttendance > 0) {
+        $overallAttendancePercentage = round(($totalActualAttendance / $totalExpectedAttendance) * 100, 2);
+      } else {
+        $overallAttendancePercentage = 0;
+      }
 
       return view('orgTrainings.training-manager', compact(
         'OrgProgram',
@@ -151,10 +171,12 @@ class OrgTrainingManagerController extends Controller
         'orgTrainingClassification',
         'education_levels',
         'assistants',
-        // 'attendanceStats',
+        'participants',
+        'attendanceStats',
         'sessionStatuses',
-        // 'sessionAttendanceCounts',
-        // 'overallAttendancePercentage',
+        'trainees',
+        'sessionAttendanceCounts',
+        'overallAttendancePercentage',
       ));
     }
 
@@ -246,7 +268,75 @@ public function storeOrgAssistant(storeOrgAssistantRequset $request)
     return redirect()->back()->with('success', 'تمت إضافة الميسر بنجاح');
 }
 
+public function enroll($OrgProgram_id)
+  {
+    $response = $this->enrollmentService->store(program_id: null, orgProgram_id: $OrgProgram_id);
+    if ($response['success'] == true) {
 
+      return redirect()->back()->with('success', $response['msg']);
+    } else {
+      return back()->withErrors(['error' => $response['msg']]);
+    }
+
+  }
+
+  public function selectSessionAttendance(OrgTrainingSchedule $session, Request $request)
+  {
+    $viewType = request()->query('view', 'default');
+
+    $programId = $session->trainingProgram->trainingProgram->id;
+
+    $traineeIds = Enrollment::where('org_training_programs_id', $programId)
+      ->where('status', 'accepted')
+      ->pluck('trainee_id');
+
+    $session_attendance_ids = OrgSessionAttendance::where('session_id', $session->id)
+      ->where('attended', 1)
+      ->pluck('trainee_id');
+
+
+    $trainees = Trainee::whereIn('id', $traineeIds)
+      ->whereNotIn('id', $session_attendance_ids)->with('user')->get();
+
+    $session_attendance = Trainee::whereIn('id', $session_attendance_ids)
+      ->with('user') ->get();
+
+    return view('orgTrainings.training-manager-attendance', compact(
+      'session',
+      'trainees',
+      'session_attendance',
+      'viewType'
+    ));
+  }
+
+  public function storeSessionAttendance(Request $request, OrgTrainingSchedule $session)
+  {
+    $attendedIds = $request->input('attended', []);
+
+    $programId = $session->trainingProgram->trainingProgram->id;
+
+    $traineeIds = Enrollment::where('org_training_programs_id', $programId)->pluck('trainee_id');
+
+    foreach ($traineeIds as $traineeId) {
+      $isPresent = in_array($traineeId, $attendedIds);
+     if ($isPresent == 1) {
+        OrgSessionAttendance::updateOrCreate([
+        'session_id' => $session->id,
+        'trainee_id' => $traineeId,
+        'attended' => 1,
+      ]);
+    }
+  }
+    return redirect()->back()->with('success', 'تم تسجيل الحضور بنجاح!');
+  }
+
+  public function showSessionAttendance(OrgTrainingSchedule $session)
+  {
+    $session_attendance_ids = OrgSessionAttendance::where('attended', 1)->pluck('trainee_id');
+    $session_attendance = Trainee::where('id', $session_attendance_ids)->get();
+
+    return view('orgTrainings.training-manager-attendance', compact('session', 'session_attendance'));
+  }
 
 
     public function stopSharing($id)

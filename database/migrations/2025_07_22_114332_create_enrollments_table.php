@@ -20,6 +20,7 @@ return new class extends Migration
             ->onDelete('cascade');
 
             $table->foreignId(column: 'training_programs_id')
+            ->nullable()
             ->references('id')
             ->on('training_programs')
             ->onDelete('cascade');

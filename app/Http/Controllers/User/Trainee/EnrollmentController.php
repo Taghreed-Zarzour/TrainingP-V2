@@ -21,7 +21,7 @@ class EnrollmentController extends Controller
   {
 
 
-    $response = $this->enrollmentService->store($program_id);
+    $response = $this->enrollmentService->store(program_id: $program_id, orgProgram_id: null);
 
     if ($response['success'] == true) {
 

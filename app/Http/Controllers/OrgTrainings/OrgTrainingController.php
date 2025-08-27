@@ -201,7 +201,7 @@ public function showtrainingDetailForm($orgTrainingId)
     // جمع الملفات من جدول org_training_detail_files
     $allTrainingFiles = [];
     $trainingFilesRecord = OrgTrainingDetailFile::where('org_training_program_id', $orgTrainingId)->first();
-    
+
     if ($trainingFilesRecord && $trainingFilesRecord->training_files) {
         // معالجة البيانات سواء كانت JSON أو array أو string
         if (is_string($trainingFilesRecord->training_files)) {
@@ -260,7 +260,7 @@ public function showtrainingDetailForm($orgTrainingId)
         'trainingFiles' => $allTrainingFiles, // تمرير الملفات للـ view
     ]);
   }
-  
+
   public function storeTrainingDetails(StoreSchedulingRequest $request, $trainingId)
 {
     DB::beginTransaction();
@@ -297,10 +297,10 @@ public function showtrainingDetailForm($orgTrainingId)
         // 5. Delete old files not kept
         $oldTrainingFiles = OrgTrainingDetailFile::where('org_training_program_id', $trainingId)->get();
         foreach ($oldTrainingFiles as $oldFile) {
-            $oldFilePaths = is_string($oldFile->training_files) 
-                ? json_decode($oldFile->training_files, true) 
+            $oldFilePaths = is_string($oldFile->training_files)
+                ? json_decode($oldFile->training_files, true)
                 : $oldFile->training_files;
-            
+
             if (is_array($oldFilePaths)) {
                 foreach ($oldFilePaths as $oldFilePath) {
                     if (!in_array($oldFilePath, $filesToKeep)) {
@@ -668,7 +668,7 @@ if ($orgTraining->files && $orgTraining->files->count() > 0) {
         // تحقق من وجود خاصية training_files في كل ملف
         if (isset($file->training_files)) {
             $filesData = $file->training_files;
-            
+
             // معالجة البيانات سواء كانت JSON أو array أو string
             if (is_string($filesData)) {
                 // محاولة تحليل JSON
@@ -745,7 +745,7 @@ if ($orgTraining->files && $orgTraining->files->count() > 0) {
       $orgTraining = OrgTrainingProgram::findOrFail($orgTrainingId);
 
       $orgTraining->update(['status' => 'online']);
-    
+
       return redirect()->route('orgTrainings.completed', $orgTraining->id)
         ->with('success', 'تم نشر البرنامج التدريبي بنجاح');
     } catch (\Exception $e) {
@@ -774,6 +774,9 @@ public function show($id){
 
     $work_sector_ids =  $OrgProgram->goals->first()->work_sector_id;
     $work_sectors = WorkSector::whereIn('id',$work_sector_ids)->pluck('name');
+
+    //   المشاهدات
+    $OrgProgram->increment('views');
 
     $grandTotalMinutes = 0;
     foreach ($OrgProgram->details as $program) {

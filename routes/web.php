@@ -284,6 +284,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::post('organization-training-manager/assistant/store', [OrgTrainingManagerController::class, 'storeOrgAssistant'])->name('orgAssistant.store');
   Route::delete('organization-training-manager/delete-assistant/{orgTraining_id}/{assistant_id}', [OrgTrainingManagerController::class, 'deleteOrgAssistant'])
   ->name('orgAssistant.destroy');
+  Route::post('/enroll/{OrgProgram_id}', [OrgTrainingManagerController::class, 'enroll'])->name('orgEnrollment.enroll');
+  Route::get('organization-training-manage/sessions/{session}/attendance',[OrgTrainingManagerController::class,'selectSessionAttendance'])->name('orgSession.attendance');
+  Route::post('organization-training-manage/sessions/{session}/attendance', [OrgTrainingManagerController::class, 'storeSessionAttendance'])->name('orgSession.attendance.store');
 
 
   Route::post('/stop-sharing/{id}', [OrgTrainingManagerController::class, 'stopSharing'])->name('stopSharing');

@@ -12,6 +12,7 @@ class Enrollment extends Model
         'status',
         'registered_at',
         'rejection_reason',
+        'org_training_programs_id',
     ];
 
     protected $casts = [
