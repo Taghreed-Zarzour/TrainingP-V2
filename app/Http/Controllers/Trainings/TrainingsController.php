@@ -186,7 +186,7 @@ public function index()
         )
         ->where('status', 'online')
         ->get();
-dd($allOrgPrograms);
+// dd($allOrgPrograms);
         return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));
     }
 

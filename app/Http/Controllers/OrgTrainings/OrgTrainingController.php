@@ -337,15 +337,14 @@ public function showtrainingDetailForm($orgTrainingId)
 
         // Save files to org_training_detail_files table
         if (!empty($allFiles)) {
+            // dd($allFiles);
             foreach ($allFiles as $file) {
-                $orgTrainingDetailFile = new OrgTrainingDetailFile(); // Create a new instance
-                $orgTrainingDetailFile->fill([
+                $orgTrainingDetailFile =  OrgTrainingDetailFile::create([
                     'org_training_program_id' => $orgTraining->id,
                     'training_files' => $file
                 ]);
-                $orgTrainingDetailFile->save(); // Save the instance to the database
             }
-            
+
         }
 
         // 8. Create new details

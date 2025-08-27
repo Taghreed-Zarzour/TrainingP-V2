@@ -19,8 +19,8 @@ return new class extends Migration
             ->on('org_training_programs')
             ->onDelete('cascade');
 
-            $table->json('training_files')->nullable(); 
-            
+            $table->text('training_files');
+
             $table->timestamps();
         });
     }

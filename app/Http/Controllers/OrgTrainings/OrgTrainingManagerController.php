@@ -14,6 +14,7 @@ use App\Models\OrgAssistantManagement;
 use App\Models\OrgRegistrationAndRequirement;
 use App\Models\OrgSessionAttendance;
 use App\Models\OrgTrainingDetail;
+use App\Models\OrgTrainingDetailFile;
 use App\Models\OrgTrainingProgram;
 use App\Models\OrgTrainingSchedule;
 use App\Models\programType;
@@ -165,6 +166,10 @@ class OrgTrainingManagerController extends Controller
         $overallAttendancePercentage = 0;
       }
 
+    //   الملفات
+
+      $attachments = OrgTrainingDetailFile::where('org_training_program_id',$id)->get();
+
       return view('orgTrainings.training-manager', compact(
         'OrgProgram',
         'work_sectors',
@@ -177,6 +182,7 @@ class OrgTrainingManagerController extends Controller
         'trainees',
         'sessionAttendanceCounts',
         'overallAttendancePercentage',
+        'attachments'
       ));
     }
 
@@ -337,6 +343,7 @@ public function enroll($OrgProgram_id)
 
     return view('orgTrainings.training-manager-attendance', compact('session', 'session_attendance'));
   }
+
 
 
     public function stopSharing($id)

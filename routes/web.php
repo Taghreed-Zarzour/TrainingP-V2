@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingController;
+use App\Http\Controllers\OrgTrainings\OrgTrainingFilesController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingManagerController;
 use App\Http\Controllers\Trainings\TrainingsController;
 use App\Http\Controllers\User\Organization\OrganizationProfileController;
@@ -287,6 +288,8 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::post('/enroll/{OrgProgram_id}', [OrgTrainingManagerController::class, 'enroll'])->name('orgEnrollment.enroll');
   Route::get('organization-training-manage/sessions/{session}/attendance',[OrgTrainingManagerController::class,'selectSessionAttendance'])->name('orgSession.attendance');
   Route::post('organization-training-manage/sessions/{session}/attendance', [OrgTrainingManagerController::class, 'storeSessionAttendance'])->name('orgSession.attendance.store');
+  Route::post('organization-training-manage/{program_id}/upload-files', [OrgTrainingFilesController::class, 'uploadOrgTrainingFiles'])->name('orgTraining.file.upload');
+  Route::delete('organization-training-manage/delete-file/{id}', [OrgTrainingFilesController::class, 'deleteOrgTrainingFile'])->name('orgTraining.file.delete');
 
 
   Route::post('/stop-sharing/{id}', [OrgTrainingManagerController::class, 'stopSharing'])->name('stopSharing');
