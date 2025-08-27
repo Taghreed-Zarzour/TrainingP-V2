@@ -26,7 +26,7 @@ class OrgTrainingManagerService
         'assistantUsers', 'registrationRequirements',
     ])
     ->where('organization_id', $organizationId)
-    ->where('status', 'stopped')
+    ->where('status', 'offline')
     ->get();
 
     $draft = [];
@@ -168,9 +168,16 @@ class OrgTrainingManagerService
         $program->total_session_duration_minutes = $totalMinutes;
 
         // Check for sessions
-        $hasSessions = $program->details && array_reduce($program->details, function ($carry, $detail) {
-            return $carry || ($detail->trainingSchedules && $detail->trainingSchedules->count() > 0);
-        }, false);
+        $hasSessions = false;
+
+        if ($program->details) {
+            foreach ($program->details as $detail) {
+                if ($detail->trainingSchedules && $detail->trainingSchedules->count() > 0) {
+                    $hasSessions = true;
+                    break; // Exit the loop once we find a match
+                }
+            }
+        }
 
         // Only completed programs are considered stopped
         if ($program->completion_percentage === 100) {
@@ -187,9 +194,9 @@ public function calculateCompletion(OrgTrainingProgram $program)
 {
     // Define weights for each step of training creation
     $weights = [
-        'basic_info' => 10,
+        'basic_info' => 7,
         'details' => 2,
-        'settings' => 8,
+        'settings' => 7,
         'sessions' => 3,
         'goals' => 6,
     ];
@@ -199,8 +206,7 @@ public function calculateCompletion(OrgTrainingProgram $program)
 
     // 1. Check basic information
     $basicFields = [
-        'title', 'language_id', 'country_id',
-        'city', 'address_in_detail', 'training_level_id',
+        'title', 'language_id', 'training_level_id',
         'program_type', 'program_presentation_method',
         'program_description', 'org_training_classification_id'
     ];
@@ -213,16 +219,15 @@ public function calculateCompletion(OrgTrainingProgram $program)
     }
 
     $basicPercentage = ($basicCompleted / count($basicFields)) * 100;
-    if ($basicPercentage >= 80) {
-        $completedWeight += $weights['basic_info'];
-    } else {
-        $completedWeight += ($basicPercentage / 100) * $weights['basic_info'];
-    }
+    $completedWeight += ($basicPercentage >= 80) 
+        ? $weights['basic_info'] 
+        : ($basicPercentage / 100) * $weights['basic_info'];
 
+    // 2. Check details
     if ($program->details && $program->details->count() > 0) {
         $detailFields = ['program_title', 'trainer_id'];
         $detailCompleted = 0;
-    
+
         foreach ($program->details as $detail) {
             foreach ($detailFields as $field) {
                 if (!empty($detail->$field)) {
@@ -230,11 +235,10 @@ public function calculateCompletion(OrgTrainingProgram $program)
                 }
             }
         }
-    
+
         // Calculate the percentage based on the number of details
         $detailPercentage = ($detailCompleted / (count($detailFields) * $program->details->count())) * 100;
         $completedWeight += ($detailPercentage / 100) * $weights['details'];
-
     }
 
     // 3. Check settings
@@ -242,7 +246,7 @@ public function calculateCompletion(OrgTrainingProgram $program)
         $settingFields = [
             'is_free', 'application_deadline', 'max_trainees',
             'application_submission_method', 'requirements',
-            'benefits', 'training_image', 'welcome_message'
+            'training_image', 'welcome_message'
         ];
 
         $settingCompleted = 0;
@@ -261,14 +265,16 @@ public function calculateCompletion(OrgTrainingProgram $program)
 
         $settingPercentage = ($settingCompleted / count($settingFields)) * 100;
         $completedWeight += ($settingPercentage / 100) * $weights['settings'];
-
     }
 
     // 4. Check sessions
     if ($program->details && $program->details->count() > 0) {
         $validSessions = 0;
+        $totalSessions = 0;
+
         foreach ($program->details as $detail) {
             if ($detail->trainingSchedules && $detail->trainingSchedules->count() > 0) {
+                $totalSessions += $detail->trainingSchedules->count();
                 foreach ($detail->trainingSchedules as $session) {
                     if (!empty($session->session_date) && 
                         !empty($session->session_start_time) && 
@@ -278,55 +284,53 @@ public function calculateCompletion(OrgTrainingProgram $program)
                 }
             }
         }
-        $sessionsPercentage = ($validSessions / ($program->details->sum(function ($detail) {
-            return $detail->trainingSchedules->count();
-        }))) * 100;
-        $completedWeight += ($sessionsPercentage / 100) * $weights['sessions'];
+
+        if ($totalSessions > 0) {
+            $sessionsPercentage = ($validSessions / $totalSessions) * 100;
+            $completedWeight += ($sessionsPercentage / 100) * $weights['sessions'];
+        }
     } else {
         $completedWeight += $weights['sessions'];
     }
 
-
     // 5. Check goals
-    // Check goals
-if ($program->goals && $program->goals->count() > 0) {
-    $goalFields = ['learning_outcomes', 'education_level_id', 'work_status',
-                   'work_sector_id', 'job_position', 'country_id'];
-    $goalCompleted = 0;
-    
-    // Iterate through each goal
-    foreach ($program->goals as $goal) {
-        $completedFields = 0;
+    if ($program->goals && $program->goals->count() > 0) {
+        $goalFields = ['learning_outcomes', 'education_level_id', 'work_status',
+                       'work_sector_id', 'job_position', 'country_id'];
+        $goalCompleted = 0;
 
-        // Check each field for the current goal
-        foreach ($goalFields as $field) {
-            if (!empty($goal->$field)) {
-                $completedFields++;
+        // Iterate through each goal
+        foreach ($program->goals as $goal) {
+            $completedFields = 0;
+
+            // Check each field for the current goal
+            foreach ($goalFields as $field) {
+                if (!empty($goal->$field)) {
+                    $completedFields++;
+                }
             }
+
+            // Calculate completion for this goal
+            $goalPercentage = ($completedFields / count($goalFields)) * 100;
+            $goalCompleted += $goalPercentage; // Accumulate the percentage
         }
 
-        // Calculate completion for this goal
-        $goalPercentage = ($completedFields / count($goalFields)) * 100;
-        $goalCompleted += $goalPercentage; // Accumulate the percentage
-    }
-
-    // Average the goal completion percentage across all goals
-    $averageGoalPercentage = $goalCompleted / $program->goals->count();
-    $completedWeight += ($averageGoalPercentage / 100) * $weights['goals'];
-
-
+        // Average the goal completion percentage across all goals
+        $averageGoalPercentage = $goalCompleted / $program->goals->count();
+        $completedWeight += ($averageGoalPercentage / 100) * $weights['goals'];
     } else {
         // If goals are not set, consider them incomplete
         $completedWeight += 0; // Or add the full weight if desired
     }
 
-    $overallPercentage = ($completedWeight / $totalWeight) * 100;
+    // Calculate overall percentage
+    $overallPercentage = $totalWeight > 0 ? ($completedWeight / $totalWeight) * 100 : 0;
     return intval($overallPercentage);
 }
 
     public function stopSharing($id){
         $program = OrgTrainingProgram::findOrFail($id);
-        $program->status = 'stopped';
+        $program->status = 'offline';
         $program->save();
     }
     
@@ -342,7 +346,7 @@ if ($program->goals && $program->goals->count() > 0) {
             'assistantUsers', 'registrationRequirements',   
             ])
             ->where('organization_id', $organizationId)
-            ->where('status','stopped');
+            ->where('status','offline');
     }
     public function getProgramWithDetails($id)
     {
