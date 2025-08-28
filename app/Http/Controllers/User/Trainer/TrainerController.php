@@ -28,12 +28,17 @@ class TrainerController extends Controller
   }
 
   public function index(Request $request){
+    $work_sectors = WorkSector::all();
+    $provided_services = ProvidedService::all();
+    $work_fields = WorkField::all();
+    $countries = Country::all();
     $trainers = Trainer::with('user')->get();
     $services = ProvidedService::pluck('name', 'id');
-    $work_fields =WorkField::pluck('name','id');
+    $work_fields_trainer =WorkField::pluck('name','id');
     $ratings =  TrainerRating::get();
-    return view('user.trainer.index',compact('trainers','services','work_fields','ratings'));
-  }
+    return view('user.trainer.index',compact('trainers','services','work_fields','ratings',
+  'provided_services','countries','work_sectors','work_fields_trainer'
+  ));}
 
   public function showRegistrationForm($id)
   {

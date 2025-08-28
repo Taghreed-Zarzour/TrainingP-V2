@@ -6,27 +6,32 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+
         .clickable-title:hover {
             color: #3498db;
         }
+
         .training-item {
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-          
+
             margin-bottom: 15px;
             transition: all 0.3s ease;
         }
+
         .training-item:hover {
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
         }
+
         .training-item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin: 5px;
-              padding: 15px;
+            padding: 15px;
         }
+
         .training-title-2 {
             font-weight: 500;
             font-size: 18px;
@@ -34,22 +39,25 @@
             display: flex;
             align-items: center;
         }
+
         .trainer-name {
             color: #7f8c8d;
             font-size: 14px;
         }
+
         .sessions-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
         }
-      
+
         .audience-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             margin-top: 8px;
         }
+
         .audience-tag {
             background-color: #D9E6FF;
             color: #003090;
@@ -58,50 +66,58 @@
             font-size: 12px;
             display: inline-block;
         }
+
         .no-sessions-message {
             text-align: center;
             color: #7f8c8d;
             padding: 20px;
             font-style: italic;
         }
+
         .training-price-value {
             font-size: 24px;
             font-weight: bold;
             color: #2c3e50;
         }
+
         .info-block-content-item {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
+
         .info-block-content-item img {
             margin-left: 10px;
         }
-      
+
         .trainer-profile {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
+
         .trainer-profile img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             margin-left: 15px;
         }
+
         .training-details-item {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
+
         .training-details-item img {
             margin-left: 10px;
         }
-        
+
         /* تعديلات جديدة */
         .training-info {
             position: relative;
         }
+
         .training-info img {
             width: 100%;
             aspect-ratio: 1/1;
@@ -109,51 +125,61 @@
             border-radius: 8px;
             height: auto;
         }
-        
+
         @media (min-width: 768px) {
             .grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 20px;
             }
+
             .training-info img {
                 height: 100%;
             }
         }
-        
+
         @media (max-width: 767px) {
             .grid {
                 display: flex;
                 flex-direction: column;
             }
+
             .training-info img {
                 width: 100%;
                 height: auto;
             }
         }
-        
+
         .sessions-container {
-          
+
             display: none;
         }
-        
+
         .sessions-container.show {
             display: block;
             border-top: 1px solid #e0e0e0;
         }
-        
+
         .session-content {
             animation: fadeIn 0.3s ease-in-out;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .content-training{
+
+        .content-training {
             padding: 15px;
         }
-        
+
         /* أنماط السهم الجديدة */
         .arrow-icon {
             transition: transform 0.3s ease;
@@ -161,7 +187,7 @@
             width: 16px;
             height: 16px;
         }
-        
+
         .arrow-icon.rotated {
             transform: rotate(90deg);
         }
@@ -366,333 +392,346 @@
                                                     @foreach ($educationLevels as $levelId)
                                                         @php
                                                             $level = \App\Models\EducationLevel::find($levelId);
-                                                            @endphp
+                                                        @endphp
                                                         @if ($level)
-                                                        <span class="audience-tag">{{ $level->name }}</span>
-                                                    @endif
+                                                            <span class="audience-tag">{{ $level->name }}</span>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                        @if (!empty($goals->work_status))
+                                            <div class="audience-question">
+                                                <div class="audience-question-title">
+                                                    <img src="{{ asset(path: 'images/icons/check-circle.svg') }}"
+                                                        class="me-2">
+                                                    الحالة الوظيفية
+                                                </div>
+                                                <div class="audience-tags">
+                                                    @foreach ($goals->work_status as $work_status)
+                                                        @if ($work_status)
+                                                            <span class="audience-tag">
+                                                                @if ($work_status === 'working')
+                                                                    يعمل
+                                                                @elseif ($work_status === 'not_working')
+                                                                    لا يعمل
+                                                                @endif
+                                                            </span>
+                                                        @endif
+                                                    @endforeach
+
+                                                </div>
+                                            </div>
+                                        @endif
+                                        @if (!empty($workSectors) && is_array($workSectors) && count($workSectors) > 0)
+                                            <div class="audience-question">
+                                                <div class="audience-question-title">
+                                                    <img src="{{ asset(path: 'images/icons/check-circle.svg') }}"
+                                                        class="me-2">
+                                                    قطاع العمل
+                                                </div>
+                                                <div class="audience-tags">
+                                                    @foreach ($workSectors as $sectorId)
+                                                        @php
+                                                            $sector = \App\Models\WorkSector::find($sectorId);
+                                                        @endphp
+                                                        @if ($sector)
+                                                            <span class="audience-tag">{{ $sector->name }}</span>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                        @if (!empty($jobPositions) && is_array($jobPositions) && count($jobPositions) > 0)
+                                            <div class="audience-question">
+                                                <div class="audience-question-title">
+                                                    <img src="{{ asset(path: 'images/icons/check-circle.svg') }}"
+                                                        class="me-2">
+                                                    المستوى الوظيفي
+                                                </div>
+                                                <div class="audience-tags">
+                                                    @foreach ($jobPositions as $position)
+                                                        <span class="audience-tag">{{ $position }}</span>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                        @if (!empty($countries) && is_array($countries) && count($countries) > 0)
+                                            <div class="audience-question">
+                                                <div class="audience-question-title">
+                                                    <img src="{{ asset(path: 'images/icons/check-circle.svg') }}"
+                                                        class="me-2">
+                                                    الجنسية/ المنطقة
+                                                </div>
+                                                <div class="audience-tags">
+                                                    @foreach ($countries as $countryId)
+                                                        @php
+                                                            $country = \App\Models\Country::find($countryId);
+                                                        @endphp
+                                                        @if ($country)
+                                                            <span class="audience-tag">{{ $country->name }}</span>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                            @if (!empty($learningOutcomes) && is_array($learningOutcomes) && count($learningOutcomes) > 0)
+                                <div class="info-block">
+                                    <div class="info-block-title clickable-title"
+                                        onclick="window.location.href='{{ route('orgTraining.goals', $training->id) }}'">
+                                        <span>النتائج التعليمية من المسار التدريبي</span>
+                                    </div>
+                                    <div class="info-block-content">
+                                        @foreach ($learningOutcomes as $item)
+                                            <div class="info-block-content-item">
+                                                <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+                                                <div class="info-block-content-item-title">
+                                                    {{ $item }}
+                                                </div>
+                                            </div>
                                         @endforeach
                                     </div>
                                 </div>
                             @endif
-                            @if (!empty($goals->work_status))
-                                <div class="audience-question">
-                                    <div class="audience-question-title">
-                                        <img src="{{ asset(path: 'images/icons/check-circle.svg') }}" class="me-2">
-                                        الحالة الوظيفية
+                            @if (!empty($requirements))
+                                <div class="info-block">
+                                    <div class="info-block-title clickable-title"
+                                        onclick="window.location.href='{{ route('orgTraining.settings', $training->id) }}'">
+                                        <span>المتطلبات أو الشروط اللازمة للالتحاق بالمسار</span>
                                     </div>
-                                    <div class="audience-tags">
-@foreach ($goals->work_status as $work_status)
-    @if ($work_status)
-        <span class="audience-tag">
-            @if ($work_status === 'working')
-                يعمل
-            @elseif ($work_status === 'not_working')
-                لا يعمل
-            @endif
-        </span>
-    @endif
-@endforeach
-
+                                    <div class="info-block-content">
+                                        @foreach ($requirements as $item)
+                                            <div class="info-block-content-item">
+                                                <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+                                                <div class="info-block-content-item-title">
+                                                    {{ $item }}
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             @endif
-                            @if (!empty($workSectors) && is_array($workSectors) && count($workSectors) > 0)
-                                <div class="audience-question">
-                                    <div class="audience-question-title">
-                                        <img src="{{ asset(path: 'images/icons/check-circle.svg') }}" class="me-2">
-                                        قطاع العمل
+                            @if (!empty($benefits))
+                                <div class="info-block">
+                                    <div class="info-block-title clickable-title"
+                                        onclick="window.location.href='{{ route('orgTraining.settings', $training->id) }}'">
+                                        <span>ميزات هذا المسار التدريبي</span>
                                     </div>
-                                    <div class="audience-tags">
-                                        @foreach ($workSectors as $sectorId)
-                                            @php
-                                                $sector = \App\Models\WorkSector::find($sectorId);
-                                            @endphp
-                                            @if ($sector)
-                                            <span class="audience-tag">{{ $sector->name }}</span>
-                                        @endif
-                            @endforeach
-                        </div>
-                </div>
-                @endif
-                @if (!empty($jobPositions) && is_array($jobPositions) && count($jobPositions) > 0)
-                    <div class="audience-question">
-                        <div class="audience-question-title">
-                            <img src="{{ asset(path: 'images/icons/check-circle.svg') }}" class="me-2">
-                            المستوى الوظيفي
-                        </div>
-                        <div class="audience-tags">
-                            @foreach ($jobPositions as $position)
-                                <span class="audience-tag">{{ $position }}</span>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-                @if (!empty($countries) && is_array($countries) && count($countries) > 0)
-                    <div class="audience-question">
-                        <div class="audience-question-title">
-                            <img src="{{ asset(path: 'images/icons/check-circle.svg') }}" class="me-2">
-                            الجنسية/ المنطقة
-                        </div>
-                        <div class="audience-tags">
-                            @foreach ($countries as $countryId)
-                                @php
-                                    $country = \App\Models\Country::find($countryId);
-                                @endphp
-                                @if ($country)
-                                <span class="audience-tag">{{ $country->name }}</span>
+                                    <div class="info-block-content">
+                                        @foreach ($benefits as $item)
+                                            <div class="info-block-content-item">
+                                                <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+                                                <div class="info-block-content-item-title">
+                                                    {{ $item }}
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             @endif
-                @endforeach
-            </div>
-        </div>
-        @endif
-        </div>
-        </div>
-        @endif
-        @if (!empty($learningOutcomes) && is_array($learningOutcomes) && count($learningOutcomes) > 0)
-            <div class="info-block">
-                <div class="info-block-title clickable-title"
-                    onclick="window.location.href='{{ route('orgTraining.goals', $training->id) }}'">
-                    <span>النتائج التعليمية من المسار التدريبي</span>
-                </div>
-                <div class="info-block-content">
-                    @foreach ($learningOutcomes as $item)
-                        <div class="info-block-content-item">
-                            <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
-                            <div class="info-block-content-item-title">
-                                {{ $item }}
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-        @if (!empty($requirements))
-            <div class="info-block">
-                <div class="info-block-title clickable-title"
-                    onclick="window.location.href='{{ route('orgTraining.settings', $training->id) }}'">
-                    <span>المتطلبات أو الشروط اللازمة للالتحاق بالمسار</span>
-                </div>
-                <div class="info-block-content">
-                    @foreach ($requirements as $item)
-                        <div class="info-block-content-item">
-                            <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
-                            <div class="info-block-content-item-title">
-                                {{ $item }}
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-        @if (!empty($benefits))
-            <div class="info-block">
-                <div class="info-block-title clickable-title"
-                    onclick="window.location.href='{{ route('orgTraining.settings', $training->id) }}'">
-                    <span>ميزات هذا المسار التدريبي</span>
-                </div>
-                <div class="info-block-content">
-                    @foreach ($benefits as $item)
-                        <div class="info-block-content-item">
-                            <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
-                            <div class="info-block-content-item-title">
-                                {{ $item }}
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-        <!-- عرض التدريبات والجلسات -->
-                        <div class="info-block">
-                            <div class="info-block-title clickable-title"
-                                onclick="window.location.href='{{ route('orgTraining.trainingDetail', $training->id) }}'">
-                                <span>تدريبات المسار</span>
-                            </div>
-                            <div class="info-block-content">
-                                @if (empty($training->details) || $training->details->count() == 0)
-                                    <div class="no-sessions-message">
-                                        لم يتم إضافة تدريبات بعد. يمكنك إضافتها لاحقاً من خلال صفحة تعديل التدريب.
-                                    </div>
-                                @else
-                                    @foreach ($training->details as $detail)
-                                        <div class="training-item">
-                                            <div class="training-item-header" id="header-{{ $detail->id }}">
-                                                <div class="training-title-2 clickable-title"
-                                                    onclick="toggleSessions({{ $detail->id }})">
-<div class="me-2">
-<svg class="arrow-icon" id="arrow-{{ $detail->id }}" width="13" height="15" viewBox="0 0 13 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.5001 5.88654C12.6655 6.68745 12.6543 8.41186 11.4787 9.19762L3.59254 14.4684C2.25871 15.3599 0.470856 14.3969 0.481237 12.7926L0.550107 2.14951C0.560488 0.545226 2.36065 -0.394492 3.68284 0.514171L11.5001 5.88654Z" fill="#666666"/>
-</svg>
-</div>
-                                                    
-
-                                                    {{ $detail->program_title }}
-                                                </div>
-                                                <div class="trainer-name m-0">
-                                                    @if ($detail->trainer)
-                                                        @if ($detail->trainer->photo)
-                                                            <img src="{{ asset('storage/' . $detail->trainer->photo) }}"
-                                                                class="tr-trainee-avatar me-2">
-                                                        @else
-                                                            <img src="{{ asset('images/icons/user.svg') }}"
-                                                                class="tr-trainee-avatar me-2">
-                                                        @endif
-                                                        المدرب: {{ $detail->trainer->getTranslation('name', 'ar') }}
-                                                        {{ $detail->trainer->trainer?->getTranslation('last_name', 'ar') }}
-                                                    @else
-                                                        لم يتم تحديد مدرب
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <div id="sessions-{{ $detail->id }}" class="sessions-container">
-                                                <div class="content-training">
-                                                @if ($detail->schedule_later)
-                                                    <div class="no-sessions-message">
-                                                        سيتم تحديد الجلسات لاحقاً بعد اكتمال عدد المشاركين.
-                                                    </div>
-                                                @elseif (empty($detail->trainingSchedules) || $detail->trainingSchedules->count() == 0)
-                                                    <div class="no-sessions-message">
-                                                        لم يتم إضافة جلسات بعد.
-                                                    </div>
-                                                @else
-                                                    <div class="info-block-content-item-title">
-                                                        الجدول الزمني للتدريب
-                                                    </div>
-                                                    <div class="session-content">
-                                                        <table class="sessions-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>عنوان الجلسة</th>
-                                                                    <th>اليوم</th>
-                                                                    <th>التاريخ</th>
-                                                                    <th>وقت الجلسة</th>
-                                                                    <th>مدة الجلسة</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($detail->trainingSchedules as $schedule)
-                                                                    <tr>
-                                                                        <td>جلسة {{ $loop->index + 1 }}</td>
-                                                                        <td>{{ \Carbon\Carbon::parse($schedule->session_date)->locale('ar')->dayName }}
-                                                                        </td>
-                                                                        <td>{{ $schedule->session_date }}</td>
-                                                                        <td>{{ \Carbon\Carbon::parse($schedule->session_start_time)->format('H:i') }}
-                                                                            -
-                                                                            {{ \Carbon\Carbon::parse($schedule->session_end_time)->format('H:i') }}
-                                                                        </td>
-                                                                        <td>
-                                                                            {{ \Carbon\Carbon::parse($schedule->session_start_time)->diffInMinutes(\Carbon\Carbon::parse($schedule->session_end_time)) }}
-                                                                            دقيقة
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                              </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-                            </div>
-                        </div>
-                        @if (!empty($training->assistantUsers) && $training->assistantUsers->count() > 0)
+                            <!-- عرض التدريبات والجلسات -->
                             <div class="info-block">
                                 <div class="info-block-title clickable-title"
-                                    onclick="window.location.href='{{ route('orgTraining.assistants', $training->id) }}'">
-                                    <span>مساعدو المدرب (الميسرون)</span>
+                                    onclick="window.location.href='{{ route('orgTraining.trainingDetail', $training->id) }}'">
+                                    <span>تدريبات المسار</span>
                                 </div>
                                 <div class="info-block-content">
-                                    @foreach ($training->assistantUsers as $assistant)
-                                        <div class="trainer-profile">
-                                            @if (!empty($assistant->photo))
-                                                <img src="{{ asset('storage/' . $assistant->photo) }}" alt="صورة المساعد"
-                                                    class="tr-trainee-avatar">
-                                            @else
-                                                <img src="{{ asset('images/icons/user.svg') }}" alt="مساعد"
-                                                    class="tr-trainee-avatar">
-                                            @endif
-                                            <p>{{ $assistant->getTranslation('name', 'ar') }}
-                                                {{ $assistant->assistant?->getTranslation('last_name', 'ar') }}</p>
+                                    @if (empty($training->details) || $training->details->count() == 0)
+                                        <div class="no-sessions-message">
+                                            لم يتم إضافة تدريبات بعد. يمكنك إضافتها لاحقاً من خلال صفحة تعديل التدريب.
                                         </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-                      @if (!empty($training_files) && count($training_files) > 0)
-    <div class="info-block">
-        <div class="info-block-title clickable-title"
-            onclick="window.location.href='{{ route('orgTraining.trainingDetail', $training->id) }}'">
-            <span>مرفقات التدريب</span>
-        </div>
-        <div class="info-block-content">
-            @foreach ($training_files as $file)
-                @php
-                    // التحقق من نوع البيانات
-                    $filePath = '';
-                    $fileName = '';
+                                    @else
+                                        @foreach ($training->details as $detail)
+                                            <div class="training-item">
+                                                <div class="training-item-header" id="header-{{ $detail->id }}">
+                                                    <div class="training-title-2 clickable-title"
+                                                        onclick="toggleSessions({{ $detail->id }})">
+                                                        <div class="me-2">
+                                                            <svg class="arrow-icon" id="arrow-{{ $detail->id }}"
+                                                                width="13" height="15" viewBox="0 0 13 15"
+                                                                fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path
+                                                                    d="M11.5001 5.88654C12.6655 6.68745 12.6543 8.41186 11.4787 9.19762L3.59254 14.4684C2.25871 15.3599 0.470856 14.3969 0.481237 12.7926L0.550107 2.14951C0.560488 0.545226 2.36065 -0.394492 3.68284 0.514171L11.5001 5.88654Z"
+                                                                    fill="#666666" />
+                                                            </svg>
+                                                        </div>
 
-                    if (is_array($file)) {
-                        // إذا كان مصفوفة، حاول الحصول على المسار أو الاسم
-                        $filePath = $file['path'] ?? '';
-                        $fileName = $file['name'] ?? ($filePath ? basename($filePath) : 'ملف غير معروف');
-                    } elseif (is_string($file)) {
-                        // إذا كان نصاً، استخدمه كمسار
-                        $filePath = $file;
-                        $fileName = basename($file);
-                    }
-                @endphp
-                @if (!empty($filePath))
-                    <div class="info-block-content-item">
-                        <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
-                        <div class="info-block-content-item-title" dir="ltr">
-                            <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="file-link">
-                                {{ $fileName }}
-                            </a>
-                        </div>
-                    </div>
-                @endif
-            @endforeach
-        </div>
-    </div>
-@endif
-                        @if (!empty($settings) && !empty($settings->payment_method))
-                            <div class="info-block">
-                                <div class="info-block-title clickable-title"
+
+                                                        {{ $detail->program_title }}
+                                                    </div>
+                                                    <div class="trainer-name m-0">
+                                                        @if ($detail->trainer)
+                                                            @if ($detail->trainer->photo)
+                                                                <img src="{{ asset('storage/' . $detail->trainer->photo) }}"
+                                                                    class="tr-trainee-avatar me-2">
+                                                            @else
+                                                                <img src="{{ asset('images/icons/user.svg') }}"
+                                                                    class="tr-trainee-avatar me-2">
+                                                            @endif
+                                                            المدرب: {{ $detail->trainer->getTranslation('name', 'ar') }}
+                                                            {{ $detail->trainer->trainer?->getTranslation('last_name', 'ar') }}
+                                                        @else
+                                                            لم يتم تحديد مدرب
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div id="sessions-{{ $detail->id }}" class="sessions-container">
+                                                    <div class="content-training">
+                                                        @if ($detail->schedule_later)
+                                                            <div class="no-sessions-message">
+                                                                سيتم تحديد الجلسات لاحقاً بعد اكتمال عدد المشاركين.
+                                                            </div>
+                                                        @elseif (empty($detail->trainingSchedules) || $detail->trainingSchedules->count() == 0)
+                                                            <div class="no-sessions-message">
+                                                                لم يتم إضافة جلسات بعد.
+                                                            </div>
+                                                        @else
+                                                            <div class="info-block-content-item-title">
+                                                                الجدول الزمني للتدريب
+                                                            </div>
+                                                            <div class="session-content">
+                                                                <table class="sessions-table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>عنوان الجلسة</th>
+                                                                            <th>اليوم</th>
+                                                                            <th>التاريخ</th>
+                                                                            <th>وقت الجلسة</th>
+                                                                            <th>مدة الجلسة</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($detail->trainingSchedules as $schedule)
+                                                                            <tr>
+                                                                                <td>جلسة {{ $loop->index + 1 }}</td>
+                                                                                <td>{{ \Carbon\Carbon::parse($schedule->session_date)->locale('ar')->dayName }}
+                                                                                </td>
+                                                                                <td>{{ $schedule->session_date }}</td>
+                                                                                <td>{{ \Carbon\Carbon::parse($schedule->session_start_time)->format('H:i') }}
+                                                                                    -
+                                                                                    {{ \Carbon\Carbon::parse($schedule->session_end_time)->format('H:i') }}
+                                                                                </td>
+                                                                                <td>
+                                                                                    {{ \Carbon\Carbon::parse($schedule->session_start_time)->diffInMinutes(\Carbon\Carbon::parse($schedule->session_end_time)) }}
+                                                                                    دقيقة
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                            @if (!empty($training->assistantUsers) && $training->assistantUsers->count() > 0)
+                                <div class="info-block">
+                                    <div class="info-block-title clickable-title"
+                                        onclick="window.location.href='{{ route('orgTraining.assistants', $training->id) }}'">
+                                        <span>مساعدو المدرب (الميسرون)</span>
+                                    </div>
+                                    <div class="info-block-content">
+                                        @foreach ($training->assistantUsers as $assistant)
+                                            <div class="trainer-profile">
+                                                @if (!empty($assistant->photo))
+                                                    <img src="{{ asset('storage/' . $assistant->photo) }}"
+                                                        alt="صورة المساعد" class="tr-trainee-avatar">
+                                                @else
+                                                    <img src="{{ asset('images/icons/user.svg') }}" alt="مساعد"
+                                                        class="tr-trainee-avatar">
+                                                @endif
+                                                <p>{{ $assistant->getTranslation('name', 'ar') }}
+                                                    {{ $assistant->assistant?->getTranslation('last_name', 'ar') }}</p>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                            @if (!empty($training_files) && count($training_files) > 0)
+                                <div class="info-block">
+                                    <div class="info-block-title clickable-title"
+                                        onclick="window.location.href='{{ route('orgTraining.trainingDetail', $training->id) }}'">
+                                        <span>مرفقات التدريب</span>
+                                    </div>
+                                    <div class="info-block-content">
+                                        @foreach ($training_files as $file)
+                                            @php
+                                                // التحقق من نوع البيانات
+                                                $filePath = '';
+                                                $fileName = '';
+
+                                                if (is_array($file)) {
+                                                    // إذا كان مصفوفة، حاول الحصول على المسار أو الاسم
+                                                    $filePath = $file['path'] ?? '';
+                                                    $fileName =
+                                                        $file['name'] ??
+                                                        ($filePath ? basename($filePath) : 'ملف غير معروف');
+                                                } elseif (is_string($file)) {
+                                                    // إذا كان نصاً، استخدمه كمسار
+                                                    $filePath = $file;
+                                                    $fileName = basename($file);
+                                                }
+                                            @endphp
+                                            @if (!empty($filePath))
+                                                <div class="info-block-content-item">
+                                                    <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                        alt="">
+                                                    <div class="info-block-content-item-title" dir="ltr">
+                                                        <a href="{{ asset('storage/' . $filePath) }}" target="_blank"
+                                                            class="file-link">
+                                                            {{ $fileName }}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                            @if (!empty($settings) && !empty($settings->payment_method))
+                                <div class="info-block">
+                                    <div class="info-block-title clickable-title"
+                                        onclick="window.location.href='{{ route('orgTraining.settings', $training->id) }}'">
+                                        <span>آلية الدفع</span>
+                                    </div>
+                                    <div class="info-block-content bordered">
+                                        {{ $settings->payment_method }}
+                                    </div>
+                                </div>
+                            @endif
+                            <!-- الرسالة الترحيبية -->
+                            <div class="welcome-box">
+                                <div class="section-title clickable-title"
                                     onclick="window.location.href='{{ route('orgTraining.settings', $training->id) }}'">
-                                    <span>آلية الدفع</span>
+                                    <h3 class="section-title">رسالة ترحيبية</h3>
                                 </div>
-                                <div class="info-block-content bordered">
-                                    {{ $settings->payment_method }}
-                                </div>
+                                <p>{{ $settings->welcome_message ?? 'لم يتم إدخال رسالة ترحيبية' }}</p>
                             </div>
-                        @endif
-                        <!-- الرسالة الترحيبية -->
-                        <div class="welcome-box">
-                            <div class="section-title clickable-title"
-                                onclick="window.location.href='{{ route('orgTraining.settings', $training->id) }}'">
-                                <h3 class="section-title">رسالة ترحيبية</h3>
+                        </div>
+                        <div class="input-group-2col mt-4 training-form-review-actions">
+                            <div class="input-group">
+                                <a href="{{ route('orgTraining.settings', $training->id) }}"
+                                    class="pbtn pbtn-outlined-main">
+                                    السابق
+                                </a>
                             </div>
-                            <p>{{ $settings->welcome_message ?? 'لم يتم إدخال رسالة ترحيبية' }}</p>
+                            <div class="input-group">
+                                <button type="submit" class="pbtn pbtn-main piconed">
+                                    <span>تأكيد نشر المسار التدريبي</span>
+                                    <img src="{{ asset('images/arrow-left.svg') }}" alt="">
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="input-group-2col mt-4 training-form-review-actions">
-                        <div class="input-group">
-                            <a href="{{ route('orgTraining.settings', $training->id) }}" class="pbtn pbtn-outlined-main">
-                                السابق
-                            </a>
-                        </div>
-                        <div class="input-group">
-                            <button type="submit" class="pbtn pbtn-main piconed">
-                                <span>تأكيد نشر المسار التدريبي</span>
-                                <img src="{{ asset('images/arrow-left.svg') }}" alt="">
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
     </main>
 @endsection
 @section('scripts')
@@ -701,7 +740,7 @@
             const sessionsDiv = document.getElementById(`sessions-${trainingId}`);
             const headerDiv = document.getElementById(`header-${trainingId}`);
             const arrowIcon = document.getElementById(`arrow-${trainingId}`);
-            
+
             if (sessionsDiv.classList.contains('show')) {
                 sessionsDiv.classList.remove('show');
                 headerDiv.classList.remove('has-content');
@@ -710,7 +749,7 @@
                 sessionsDiv.classList.add('show');
                 headerDiv.classList.add('has-content');
                 arrowIcon.classList.add('rotated');
-                
+
                 // إضافة تأثير حركي عند الفتح
                 const content = sessionsDiv.querySelector('.session-content');
                 if (content) {

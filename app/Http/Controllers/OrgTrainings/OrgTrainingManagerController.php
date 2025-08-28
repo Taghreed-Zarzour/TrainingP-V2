@@ -188,10 +188,12 @@ class OrgTrainingManagerController extends Controller
 
 
     public function destroy($id)
-    {
-        $program = OrgTrainingDetail::findOrFail($id);
-        $program->trainingSchedules()->delete();
+    {$program = OrgTrainingProgram::findOrFail($id);
+      
+        
+        $program->details()->delete();
         $program->delete();
+      
       return redirect()->back()->with('deleted', true);
 
     }
@@ -349,12 +351,12 @@ public function enroll($OrgProgram_id)
     public function stopSharing($id)
     {
       $this->OrgTrainingManagerService->stopSharing($id);
-      return redirect()->route('orgTrainings.index')->with('stopped', true);
+      return redirect()->route('orgTrainingsManager.index')->with('stopped', true);
     }
     public function rePublish($id)
     {
       $this->OrgTrainingManagerService->rePublish($id);
-      return redirect()->route('orgTrainings.index')->with('online', true);
+      return redirect()->route('orgTrainingsManager.index')->with('online', true);
     }
     public function showStoppedPrograms()
     {

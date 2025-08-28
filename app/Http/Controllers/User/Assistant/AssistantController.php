@@ -28,7 +28,10 @@ class AssistantController extends Controller
         $assistants = Assistant::with('user')->get();
         $services = ProvidedService::pluck('name', 'id');
         $experience_areas =ExperienceArea::pluck('name','id');
-        return view('user.assistant.index',compact('assistants','services','experience_areas'));
+                $education_levels = EducationLevel::all();
+  $countries = Country::all();
+        $provided_services = ProvidedService::all();
+        return view('user.assistant.index',compact('assistants','services','experience_areas','provided_services','education_levels','countries'));
       }
 
 

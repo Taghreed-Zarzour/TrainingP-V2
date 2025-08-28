@@ -3076,3 +3076,19 @@ font-size: 1.3rem;
     letter-spacing: 0%;
     color: #333333;
 }
+
+  .audience-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .audience-tag {
+            background-color: #D9E6FF;
+            color: #003090;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: inline-block;
+        }

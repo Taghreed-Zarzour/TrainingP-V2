@@ -364,9 +364,9 @@
                     <div class="d-flex flex-nowrap" id="orgCardCarousel" style="scroll-behavior: smooth; overflow-x: auto;">
                         @foreach ($allOrgPrograms as $program)
                             <div class="card-slide p-2">
-                                {{-- <a href="{{ route('show_org_training_program', $program->id) }}" --}}
+                          
 
-                                <a href="#"
+                                <a href="{{ route('org.training.show', $program->id) }}"
                                     class="text-decoration-none text-dark">
                                     <div class="card h-100 shadow-sm rounded-4 position-relative">
                                         <div class="d-flex flex-column justify-content-between image-custom">

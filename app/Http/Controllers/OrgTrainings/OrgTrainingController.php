@@ -814,7 +814,29 @@ public function showProgram($id)
         }
     }
 
-    return view('orgTrainings.show-program', compact('program','orgProgram','grandTotalMinutes'));
+      // حساب تقييم المدرب
+        $averageTrainerRating = 0;
+        if ($program->Trainer && $program->Trainer->trainer && $program->Trainer->trainer->ratings) {
+            $ratings = $program->Trainer->trainer->ratings;
+            $criteria = ['clarity', 'interaction', 'organization'];
+            $totalRatings = 0;
+            $totalSum = 0;
+
+            foreach ($ratings as $rating) {
+                foreach ($criteria as $criterion) {
+                    if (isset($rating->$criterion)) {
+                        $score = $rating->$criterion;
+                        $totalSum += $score;
+                        $totalRatings++;
+                    }
+                }
+            }
+
+            $averageTrainerRating = $totalRatings > 0 ? round($totalSum / $totalRatings, 1) : 0;
+        }
+
+
+    return view('orgTrainings.show-program', compact('program','orgProgram','grandTotalMinutes','averageTrainerRating'));
 }
 
 

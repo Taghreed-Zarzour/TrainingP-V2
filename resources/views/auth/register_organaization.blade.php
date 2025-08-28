@@ -115,6 +115,15 @@
                 </div>
 
 
+<!-- إضافة هذا الكود تحت حقل تأكيد كلمة المرور -->
+<div class="form-group mt-3 mb-4">
+    <p class="text-center" style="font-size: 15px;">
+        بالنقر على إنشاء حساب فأنت توافق على 
+        <a href="{{ route('terms') }}" style="color: #0083FF; text-decoration: none;">شروط الاستخدام</a> 
+        و 
+        <a href="{{ route('privacy-policy') }}" style="color: #0083FF; text-decoration: none;">سياسة الخصوصية</a>
+    </p>
+</div>
                 @if (session('success'))
                     <div class="alert alert-success text-center">{{ session('success') }}</div>
                 @endif

@@ -67,12 +67,12 @@
                     </li>
 
                     
-                    <li class="nav-item {{ request()->is('trainers.index') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->is('trainers') ? 'active' : '' }}">
                         <a class="nav-link nav-font pb-0" href="{{ route('trainers.index') }}">المدربون</a>
                     </li>
 
                     
-                    <li class="nav-item {{ request()->is('assistants.index') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->is('assistants') ? 'active' : '' }}">
                         <a class="nav-link nav-font pb-0" href="{{ route('assistants.index') }}">المساعدون</a>
                     </li>
                 </ul>
@@ -205,7 +205,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" href="{{ route('orgTrainingsManager.index') }}">
                                             <img src="{{ asset('images/profile-menu/files.svg') }}" />
                                             إدارة المسارات التدريبية
                                         </a>

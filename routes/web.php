@@ -277,7 +277,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::get('/organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTrainingsManager.index');
   Route::get('organization-training-manager/{id}', [OrgTrainingManagerController::class, 'show'])->name('orgTrainingsManager.show');
-  Route::get('organization-training-manager/destroy/{id}', [OrgTrainingManagerController::class, 'destroy'])->name('orgTrainingsManager.destroy');
+  Route::delete('organization-training-manager/destroy/{id}', [OrgTrainingManagerController::class, 'destroy'])->name('orgTrainingsManager.destroy');
   Route::delete('organization-training-manager/destroy-session/{id}', [OrgTrainingManagerController::class, 'deleteOrgSession'])->name('orgSessions.destroy');
   Route::put('organization-training-manager/update-session/{id}', [OrgTrainingManagerController::class, 'updateOrgSession'])->name('orgSessions.update');
   Route::delete('organization-training-manager/delete-image/{id}', [OrgTrainingManagerController::class, 'deleteOrgImage'])->name('orgImage.delete');
@@ -292,9 +292,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::delete('organization-training-manage/delete-file/{id}', [OrgTrainingFilesController::class, 'deleteOrgTrainingFile'])->name('orgTraining.file.delete');
 
 
-  Route::post('/stop-sharing/{id}', [OrgTrainingManagerController::class, 'stopSharing'])->name('stopSharing');
-  Route::post('/re-publish/{id}', [OrgTrainingManagerController::class, 'rePublish'])->name('rePublish');
-  Route::get('/stopped', [OrgTrainingManagerController::class, 'showStoppedPrograms'])->name('stopped');
+  Route::post('/stop-sharing/{id}', [OrgTrainingManagerController::class, 'stopSharing'])->name('orgtrainings.stopSharing');
+  Route::post('/re-publish/{id}', [OrgTrainingManagerController::class, 'rePublish'])->name('orgtrainings.rePublish');
+  Route::get('/stopped', [OrgTrainingManagerController::class, 'showStoppedPrograms'])->name('orgtrainings.stopped');
 
 });
 

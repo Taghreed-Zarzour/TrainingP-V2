@@ -54,7 +54,7 @@ class OrgTrainingManagerService
                                 $startInMinutes = ((int)$startParts[0] * 60) + (int)$startParts[1];
                                 $endInMinutes = ((int)$endParts[0] * 60) + (int)$endParts[1];
                                 $diff = max(0, $endInMinutes - $startInMinutes);
-                                $totalMinutes += $diff;
+                                $totalMinutes += $diff;   
                             }
                         } catch (\Exception $e) {
                             continue;
@@ -63,6 +63,7 @@ class OrgTrainingManagerService
                 }
             }
         }
+    
         $program->total_session_duration_minutes = $totalMinutes;
 
         // Check for sessions
@@ -74,6 +75,7 @@ class OrgTrainingManagerService
         if ($program->completion_percentage < 100) {
             $draft[] = $program;
             continue;
+            
         }
 
         if ($program->completion_percentage === 100) {
@@ -84,9 +86,12 @@ class OrgTrainingManagerService
 
             foreach ($program->details as $detail) {
                 $firstSession = $detail->trainingSchedules->sortBy('session_date')->first();
+              
                 if ($firstSession) {
                     $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                    
                     if ($startTime->isFuture()) {
+                       
                         $announced[] = $program;
                         continue 2; // Continue to the next program
                     }
