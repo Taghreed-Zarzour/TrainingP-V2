@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingFilesController;
@@ -318,5 +319,10 @@ Route::get('/assistants', [AssistantController::class, 'index'])->name('assistan
   Route::get('/show-organization-profile/{id?}', [OrganizationProfileController::class, 'showProfile'])->name('show_organization_profile');
 
 
+//reset password
+Route::get('forgot-password', [ResetPasswordController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
 
 require __DIR__ . '/front_fetch.php';
