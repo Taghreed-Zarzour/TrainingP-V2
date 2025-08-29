@@ -166,6 +166,7 @@ class OrgTrainingManagerController extends Controller
         $overallAttendancePercentage = 0;
       }
 
+
     //   الملفات
 
       $attachments = OrgTrainingDetailFile::where('org_training_program_id',$id)->get();
@@ -182,22 +183,33 @@ class OrgTrainingManagerController extends Controller
         'trainees',
         'sessionAttendanceCounts',
         'overallAttendancePercentage',
-        'attachments'
+        'attachments',
+
+
       ));
     }
 
 
     public function destroy($id)
-    {$program = OrgTrainingProgram::findOrFail($id);
-      
-        
+    {
+      $program = OrgTrainingProgram::findOrFail($id);
         $program->details()->delete();
         $program->delete();
       
       return redirect()->back()->with('deleted', true);
 
     }
+  public function deleteOrgTraining($id)
+    {
+     
+      $program = OrgTrainingDetail::findOrFail($id);
+  
+        $program->trainingSchedules()->delete();
+        $program->delete();
+      
+      return redirect()->back()->with('deleted', true);
 
+    }
     public function deleteOrgSession($id){
 
     $session = OrgTrainingSchedule::findOrFail($id);
@@ -279,6 +291,7 @@ public function storeOrgAssistant(storeOrgAssistantRequset $request)
 public function enroll($OrgProgram_id)
   {
     $response = $this->enrollmentService->store(program_id: null, orgProgram_id: $OrgProgram_id);
+
     if ($response['success'] == true) {
 
       return redirect()->back()->with('success', $response['msg']);

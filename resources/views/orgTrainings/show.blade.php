@@ -566,22 +566,119 @@
                             {{ $OrgProgram->organization->user->getTranslation('name', 'ar') ?? '' }}
                         </span></span>
                       </div>
-                    <div class="">
-                        <button class="join-section custom-btn">انضم الآن
-                            <br>
-                            <span dir="ltr">
-                                @php
-                                    $cost = $OrgProgram->registrationRequirements->cost ?? 0;
-                                @endphp
-                                @if ($cost > 0)
-                                    ${{ number_format($cost, 2) }}
-                                @else
-                                    المسار مجاني
-                                @endif
-                            </span>
-                        </button>
+                  <div class="join-section">
+    @if (!auth()->check())
+        <!-- الحالة 1: المستخدم غير مسجل دخول -->
+        <div class="alert alert-info text-center mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            الرجاء تسجيل الدخول أولاً بحساب متدرب للانضمام إلى المسار التدريبي
+            <div class="mt-2">
+                <a href="{{ route('login') }}" class="btn btn-primary btn-sm me-2">تسجيل الدخول</a>
+                <span>ليس لديك حساب؟</span>
+                <a href="{{ route('register') }}" class="btn btn-outline-primary btn-sm ms-2">إنشاء حساب</a>
+            </div>
+        </div>
+    @elseif (auth()->user()->userType?->type !== 'متدرب')
+        <!-- الحالة 2: المستخدم مسجل ولكن ليس من نوع متدرب -->
+        <div class="alert alert-warning text-center mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            الرجاء التسجيل بحساب متدرب للانضمام إلى المسار التدريبي
+            <div class="mt-2">
+                <span>الحساب الحالي: {{ auth()->user()->userType?->type }}</span>
+                <a href="{{ route('logout') }}" class="btn btn-outline-danger btn-sm ms-2">تسجيل الخروج</a>
+            </div>
+        </div>
+    @else
+        <!-- المستخدم متدرب، نتحقق من الحالات الأخرى -->
+        @if ($training_has_ended)
+            <!-- الحالة 3: انتهى موعد التسجيل -->
+            <div class="alert alert-danger text-center mb-0">
+                <i class="fas fa-calendar-times me-2"></i>
+                انتهى موعد التسجيل في هذا المسار التدريبي
+                <div class="mt-2">
+                    <small>آخر موعد للتسجيل كان: {{ \Carbon\Carbon::parse($OrgProgram->registrationRequirements->application_deadline)->format('d/m/Y') }}</small>
+                </div>
+            </div>
+        @elseif ($has_enrolled)
+            <!-- الحالة 4: المستخدم مسجل بالفعل، نتحقق من حالة تسجيله -->
+            @switch($enrollment?->status)
+                @case('pending')
+                    <!-- الحالة 4.1: طلب قيد الانتظار -->
+                    <div class="alert alert-warning text-center mb-0">
+                        <i class="fas fa-clock me-2"></i>
+                        تم إرسال طلبك مسبقًا، في انتظار الموافقة.
+                        <div class="mt-2">
+                            <small>تاريخ التقديم: {{ \Carbon\Carbon::parse($enrollment->created_at)->format('d/m/Y H:i') }}</small>
+                        </div>
                     </div>
->>>>>>> Stashed changes
+                    @break
+                @case('accepted')
+                    <!-- الحالة 4.2: تم قبول الطلب -->
+                    <div class="alert alert-success text-center mb-0">
+                        <i class="fas fa-check-circle me-2"></i>
+                        تم قبولك في المسار التدريبي، بالتوفيق!
+                        <div class="mt-2">
+                            <small>رقم التسجيل: #{{ $enrollment->id }}</small>
+                        </div>
+                    </div>
+                    @break
+                @case('rejected')
+                    <!-- الحالة 4.3: تم رفض الطلب -->
+                    <div class="alert alert-danger text-center mb-0">
+                        <i class="fas fa-times-circle me-2"></i>
+                        تم رفض طلبك للانضمام.
+                        @if (!empty($enrollment?->rejection_reason))
+                            <div class="mt-2">
+                                <strong>السبب:</strong> {{ $enrollment->rejection_reason }}
+                            </div>
+                        @endif
+
+                    </div>
+                    @break
+                @default
+                    <!-- الحالة 4.5: حالة غير معروفة -->
+                    <div class="alert alert-info text-center mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        حالة طلبك: {{ $enrollment?->status ?? 'غير محدد' }}
+                        <div class="mt-2">
+                            <small>يرجى التواصل مع إدارة المسار التدريبي</small>
+                        </div>
+                    </div>
+            @endswitch
+        @else
+            <!-- الحالة 5: المستخدم لم يسجل بعد -->
+            @if ($OrgProgram->registrationRequirements->max_trainees > 0 && count($participants) >= $OrgProgram->registrationRequirements->max_trainees)
+                <!-- الحالة 5.1: وصل العدد الأقصى للمتدربين -->
+                <div class="alert alert-warning text-center mb-0">
+                    <i class="fas fa-users me-2"></i>
+                    وصل العدد الأقصى للمتدربين في هذا المسار التدريبي
+                    <div class="mt-2">
+                        <small>العدد الأقصى: {{ $OrgProgram->registrationRequirements->max_trainees }} متدرب</small>
+                    </div>
+                </div>
+            @else
+                <!-- الحالة 5.2: يمكن للمستخدم التسجيل -->
+                <button class=" custom-btn w-100" data-bs-toggle="modal" data-bs-target="#confirmEnrollmentModal">
+                    انضم الآن
+                    <br>
+                    <span dir="ltr">
+                        @php
+                            $cost = $OrgProgram->registrationRequirements->cost ?? 0;
+                        @endphp
+                        @if ($cost > 0)
+                            ${{ number_format($cost, 2) }}
+                        @else
+                            المسار مجاني
+                        @endif
+                    </span>
+                </button>
+            @endif
+        @endif
+    @endif
+</div>
+
+
+
                     @php
                         $deadline = null;
                         $remainingText = 'لا يوجد موعد نهائي للتسجيل';
@@ -1035,6 +1132,37 @@
                 @else
                     <p>لا يوجد ميسرون لهذا المسار.</p>
                 @endif
+            </div>
+        </div>
+    </div>
+
+        <!-- Modal تأكيد الاشتراك -->
+    <div class="modal fade" id="confirmEnrollmentModal" tabindex="-1" aria-labelledby="confirmEnrollmentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <div class="modal-header border-0 position-relative justify-content-end pb-3">
+                    <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal"
+                        aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body text-center pt-0">
+                    <img src="{{ asset('/images/cources/join.svg') }}" />
+                    <h5 class="modal-title fw-bold mb-3" id="confirmEnrollmentModalLabel">هل أنت متأكد من الاشتراك في هذا
+                        المسار التدريبي</h5>
+                    <p class="text-muted mb-4">
+                        عند تأكيد الاشتراك، سيتم إضافتك إلى قائمة المشاركين في المسار التدريبي "{{ $OrgProgram->title ?? '' }}".<br>
+                        قد يتطلب الأمر موافقة من المدرب أو خطوات إضافية.
+                    </p>
+                </div>
+                
+                <div class="modal-footer border-0 d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <form class="flex-fill" style="padding: 0px"
+                        action="{{ route('orgEnrollment.enroll', ['OrgProgram_id' => $OrgProgram->id]) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="custom-btn flex-fill">نعم، أؤكد انضمامي</button>
+                    </form>
+                    <button type="button" class="btn-cancel flex-fill" data-bs-dismiss="modal">إلغاء</button>
+                </div>
             </div>
         </div>
     </div>

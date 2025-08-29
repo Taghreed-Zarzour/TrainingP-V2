@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class EnrollmentService
 {
     public function store($program_id = null, $orgProgram_id = null)
-    {
+    { 
         try {
             DB::beginTransaction();
 

@@ -65,7 +65,11 @@ class Trainee extends Model
         return $this->belongsToMany(TrainingProgram::class, 'enrollments', 'trainee_id', 'training_programs_id')
                     ->withPivot('status', 'registered_at', 'rejection_reason');
     }
-
+    public function orgtrainingPrograms()
+    {
+        return $this->belongsToMany(OrgTrainingProgram::class, 'enrollments', 'trainee_id', 'org_training_programs_id')
+                    ->withPivot('status', 'registered_at', 'rejection_reason');
+    }
     public function enrollments()
     {
         return $this->hasMany(Enrollment::class, 'trainee_id');

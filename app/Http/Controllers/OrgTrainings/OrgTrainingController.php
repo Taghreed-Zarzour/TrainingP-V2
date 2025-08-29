@@ -31,7 +31,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
+use App\Models\Enrollment;
 class OrgTrainingController extends Controller
 {
 
@@ -796,7 +796,34 @@ public function show($id){
                 ->diffInMinutes(\Carbon\Carbon::parse($session->session_end_time));
         }
     }
-    return view('orgTrainings.show',compact('OrgProgram','education_levels','work_sectors','grandTotalMinutes'));
+
+              // حساب حالة التسجيل
+        $deadline = $OrgProgram->registrationRequirements->application_deadline ?? null;
+        $registrationStatus = $this->calculateRegistrationStatus($deadline);
+        $remainingText = $registrationStatus['text'];
+
+            // تحديد ما إذا انتهى موعد التسجيل
+    $training_has_ended = false;
+    if ($deadline) {
+        $training_has_ended = now() > Carbon::parse($deadline);
+    }
+    $participants = Enrollment::where('org_training_programs_id', $OrgProgram->id)->get();
+
+  // التحقق من تسجيل المستخدم
+        $has_enrolled = false;
+        $enrollment = null;
+        if (auth()->check()) {
+            $has_enrolled = Enrollment::where('trainee_id', auth()->id())
+                ->where('org_training_programs_id', $id)
+                ->exists();
+
+            $enrollment = Enrollment::where('trainee_id', auth()->id())
+                ->where('org_training_programs_id', $id)
+                ->first();
+        }
+
+    return view('orgTrainings.show',compact('OrgProgram','education_levels','work_sectors','grandTotalMinutes','training_has_ended',
+        'remainingText','participants','has_enrolled','enrollment'));
 
 }
 
@@ -839,7 +866,122 @@ public function showProgram($id)
     return view('orgTrainings.show-program', compact('program','orgProgram','grandTotalMinutes','averageTrainerRating'));
 }
 
+private function calculateRegistrationStatus($deadline)
+{
+    $now = Carbon::now();
 
+    if (!$deadline) {
+        return [
+            'text' => 'تاريخ انتهاء التسجيل غير محدد',
+            'status' => 'unknown'
+        ];
+    }
+
+    $deadline = Carbon::parse($deadline);
+
+    if ($deadline->isFuture()) {
+        // الوقت المتبقي
+$diffInSeconds = $now->diffInSeconds($deadline);
+        $days = (int) floor($diffInSeconds / (60 * 60 * 24));
+        $hours = (int) floor(($diffInSeconds % (60 * 60 * 24)) / (60 * 60));
+
+        if ($days > 0) {
+            $daysText = $this->arabicPlural($days, 'يوم');
+            $hoursText = $this->arabicPlural($hours, 'ساعة');
+            return [
+                'text' => "متبقي {$days} {$daysText} و{$hours} {$hoursText} على انتهاء التسجيل",
+                'status' => 'active'
+            ];
+        } else {
+            $hoursText = $this->arabicPlural($hours, 'ساعة');
+            return [
+                'text' => "متبقي {$hours} {$hoursText} على انتهاء التسجيل",
+                'status' => 'ending_soon'
+            ];
+        }
+    } else {
+        // الوقت المنقضي
+        $daysAgo = (int) abs($now->diffInDays($deadline));
+
+        if ($daysAgo === 0) {
+            return [
+                'text' => "انتهت فترة التسجيل اليوم",
+                'status' => 'expired'
+            ];
+        } elseif ($daysAgo === 1) {
+            return [
+                'text' => "انتهت فترة التسجيل أمس",
+                'status' => 'expired'
+            ];
+        } elseif ($daysAgo <= 7) {
+            $daysText = $this->arabicPlural($daysAgo, 'يوم');
+            return [
+                'text' => "انتهت فترة التسجيل منذ {$daysAgo} {$daysText}",
+                'status' => 'expired'
+            ];
+        } elseif ($daysAgo <= 30) {
+            $weeksAgo = (int) floor($daysAgo / 7);
+            $weeksText = $this->arabicPlural($weeksAgo, 'أسبوع');
+            return [
+                'text' => "انتهت فترة التسجيل منذ {$weeksAgo} {$weeksText}",
+                'status' => 'expired'
+            ];
+      } else {
+    $monthsAgo = (int) abs($now->diffInMonths($deadline));
+
+    if ($monthsAgo >= 12) {
+        $yearsAgo = floor($monthsAgo / 12);
+        $remainingMonths = $monthsAgo % 12;
+
+        $yearsText = $this->arabicPlural($yearsAgo, 'سنة');
+
+        if ($remainingMonths > 0) {
+            $monthsText = $this->arabicPlural($remainingMonths, 'شهر');
+            return [
+                'text' => "انتهت فترة التسجيل منذ {$yearsAgo} {$yearsText} و{$remainingMonths} {$monthsText}",
+                'status' => 'expired'
+            ];
+        } else {
+            return [
+                'text' => "انتهت فترة التسجيل منذ {$yearsAgo} {$yearsText}",
+                'status' => 'expired'
+            ];
+        }
+    } else {
+        $monthsText = $this->arabicPlural($monthsAgo, 'شهر');
+        return [
+            'text' => "انتهت فترة التسجيل منذ {$monthsAgo} {$monthsText}",
+            'status' => 'expired'
+        ];
+    }
+}
+
+    }
+}
+    private function arabicPlural($number, $word)
+{
+    $forms = [
+        'يوم'   => ['يوم', 'يومين', 'أيام'],
+        'ساعة'  => ['ساعة', 'ساعتين', 'ساعات'],
+        'دقيقة' => ['دقيقة', 'دقيقتين', 'دقائق'],
+        'أسبوع' => ['أسبوع', 'أسبوعين', 'أسابيع'],
+        'شهر'   => ['شهر', 'شهرين', 'أشهر'],
+    ];
+
+    if (!isset($forms[$word])) {
+        return $word; // في حال ما وجدنا الكلمة
+    }
+
+    if ($number == 1) {
+        return $forms[$word][0];
+    } elseif ($number == 2) {
+        return $forms[$word][1];
+    } elseif ($number > 2 && $number <= 10) {
+        return $forms[$word][2];
+    } else {
+        return $forms[$word][0];
+    }
+}
 }
 
 

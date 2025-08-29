@@ -278,11 +278,13 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::get('/organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTrainingsManager.index');
   Route::get('organization-training-manager/{id}', [OrgTrainingManagerController::class, 'show'])->name('orgTrainingsManager.show');
   Route::delete('organization-training-manager/destroy/{id}', [OrgTrainingManagerController::class, 'destroy'])->name('orgTrainingsManager.destroy');
+    Route::delete('organization-training-manager/destroy-training/{id}', [OrgTrainingManagerController::class, 'deleteOrgTraining'])->name('orgTraining.destroy');
+
   Route::delete('organization-training-manager/destroy-session/{id}', [OrgTrainingManagerController::class, 'deleteOrgSession'])->name('orgSessions.destroy');
   Route::put('organization-training-manager/update-session/{id}', [OrgTrainingManagerController::class, 'updateOrgSession'])->name('orgSessions.update');
   Route::delete('organization-training-manager/delete-image/{id}', [OrgTrainingManagerController::class, 'deleteOrgImage'])->name('orgImage.delete');
   Route::put('organization-training-manager/update-image/{id}', [OrgTrainingManagerController::class, 'updateOrgImage'])->name('orgImage.update');
-  Route::post('organization-training-manager/assistant/store', [OrgTrainingManagerController::class, 'storeOrgAssistant'])->name('orgAssistant.store');
+  Route::post('organization-training-manager/assistant/store/{id}', [OrgTrainingManagerController::class, 'storeOrgAssistant'])->name('orgAssistant.store');
   Route::delete('organization-training-manager/delete-assistant/{orgTraining_id}/{assistant_id}', [OrgTrainingManagerController::class, 'deleteOrgAssistant'])
   ->name('orgAssistant.destroy');
   Route::post('/enroll/{OrgProgram_id}', [OrgTrainingManagerController::class, 'enroll'])->name('orgEnrollment.enroll');

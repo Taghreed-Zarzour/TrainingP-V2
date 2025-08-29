@@ -292,6 +292,7 @@ public function index()
             'averageTrainerRating',
             'registrationStatus',
              'training_has_ended',
+        
         ));
     }
 }

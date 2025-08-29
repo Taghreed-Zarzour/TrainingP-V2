@@ -146,7 +146,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <a href=""
+                                        <a href="{{ route('orgTrainingsManager.show', $p->id) }}"
                                             class="btn btn-register">
                                             <img src="{{ asset('images/cources/register-icon.svg') }}">
                                             قائمة المسجلين

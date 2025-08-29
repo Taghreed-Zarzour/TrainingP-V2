@@ -18,8 +18,11 @@
                     </h1>
                 </div>
                 <div class="mb-4">
-                    التدريبات / {{ $session->trainingProgram->title }}
-                </div>
+    المسار التدريبي / {{ $session->trainingProgram->trainingProgram->title }}
+    / {{ $session->trainingProgram->program_title }}
+  
+</div>
+
             </div>
         </div>
     </div>
