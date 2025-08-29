@@ -43,6 +43,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\TrainingAnnouncementSessionService;
 use App\Http\Controllers\Trainings\Trainings_CURD_Controller;
+use App\Http\Controllers\User\Trainee\MyTrainingsController;
 use App\Http\Controllers\User\Trainee\RegisteredTrainingsController;
 
 // User Route - Adjusted for Session Authentication
@@ -298,6 +299,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::post('/stop-sharing/{id}', [OrgTrainingManagerController::class, 'stopSharing'])->name('orgtrainings.stopSharing');
   Route::post('/re-publish/{id}', [OrgTrainingManagerController::class, 'rePublish'])->name('orgtrainings.rePublish');
   Route::get('/stopped', [OrgTrainingManagerController::class, 'showStoppedPrograms'])->name('orgtrainings.stopped');
+
+
+  Route::get('/trainee-trainings/manager',[MyTrainingsController::class, 'index'])->name('trainee.trainings.manager');
 
 });
 
