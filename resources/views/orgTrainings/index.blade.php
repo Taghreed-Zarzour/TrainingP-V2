@@ -307,7 +307,8 @@
                             class="col-12 w-100 empty-state d-flex flex-column text-center justify-content-center align-items-center">
                             <h4>لا توجد مسارات قيد الإنشاء</h4>
                             <p>ابدأ بإنشاء مسار تدريبي جديد لبناء مسارك التعليمي</p>
-                            <a href="{{ route('pathway.create') }}" class="custom-btn">بدء إنشاء مسار</a>
+                            <a href="" class="custom-btn">بدء إنشاء مسار</a>
+                            {{-- pathway.create --}}
                         </div>
                     @else
                         @foreach ($drafts as $p)

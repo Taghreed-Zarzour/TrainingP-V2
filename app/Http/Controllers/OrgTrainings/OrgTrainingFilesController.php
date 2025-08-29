@@ -10,25 +10,41 @@ use Illuminate\Support\Facades\Storage;
 class OrgTrainingFilesController extends Controller
 {
     public function uploadOrgTrainingFiles(Request $request, $program_id)
-    {
-        if ($request->hasFile('file')) {
-            $uploadedFile = $request->file('file');
+{
+    if (!$request->hasFile('training_files')) {
+        return back()->with('error', 'يرجى اختيار ملف للرفع.');
+    }
 
-            // احصل على اسم الملف الأصلي
-            $originalName = $uploadedFile->getClientOriginalName();
+    $files = $request->file('training_files');
 
-            $path = $uploadedFile->storeAs('training/files', $originalName, 'public');
+    foreach ($files as $uploadedFile) {
+        $originalName = $uploadedFile->getClientOriginalName();
+        $storagePath = 'training/files/' . $originalName;
 
-            OrgTrainingDetailFile::create([
-                'org_training_program_id' => $program_id,
-                'training_files' => $path,
-            ]);
-
-            return back()->with('success', 'تم رفع الملف بنجاح');
+        // تحقق من وجود الملف في التخزين
+        if (Storage::disk('public')->exists($storagePath)) {
+            return back()->with('error', 'الملف "' . $originalName . '" موجود مسبقًا في التخزين.');
         }
 
-        return back()->with('error', 'يرجى اختيار ملف للرفع');
+        // تحقق من وجود الملف في قاعدة البيانات
+        $existsInDatabase = OrgTrainingDetailFile::where('training_files', $storagePath)
+            ->where('org_training_program_id', $program_id)
+            ->exists();
+
+        if ($existsInDatabase) {
+            return back()->with('error', 'الملف "' . $originalName . '" مسجل مسبقًا في قاعدة البيانات.');
+        }
+
+        $path = $uploadedFile->storeAs('training/files', $originalName, 'public');
+
+        OrgTrainingDetailFile::create([
+            'org_training_program_id' => $program_id,
+            'training_files' => $path,
+        ]);
     }
+
+    return back()->with('success', 'تم رفع الملفات بنجاح.');
+}
 
 
   public function deleteOrgTrainingFile($id)

@@ -8,47 +8,47 @@
         transition: all 0.3s ease;
         margin-bottom: 30px;
     }
-    
+
     .upload-container:hover {
         border-color: #003090;
         background-color: #F8FAFC;
     }
-    
+
     .upload-icon {
         width: 60px;
         height: 60px;
         margin-bottom: 15px;
     }
-    
+
     .upload-title {
         font-size: 1.25rem;
         font-weight: 600;
         color: #003090;
         margin-bottom: 10px;
     }
-    
+
     .or-divider {
         display: flex;
         align-items: center;
         margin: 20px 0;
         color: #6B7280;
     }
-    
+
     .or-divider::before,
     .or-divider::after {
         content: "";
         flex: 1;
         border-bottom: 1px solid #E5E7EB;
     }
-    
+
     .or-divider::before {
         margin-left: 10px;
     }
-    
+
     .or-divider::after {
         margin-right: 10px;
     }
-    
+
     .browse-btn {
         background-color: #003090;
         color: white;
@@ -59,37 +59,37 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
-    
+
     .browse-btn:hover {
         background-color: #001f5a;
     }
-    
+
     .progress-container {
         margin: 30px 0;
     }
-    
+
     .progress-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 8px;
     }
-    
+
     .progress-title {
         color: #003090;
         font-weight: 500;
     }
-    
+
     .progress-percentage {
         color: #003090;
         font-weight: 600;
     }
-    
+
     .progress-actions {
         display: flex;
         gap: 10px;
     }
-    
+
     .progress-action {
         background: none;
         border: none;
@@ -98,18 +98,18 @@
         font-size: 1rem;
         transition: color 0.3s ease;
     }
-    
+
     .progress-action:hover {
         color: #003090;
     }
-    
+
     .progress-bar {
         height: 8px;
         background-color: #E5E7EB;
         border-radius: 4px;
         overflow: hidden;
     }
-    
+
     .progress-fill {
         height: 100%;
         width: 65%;
@@ -117,7 +117,7 @@
         border-radius: 4px;
         transition: width 0.5s ease;
     }
-    
+
     .uploaded-file {
         display: flex;
         align-items: center;
@@ -126,34 +126,41 @@
         border-radius: 8px;
         margin-top: 20px;
     }
-    
+
     .file-icon {
         width: 40px;
         height: 40px;
         margin-left: 15px;
     }
-    
+
     .file-name {
         flex: 1;
         color: #1F2937;
         font-weight: 500;
     }
-    
+
     @media (max-width: 576px) {
         .upload-container {
             padding: 30px 20px;
         }
-        
+
         .upload-icon {
             width: 50px;
             height: 50px;
         }
-        
+
         .progress-actions {
             gap: 8px;
         }
     }
 </style>
+
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+
 <div class="container py-5">
     <!-- منطقة تحميل الملفات -->
     <div class="upload-container" id="dropArea">
@@ -166,7 +173,7 @@
             <input type="file" id="fileInput" name="training_files[]" multiple class="visually-hidden">
         </form>
     </div>
-    
+
     <!-- الملفات المرفوعة -->
     @if(isset($attachments) && count($attachments) > 0)
         <div class="mt-4">
@@ -205,49 +212,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('fileInput');
     const browseBtn = document.getElementById('browseBtn');
     const uploadForm = document.getElementById('uploadForm');
-    
+
     // عند النقر على زر التصفح
     browseBtn.addEventListener('click', () => fileInput.click());
-    
+
     // عند اختيار الملفات
     fileInput.addEventListener('change', function() {
         if (this.files.length > 0) {
             uploadForm.submit();
         }
     });
-    
+
     // منع السلوك الافتراضي لأحداث السحب
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropArea.addEventListener(eventName, preventDefaults, false);
     });
-    
+
     function preventDefaults(e) {
         e.preventDefault();
         e.stopPropagation();
     }
-    
+
     // إضافة تأثير عند السحب
     ['dragenter', 'dragover'].forEach(eventName => {
         dropArea.addEventListener(eventName, highlight, false);
     });
-    
+
     ['dragleave', 'drop'].forEach(eventName => {
         dropArea.addEventListener(eventName, unhighlight, false);
     });
-    
+
     function highlight() {
         dropArea.style.borderColor = '#003090';
         dropArea.style.backgroundColor = '#F8FAFC';
     }
-    
+
     function unhighlight() {
         dropArea.style.borderColor = '#D1D5DB';
         dropArea.style.backgroundColor = '';
     }
-    
+
     // معالجة إفلات الملفات
     dropArea.addEventListener('drop', handleDrop, false);
-    
+
     function handleDrop(e) {
         const dt = e.dataTransfer;
         const files = dt.files;
