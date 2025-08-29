@@ -21,6 +21,8 @@
 
 
 <body>
+  @include('frontend.partials.loader')
+
     <div class="verify-bg mb-5">
         <div class="container-lg py-4">
             <!-- Form Container -->

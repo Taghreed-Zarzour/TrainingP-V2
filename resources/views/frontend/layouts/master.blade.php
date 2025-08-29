@@ -7,4 +7,4 @@
 
 @include('frontend.partials.footer')
 @include('frontend.include.footer_script')
-
+@include('frontend.partials.loader')

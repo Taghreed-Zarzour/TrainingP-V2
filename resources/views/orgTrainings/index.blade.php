@@ -146,7 +146,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <a href="{{ route('orgTrainingsManager.show', $p->id) }}"
+                                        <a href="{{ route('orgTrainingsManager.show', $p->id) }}#registrants"
                                             class="btn btn-register">
                                             <img src="{{ asset('images/cources/register-icon.svg') }}">
                                             قائمة المسجلين
@@ -286,7 +286,7 @@
                                                 </form>
                                             </div>
                                         </div>
-                                        <a href=""
+                                        <a href="{{ route('orgTrainingsManager.show', $p->id) }}#registrants"
                                             class="btn btn-register restart">
                                             <img src="{{ asset('images/cources/register-icon.svg') }}">
                                             قائمة المسجلين
@@ -530,7 +530,7 @@
                                         </div>
                                     </div>
                                     <div class="card-footer">
-                                        <a href="#"
+                                        <a href="{{ route('orgTrainingsManager.show', $p->id) }}#trainees"
                                             class="btn btn-register w-100">
                                             <img src="{{ asset('images/cources/members.svg') }}">
                                             المتدربون المنضمون

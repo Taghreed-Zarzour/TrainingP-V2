@@ -51,7 +51,7 @@ Route::get('/user', function (Request $request) {
   return Auth::user();
 })->middleware('auth');
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('index');
 
 //home page
 Route::get('/homePage', [AuthController::class, 'View'])->name('homePage');
@@ -328,5 +328,6 @@ Route::get('forgot-password', [ResetPasswordController::class, 'showForgotPasswo
 Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
+Route::get('complete-reset-password', [ResetPasswordController::class, 'showCompleteResetPassword'])->name('password.reset.complete');
 
 require __DIR__ . '/front_fetch.php';

@@ -120,7 +120,7 @@
     {{-- cards --}}
     <div class="container-fluid my-5" dir="rtl">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-bold">البرامج التدريبية المتاحة</h4>
+            <h4 class="fw-bold">أحدث التدريبات المعلنة</h4>
             @if (!empty($programs))
                 <div class="d-flex gap-2">
                     <button class="arrow-btn" id="carouselPrev">
@@ -321,7 +321,7 @@
     {{-- قسم المسارات التدريبية المتاحة --}}
     <div class="container-fluid my-5" dir="rtl">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-bold">المسارات التدريبية المتاحة</h4>
+            <h4 class="fw-bold">المسارات التدريبية المعلنة</h4>
             @if (!empty($allOrgPrograms))
                 <div class="d-flex gap-2">
                     <button class="arrow-btn" id="orgCarouselPrev">
@@ -476,11 +476,7 @@
         prevBtn.addEventListener('click', () => {
             currentIndex = (currentIndex - 1 + slides.length) % slides.length;
             scrollToCurrentCard();
-        });
-        
-        // للتأكد من البداية
-        scrollToCurrentCard();
-        
+        });    
         //التنقل بين الكروت عن طريق الأزرار للمسارات التدريبية
         const orgContainer = document.getElementById('orgCardCarousel');
         const orgSlides = Array.from(orgContainer.querySelectorAll('.card-slide'));
@@ -506,7 +502,6 @@
             scrollToCurrentOrgCard();
         });
         
-        // للتأكد من البداية
-        scrollToCurrentOrgCard();
+
     </script>
 @endsection

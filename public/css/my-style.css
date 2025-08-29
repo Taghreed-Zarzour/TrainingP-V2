@@ -812,14 +812,22 @@ font-size: 1.3rem;
 
         .hero-image {
             flex: 1;
+              padding: 50px 50px 0px 50px;
         }
 
         .hero-image img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            
         }
-
+  @media (max-width: 992px) {
+      .hero-image {
+            flex: 1;
+              padding: 5px;
+        }
+    
+  }
         .hero-text {
             flex: 1;
             display: flex;
@@ -3092,3 +3100,7 @@ font-size: 1.3rem;
             font-size: 14px;
             display: inline-block;
         }
+          .reset-sub-text{
+    font-size: 15px;
+    color: #444444;
+  }

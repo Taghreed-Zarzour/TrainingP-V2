@@ -6,7 +6,7 @@
         <div class="container d-flex justify-content-center">
             <div class="col-12 col-lg-7 text-center">
                 <div class="title-wrapper">
-                    <h1 class="d-inline-block lh-base">إدارة المسار التدريبي</h1>
+                    <h1 class="d-inline-block lh-base">برامج المؤسسة التدريبية</h1>
                 </div>
                 <div class="mb-4">
                     <div class="mb-4" id="breadcrumb-tab-title">
@@ -134,24 +134,40 @@
                             </div>
                         </div>
                         
-                        <!-- البطاقة 4: تصنيف التدريب -->
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm">
-                                <div class="card-body d-flex align-items-center p-2 flex-nowrap gap-1">
-                                    <div class="icon-circle bg-light rounded-circle p-2 me-2">
-                                        <img src="/images/cources/calssification.svg" class="info-icon" alt="تصنيف التدريب">
-                                    </div>
-                                    <div>
-                                        <div class="text-muted small">تصنيف المسار</div>
-                                        <div class="fw-bold">
-                                            @foreach ($orgTrainingClassification as $Classification)
-                                            {{ $Classification }}{{ !$loop->last ? ', ' : '' }}
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<!-- البطاقة 4: تصنيف التدريب -->
+<div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm"
+         data-bs-toggle="tooltip"
+         data-bs-placement="bottom"
+         title="{{ implode(', ', $orgTrainingClassification->toArray()) }}">
+        <div class="card-body d-flex align-items-center p-2 flex-nowrap gap-1">
+            <div class="icon-circle bg-light rounded-circle p-2 me-2">
+                <img src="/images/cources/calssification.svg" class="info-icon" alt="تصنيف التدريب">
+            </div>
+            <div>
+                <div class="text-muted small">تصنيف المسار</div>
+                <div class="fw-bold">
+                    @php
+                        $items = $orgTrainingClassification->toArray();
+                        $first = $items[0] ?? 'غير متاح';
+                        $remaining = count($items) - 1;
+                    @endphp
+                    {{ $first }}@if($remaining > 0) +{{ $remaining }}@endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
+
                         
                         <!-- البطاقة 5: طريقة تقديم التدريب -->
                         <div class="col-md-4">
@@ -225,8 +241,8 @@
                                     <div>
                                         <div class="text-muted small">تاريخ انتهاء التسجيل</div>
                                         <div class="fw-bold">
-                                            @if($OrgProgram->registrationRequirements->registration_end_date)
-                                                {{ date('Y/m/d', strtotime($OrgProgram->registrationRequirements->registration_end_date)) }}
+                                            @if($OrgProgram->registrationRequirements->application_deadline)
+                                                {{ date('Y/m/d', strtotime($OrgProgram->registrationRequirements->application_deadline)) }}
                                             @else
                                                 غير محدد
                                             @endif

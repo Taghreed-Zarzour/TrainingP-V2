@@ -92,14 +92,14 @@
                     </label>
                 </div>
 
-
-
-                <div class="d-flex justify-content-between align-items-center mt-4">
                     @if (Route::has('password.request'))
-                        <a class="forgot-password" href="{{ route('password.request') }}">
+                        <a class="forgot-password w-100" href="{{ route('password.request') }}">
                             نسيت كلمة المرور؟
                         </a>
                     @endif
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+
 
                     <button type="submit" class="btn btn-primary">
                         تسجيل الدخول

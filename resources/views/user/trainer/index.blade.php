@@ -384,7 +384,7 @@
 
         @media (max-width: 768px) {
             .trainer-image-container {
-                height: 150px;
+                
             }
 
             .trainer-name {
@@ -411,7 +411,7 @@
             }
 
             .trainer-image-container {
-                height: 120px;
+              
             }
 
             .badge {

@@ -585,7 +585,6 @@
             الرجاء التسجيل بحساب متدرب للانضمام إلى المسار التدريبي
             <div class="mt-2">
                 <span>الحساب الحالي: {{ auth()->user()->userType?->type }}</span>
-                <a href="{{ route('logout') }}" class="btn btn-outline-danger btn-sm ms-2">تسجيل الخروج</a>
             </div>
         </div>
     @else
@@ -705,18 +704,49 @@
                     @endphp
                     <div class="time-left">{{ $remainingText }}</div>
                     <!-- تعديل قسم المشاركين ليكون في سطرين -->
-                    <div class="participants">
-                        <div class="mb-2">
-                            <span>انضم {{ $OrgProgram->organization->user->name ?? 'مستخدمين' }} و آخرون</span>
-                        </div>
-                        <div class="avatar-stack">
-                            <img src="{{ asset('images/icons/user.svg') }}" alt="مستخدم" class="user-avatar">
-                            <img src="{{ asset('images/icons/user.svg') }}" alt="مستخدم" class="user-avatar">
-                            <img src="{{ asset('images/icons/user.svg') }}" alt="مستخدم" class="user-avatar">
-                            <img src="{{ asset('images/icons/user.svg') }}" alt="مستخدم" class="user-avatar">
-                            <img src="{{ asset('images/icons/user.svg') }}" alt="مستخدم" class="user-avatar">
-                        </div>
-                    </div>
+                  @php
+    $participants = $OrgProgram->trainees;
+    $participantsCount = $participants->count();
+    $maxVisible = 10;
+@endphp
+
+@if ($participantsCount > 0)
+<div class="participants">
+    <div class="mb-2">
+        @php
+            $firstParticipant = $participants->first();
+            $fullName = trim($firstParticipant->user->getTranslation('name', 'ar') ?? '');
+            $remainingCount = $participantsCount - 1; // العدد الباقي بعد أول اسم
+        @endphp
+
+        <span>
+            @if($participantsCount == 1)
+                انضم {{ $fullName ?: 'مشارك' }}
+            @else
+                انضم {{ $fullName ?: 'مشارك' }}
+                و {{ $remainingCount }} {{ $remainingCount == 1 ? 'آخر' : 'آخرون' }}
+            @endif
+        </span>
+    </div>
+
+    <div class="avatar-stack">
+        @foreach($participants->take($maxVisible) as $participant)
+            @php
+                $participantName = trim($participant->user->getTranslation('name', 'ar') ?? '');
+            @endphp
+            <img src="{{ asset('images/icons/user.svg') }}"
+                 alt="{{ $participantName ?: 'مشارك' }}"
+                 class="user-avatar"
+                 title="{{ $participantName ?: 'مشارك' }}">
+        @endforeach
+
+        @if($participantsCount > $maxVisible)
+            <div class="more-avatars">+{{ $participantsCount - $maxVisible }}</div>
+        @endif
+    </div>
+</div>
+@endif
+
                 </div>
                 <!-- العمود الثاني للصورة -->
                 <div class="col-12 col-lg-4 d-flex align-items-end px-5">

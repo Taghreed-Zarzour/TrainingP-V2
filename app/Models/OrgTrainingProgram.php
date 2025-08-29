@@ -91,6 +91,10 @@ public function files()
 {
     return $this->hasMany(OrgTrainingDetailFile::class, 'org_training_program_id');
 }
-
+    public function trainees()
+    {
+        return $this->belongsToMany(Trainee::class, 'enrollments', 'org_training_programs_id', 'trainee_id')
+                    ->withPivot('status', 'registered_at', 'rejection_reason');
+    }
 
 }

@@ -2,8 +2,6 @@
 
 @section('title', 'حساب المدرب')
 
-
-
 @section('content')
     <style>
         .phone-container {

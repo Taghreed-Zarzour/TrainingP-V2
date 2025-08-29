@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="{{ asset('css/intro.css') }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 </head>
-
+@include('frontend.partials.loader')
 <body class="min-vh-100 d-flex align-items-center">
     <div class="container-fluid intro-bg-container">
         <main class="main-content-container">

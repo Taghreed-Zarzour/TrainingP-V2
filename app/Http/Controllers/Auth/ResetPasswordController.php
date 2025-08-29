@@ -28,7 +28,7 @@ class ResetPasswordController extends Controller
         $user = User::where('email',$data['email'])->first();
 
         if (!$user) {
-            return back()->withErrors(['email' => 'No user found with that email.']);
+return back()->withErrors(['email' => 'لم يتم العثور على مستخدم بهذا البريد الإلكتروني.']);
         }
 
         $token = Password::createToken($user);
@@ -37,7 +37,7 @@ class ResetPasswordController extends Controller
 
         Mail::to($user->email)->send(new ResetPasswordMail($url, $user));
 
-        return back()->with('status', 'Password reset email sent successfully.');
+return back()->with('status', 'تم إرسال بريد إعادة تعيين كلمة المرور بنجاح.');
 
     }
 
@@ -59,13 +59,16 @@ class ResetPasswordController extends Controller
     });
 
     if ($status === Password::PASSWORD_RESET) {
-        return redirect()->route('login')->with('status', 'تم تغيير كلمة المرور بنجاح.');
+        return redirect()->route('password.reset.complete')->with('status', 'تم تغيير كلمة المرور بنجاح.');
     }
 
     return back()->withErrors(['email' => 'حدث خطأ أثناء تغيير كلمة المرور.']);
 }
 
-
+  public function showCompleteResetPassword()
+  {
+    return view('auth.complete-reset-password');
+  }
 
 }
 

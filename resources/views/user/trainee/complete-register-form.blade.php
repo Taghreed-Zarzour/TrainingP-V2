@@ -142,6 +142,8 @@ tbody td:first-child {
 </style>
 
 <body>
+  @include('frontend.partials.loader')
+
     <div class="verify-bg mb-5">
         <!-- العنوان الرئيسي -->
         <div class="header">

@@ -469,6 +469,23 @@
             font-size: 1rem;
         }
     }
+
+
+
+/* إذا أردت تغيير اللون عند التحويم فقط */
+.navbar-nav .dropdown-item:hover {
+    background-color: #D9E6FF;
+  
+}
+
+/* للقائمة الرئيسية أيضًا */
+.navbar-nav .nav-link:focus,
+.navbar-nav .nav-link:active {
+    background-color: transparent; /* أو أي لون تفضله */
+    color: #003090;
+    outline: none;
+}
+
 </style>
 
 <script>
