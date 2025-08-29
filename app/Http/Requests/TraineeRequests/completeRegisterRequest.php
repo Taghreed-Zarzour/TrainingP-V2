@@ -31,6 +31,7 @@ public function rules(): array
         'country_id' => ['required', 'exists:countries,id'],
         'nationality' => 'required|array|min:1',
         'nationality.*' => 'exists:countries,id',
+        'investment_value' => ['required'],
         'phone_number' => ['required', 'regex:/^\+?\d{6,20}$/'],
         'city' => 'required|string',
         'sex' => ['required', new Enum(SexEnum::class)],
@@ -84,7 +85,7 @@ $rules['job_position'] = ['required', new Enum(JobPositionEnum::class)];
       'sex.required' => 'الجنس مطلوب.',
       'sex.in' => 'يرجى اختيار الجنس بين ذكر أو أنثى.',
 
-
+     'investment_value' => 'يرجى اختيار القيمة التي تريد استثمارها',
 
 
       'education_levels_id.required' => 'مستوى التعليم مطلوب.',

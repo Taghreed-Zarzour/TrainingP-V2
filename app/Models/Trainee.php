@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\InvestmentValuesEnum;
 use App\Enums\SexEnum;
 use App\Enums\TrainingAttendanceType;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +41,7 @@ class Trainee extends Model
         'work_sectors' => 'array',
         'preferred_times' => 'array',
         'training_attendance' => TrainingAttendanceType::class,
+        'investment_value' => InvestmentValuesEnum::class,
     ];
 
     public function user()

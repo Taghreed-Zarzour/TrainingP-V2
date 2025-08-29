@@ -50,6 +50,7 @@ class TraineeService
         'fields_of_interest' => $data['fields_of_interest'],
         'preferred_times' => $data['preferred_times'],
         'training_attendance' => $data['training_attendance'],
+        'investment_value' => $data['investment_value'],
       ];
 
       // إضافة حقول العمل إذا كان يعمل
