@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Trainee;
+use App\Notifications\RegistrationCompleted;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -65,6 +66,7 @@ class TraineeService
         ->save();
 
       DB::commit();
+      $user->notify(new RegistrationCompleted('Thank you for completing your profile!'));
       return [
         'msg' => 'تم تخزين البيانات بنجاح',
         'success' => true,

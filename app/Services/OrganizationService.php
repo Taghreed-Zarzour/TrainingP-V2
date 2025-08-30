@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Organization;
+use App\Notifications\RegistrationCompleted;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
@@ -66,7 +67,7 @@ class OrganizationService
             // dd($branches);
 
             $organization->save();
-
+            $user->notify(new RegistrationCompleted('Thank you for completing your profile!'));
             DB::commit();
             return [
                 'msg' => 'تم تخزين البيانات.',

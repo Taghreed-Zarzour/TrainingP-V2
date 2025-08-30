@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Trainer;
 use App\Models\User;
+use App\Notifications\RegistrationCompleted;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -65,6 +66,7 @@ class TrainerService
 // ربط الجنسيات عبر جدول وسيط
     $user->nationalities()->sync($data['nationality']); // مصفوفة IDs
       DB::commit();
+      $user->notify(new RegistrationCompleted('Thank you for completing your profile!'));
 
       return [
         'msg' => 'تم تخزين البيانات.',

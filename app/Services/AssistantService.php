@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Assistant;
+use App\Notifications\RegistrationCompleted;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Education;
@@ -54,6 +55,7 @@ class AssistantService
             $Assistant->save();
 
             DB::commit();
+            $user->notify(new RegistrationCompleted('Thank you for completing your profile!'));
             return [
                 'msg' => 'تم تخزين البيانات.',
                 'success' => true,

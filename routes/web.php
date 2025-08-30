@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingFilesController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingManagerController;
@@ -303,6 +304,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::get('/trainee-trainings/manager',[MyTrainingsController::class, 'index'])->name('trainee.trainings.manager');
 
+  Route::get('/notifications', [NotificationController::class, 'index']);
 });
 
 Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');
