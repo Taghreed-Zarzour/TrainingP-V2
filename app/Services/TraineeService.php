@@ -21,6 +21,7 @@ class TraineeService
       }
       $user->update([
         'phone_number' => $data['phone_number'],
+          'phone_code' => $data['phone_code'],
         'city' => $data['city'],
         'country_id' => $data['country_id'],
       ]);
@@ -95,6 +96,7 @@ class TraineeService
       $user->update([
 
         'phone_number' => $data['phone_number'],
+          'phone_code' => $data['phone_code'],
         'city' => $data['city'],
         'country_id' => $data['country_id'],
 

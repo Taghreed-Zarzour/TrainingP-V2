@@ -378,12 +378,12 @@
                                     <p class="fw-semibold text-dark mb-3">معلومات التواصل</p>
                                     <p class="mb-3 fw-semibold"> {{ $user->country->name ?? '' }}،
                                         {{ $user->city ?? '' }}</p>
-                                    <div class="contact-style mb-3">
-                                        <div class="label">رقم الهاتف:</div>
-                                        <div class="value text-dark" style="text-align: left;" dir="ltr">
-                                            <strong>{{ $user->phone_number }}</strong>
-                                        </div>
-                                    </div>
+<div class="contact-style mb-3">
+    <div class="label">رقم الهاتف:</div>
+    <div class="value text-dark" style="text-align: left;" dir="ltr">
+        <strong>{{ $user->phone_code }} {{ $user->phone_number }}</strong>
+    </div>
+</div>
                                     <div class="contact-style mb-3">
                                         <div class="label">البريد الإلكتروني:</div>
                                         <div class="value text-dark" style="text-align: left;" dir="rtl">
@@ -666,12 +666,36 @@
                 </div>
             </div>
 
-            <div class="input-group-2col">
-                <div class="input-group">
-                    <label>رقم الهاتف<span class="required">*</span></label>
-                    <input name="phone_number" type="text" value="{{ old('phone_number', $user->phone_number) }}"
-                        placeholder="اكتب هنا" required />
-                </div>
+          <div class="input-group-2col">
+    <div class="input-group">
+        <label>رقم الهاتف<span class="required">*</span></label>
+        <div class="phone-container">
+            <div class="phone-country-selector" id="flagBtn">
+                <span id="countryCode" dir="ltr">{{ $user->phone_code ?? '+966' }}</span>
+                <span class="divider"></span>
+                <span class="arrow-down">🞃</span>
+                <img class="flag-img" id="selectedFlag" 
+                    src="{{ asset('flags/' . ($user->country->iso2 ?? 'sa') . '.svg') }}">
+            </div>
+            <input type="tel" name="phone_number" class="phone-input"
+                value="{{ $user->phone_number }}" placeholder="ادخل رقم الهاتف" required>
+            <input type="hidden" name="phone_code" id="phoneCodeHidden"
+                value="{{ $user->phone_code ?? '+966' }}">
+        </div>
+        <div class="country-dropdown" id="countryDropdown">
+            <input type="text" class="search-box" placeholder="ابحث عن دولة...">
+            <div class="country-list">
+                @foreach ($countries as $country)
+                    <div class="country-option" data-code="{{ $country->phonecode }}"
+                        data-flag="{{ strtolower($country->iso2) }}">
+                        <img src="{{ asset('flags/' . strtolower($country->iso2) . '.svg') }}"
+                            width="34" height="24">
+                        <span>{{ $country->phonecode }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
                 <div class="input-group disable">
                     <label>البريد الإلكتروني<span class="required">*</span></label>
                     <input name="email" type="email" placeholder="اكتب هنا" value="{{ $user->email }}" disabled />
@@ -1095,5 +1119,46 @@
                 loadCities(initialCountryId, true);
             }
         });
+        document.addEventListener('DOMContentLoaded', function() {
+    const flagBtn = document.getElementById('flagBtn');
+    const countryDropdown = document.getElementById('countryDropdown');
+    const selectedFlag = document.getElementById('selectedFlag');
+    const countryCode = document.getElementById('countryCode');
+    const phoneCodeHidden = document.getElementById('phoneCodeHidden');
+
+    flagBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        countryDropdown.style.display = countryDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', function() {
+        countryDropdown.style.display = 'none';
+    });
+
+    document.querySelector('.search-box').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        document.querySelectorAll('.country-option').forEach(option => {
+            const text = option.textContent.toLowerCase();
+            option.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+        });
+    });
+
+    document.querySelectorAll('.country-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const code = this.getAttribute('data-code');
+            const flag = this.getAttribute('data-flag');
+
+            selectedFlag.src = `/flags/${flag}.svg`;
+            countryCode.textContent = code;
+            phoneCodeHidden.value = code;
+
+            countryDropdown.style.display = 'none';
+        });
+    });
+
+    countryDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+});
     </script>
 @endsection

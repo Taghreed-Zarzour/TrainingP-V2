@@ -216,20 +216,29 @@
                             </div>
                         </div>
                         
-                        <!-- البطاقة 8: مكان التدريب -->
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm">
-                                <div class="card-body d-flex align-items-center p-2 flex-nowrap gap-1">
-                                    <div class="icon-circle bg-light rounded-circle p-2 me-2">
-                                        <img src="/images/cources/location2.svg" class="info-icon" alt="مكان التدريب">
-                                    </div>
-                                    <div>
-                                        <div class="text-muted small">مكان التدريب</div>
-                                        <div class="fw-bold">{{ $OrgProgram->country->name }} , {{ $OrgProgram->city }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<!-- البطاقة 8: مكان التدريب أو أونلاين -->
+<div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body d-flex align-items-center p-2 flex-nowrap gap-1">
+            <div class="icon-circle bg-light rounded-circle p-2 me-2">
+                <img src="/images/cources/location2.svg" class="info-icon" alt="مكان التدريب">
+            </div>
+            <div>
+                <div class="text-muted small">مكان التدريب</div>
+                @if ($OrgProgram->program_presentation_method === \App\Enums\TrainingAttendanceType::HYBRID->value 
+                    || $OrgProgram->program_presentation_method === \App\Enums\TrainingAttendanceType::REMOTE->value)
+                    <div class="fw-bold">أونلاين</div>
+                @else
+                    <div class="fw-bold">
+                        {{ $OrgProgram->city ?? '---' }}
+                        {{ $OrgProgram->country ? ' - ' . $OrgProgram->country->name : '' }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
                         
                         <!-- البطاقة 9: تاريخ انتهاء التسجيل -->
                         <div class="col-md-4">

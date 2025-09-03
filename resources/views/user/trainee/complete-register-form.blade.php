@@ -498,6 +498,19 @@ tbody td:first-child {
                                 </select>
                                 <div class="error-message" id="training_attendance_error">يجب اختيار طريقة الحضور</div>
                             </div>
+
+                              <div class="col-md-12">
+                                <label class="form-label">لضمان عرض تدريبات مناسبة لميزانيتك، ما هي القيمة التي تفضل استثمارها في التدريب الواحد؟</label>
+                                <select class="form-select" id="investment_value" name="investment_value" required>
+                                    <option value="" selected disabled>اختر من القائمة</option>
+                                    @foreach (\App\Enums\InvestmentValuesEnum::cases() as $investment_value)
+                                        <option value="{{ $investment_value->value }}" {{ old('investment_value') == $investment_value->value ? 'selected' : '' }}>
+                                            {{ $investment_value->value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="error-message" id="investment_value_error">يجب اختيار القيمة</div>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4 ">
@@ -732,6 +745,13 @@ tbody td:first-child {
                     errorId: 'training_attendance_error',
                     validation: (value) => value && value !== '',
                     errorMessage: 'يجب اختيار طريقة الحضور',
+                    isSelect2: false
+                },
+                                {
+                    id: 'investment_value',
+                    errorId: 'investment_value_error',
+                    validation: (value) => value && value !== '',
+                    errorMessage: 'يجب اختيار القيمة',
                     isSelect2: false
                 }
             ];

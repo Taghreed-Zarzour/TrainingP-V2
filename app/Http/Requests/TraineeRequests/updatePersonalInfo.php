@@ -38,7 +38,8 @@ class updatePersonalInfo extends FormRequest
 
       'photo' => 'sometimes|image|mimes:jpg,jpeg,png|max:5120',
 
-      'phone_number' => ['required', 'regex:/^\+?\d{6,20}$/'],
+    'phone_code' => ['required', 'regex:/^\+\d{1,4}$/'],
+      'phone_number' => ['required', 'regex:/^\d{6,15}$/'],
 
     ];
   }
@@ -75,9 +76,8 @@ class updatePersonalInfo extends FormRequest
       'photo.mimes' => 'يجب أن تكون الصورة بصيغة JPG أو PNG.',
       'photo.max' => 'يجب ألا يتجاوز حجم الصورة 5 ميغابايت.',
 
-      'phone_number.required' => 'حقل رقم الجوال مطلوب.',
-      'phone_number.regex' => 'يجب أن يكون رقم الجوال مكونًا من 6 إلى 20 رقماً دون أحرف أو رموز أخرى.',
-
+    'phone_number.required' => 'حقل رقم الجوال مطلوب.',
+      'phone_number.regex' => 'يجب أن يكون رقم الجوال مكونًا من 8 إلى 20 رقمًا، ويمكن أن يبدأ بعلامة "+" فقط.',
 
     ];
   }

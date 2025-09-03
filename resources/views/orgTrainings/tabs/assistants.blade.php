@@ -177,8 +177,8 @@
                                         <img src="{{ asset('storage/' . $assistant->photo) }}" alt="صورة الميسر" class="tr-trainee-avatar">
                                     @else
                                         <img src="{{ asset('images/icons/user.svg') }}" alt="ميسر" class="tr-trainee-avatar">
-                                    @endif
-                                    <span>{{ $assistant->name }} {{ $assistant->assistant->last_name }}</span>
+                                    @endif 
+                                    <span>{{ $assistant->getTranslation('name', 'ar') }} {{ $assistant->assistant->getTranslation('last_name', 'ar') }}</span>
                                 </div>
                             </td>
                             <td>{{ $assistant->email }}</td>

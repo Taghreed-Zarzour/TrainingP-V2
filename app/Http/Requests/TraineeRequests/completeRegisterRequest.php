@@ -32,7 +32,9 @@ public function rules(): array
         'nationality' => 'required|array|min:1',
         'nationality.*' => 'exists:countries,id',
         'investment_value' => ['required'],
-        'phone_number' => ['required', 'regex:/^\+?\d{6,20}$/'],
+        
+      'phone_code' => ['required', 'regex:/^\+\d{1,4}$/'],
+      'phone_number' => ['required', 'regex:/^\d{6,15}$/'],
         'city' => 'required|string',
         'sex' => ['required', new Enum(SexEnum::class)],
       'work_fields' => ['required', 'array', 'min:1'],
@@ -93,10 +95,6 @@ $rules['job_position'] = ['required', new Enum(JobPositionEnum::class)];
 
       'city.required' => 'المدينة مطلوبة.',
 
-
-      'phone_number.required' => 'حقل رقم الجوال مطلوب.',
-      'phone_number.regex' => 'يجب أن يكون رقم الجوال مكونًا من 6 إلى 20 رقماً دون أحرف أو رموز أخرى.',
-
       'work_sectors.required' => 'يجب اختيار القطاع الذي تعمل به',
       'work_sectors.exists' => 'القطاع المحدد غير صحيح.',
 
@@ -125,6 +123,12 @@ $rules['job_position'] = ['required', new Enum(JobPositionEnum::class)];
         'extra_work_field.required' => 'يجب إدخال مجال العمل الإضافي عند اختيار "أخرى"',
         'extra_work_field.string' => 'يجب أن يكون مجال العمل الإضافي نصاً',
         'extra_work_field.max' => 'يجب ألا يتجاوز مجال العمل الإضافي 255 حرفاً',
+          'phone_number.required' => 'حقل رقم الجوال مطلوب.',
+      'phone_number.regex' => 'يجب أن يكون رقم الجوال مكونًا من 8 إلى 20 رقمًا، ويمكن أن يبدأ بعلامة "+" فقط.',
+
+          'phone_code.required' => 'حقل رمز الدولة مطلوب.',
+      'phone_code.regex' => 'يجب أن يكون رمز الدولة مكونًا من علامة + متبوعة بـ 1 إلى 4 أرقام.',
+
     ];
 
   }
