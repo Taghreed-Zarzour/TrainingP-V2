@@ -192,7 +192,7 @@
                                     </li>
                                 @elseif(auth()->user()->user_type_id == 3)
                                     <li>
-                                        <a class="dropdown-item" href="{{ route('trainings_announcements') }}">
+                                        <a class="dropdown-item" href="{{ route('trainee.trainings.manager') }}">
                                             <img src="{{ asset('images/profile-menu/files.svg') }}" />
                                             التدريبات
                                         </a>

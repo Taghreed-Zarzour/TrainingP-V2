@@ -607,7 +607,7 @@
                         <i class="fas fa-clock me-2"></i>
                         تم إرسال طلبك مسبقًا، في انتظار الموافقة.
                         <div class="mt-2">
-                            <small>تاريخ التقديم: {{ \Carbon\Carbon::parse($enrollment->created_at)->format('d/m/Y H:i') }}</small>
+                            <small>تاريخ التقديم: {{ \Carbon\Carbon::parse($enrollment->created_at)->format('d/m/Y') }}</small>
                         </div>
                     </div>
                     @break
@@ -616,9 +616,7 @@
                     <div class="alert alert-success text-center mb-0">
                         <i class="fas fa-check-circle me-2"></i>
                         تم قبولك في المسار التدريبي، بالتوفيق!
-                        <div class="mt-2">
-                            <small>رقم التسجيل: #{{ $enrollment->id }}</small>
-                        </div>
+
                     </div>
                     @break
                 @case('rejected')
