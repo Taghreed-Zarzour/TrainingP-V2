@@ -3,8 +3,12 @@
 namespace App\Services;
 
 use App\Models\Enrollment;
+use App\Models\OrgTrainingProgram;
+use App\Models\TrainingProgram;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\EnrollmentRequest;
 
 class EnrollmentService
 {
@@ -36,6 +40,11 @@ class EnrollmentService
                     'org_training_programs_id' => null,
                     'registered_at' => now(),
                 ]);
+                $trainer  = TrainingProgram::where('id',$program_id)->first();
+                $trainer = User::where('id', $trainer->user_id)->first();
+                if ($trainer) {
+                    $trainer->notify(new EnrollmentRequest($enrollment , false));
+                }
             } elseif ($orgProgram_id) {
                 $existing = Enrollment::where('trainee_id', $trainee_id)
                     ->where('org_training_programs_id', $orgProgram_id)
@@ -56,6 +65,11 @@ class EnrollmentService
                     'training_programs_id'=>null,
                     'registered_at' => now(),
                 ]);
+                $orgtraining  = OrgTrainingProgram::where('id',$orgProgram_id)->first();
+                $organization = User::where('id', $orgtraining->organization_id)->first();
+                if ($organization) {
+                    $organization->notify(new EnrollmentRequest($enrollment , true));
+                }
             } else {
                 return [
                     'msg' => 'يجب تحديد معرف البرنامج.',

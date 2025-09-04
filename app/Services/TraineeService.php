@@ -67,7 +67,7 @@ class TraineeService
         ->save();
 
       DB::commit();
-      $user->notify(new RegistrationCompleted('Thank you for completing your profile!'));
+      $user->notify(new RegistrationCompleted('شكرًا لك على إكمال ملفك الشخصي!'));
       return [
         'msg' => 'تم تخزين البيانات بنجاح',
         'success' => true,

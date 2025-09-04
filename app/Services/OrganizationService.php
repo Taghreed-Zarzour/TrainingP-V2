@@ -67,7 +67,7 @@ class OrganizationService
             // dd($branches);
 
             $organization->save();
-            $user->notify(new RegistrationCompleted('Thank you for completing your profile!'));
+            $user->notify(new RegistrationCompleted('شكرًا لك على إكمال ملفك الشخصي!'));
             DB::commit();
             return [
                 'msg' => 'تم تخزين البيانات.',

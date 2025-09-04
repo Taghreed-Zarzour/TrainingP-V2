@@ -16,6 +16,7 @@ use App\Models\Enrollments;
 use App\Models\schedulingTrainingSessions;
 use App\Models\SessionAttendance;
 use App\Models\Trainee;
+use App\Notifications\OrgViewsNotification;
 use Illuminate\Support\Facades\Storage;
 use App\Models\trainingAssistantManagement;
 use App\Models\TrainingClassification;
@@ -65,7 +66,10 @@ public function index()
 
     // المشاهدات
     $program->increment('views');
-
+    $programUser = User::find($program->user_id);
+    if ($program->views % 30 === 0) {
+        $programUser->notify(new OrgViewsNotification($program->views));
+    }
     $programTypes = ProgramType::pluck('name', 'id');
     $languages = Language::pluck('name', 'id');
     $classifications = TrainingClassification::pluck('name', 'id');

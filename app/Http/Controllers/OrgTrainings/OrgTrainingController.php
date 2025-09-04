@@ -25,6 +25,7 @@ use App\Models\trainingLevel;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\WorkSector;
+use App\Notifications\OrgViewsNotification;
 use App\Services\TrainingAnnouncementService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -788,7 +789,10 @@ public function show($id){
 
     //   المشاهدات
     $OrgProgram->increment('views');
-
+    $organization = User::find($OrgProgram->organization_id);
+    if ($OrgProgram->views % 30 === 0) {
+        $organization->notify(new OrgViewsNotification($OrgProgram->views));
+    }
     $grandTotalMinutes = 0;
     foreach ($OrgProgram->details as $program) {
         foreach ($program->trainingSchedules as $session) {

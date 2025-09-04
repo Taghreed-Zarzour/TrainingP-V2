@@ -66,7 +66,7 @@ class TrainerService
 // ربط الجنسيات عبر جدول وسيط
     $user->nationalities()->sync($data['nationality']); // مصفوفة IDs
       DB::commit();
-      $user->notify(new RegistrationCompleted('Thank you for completing your profile!'));
+      $user->notify(new RegistrationCompleted('شكرًا لك على إكمال ملفك الشخصي!'));
 
       return [
         'msg' => 'تم تخزين البيانات.',

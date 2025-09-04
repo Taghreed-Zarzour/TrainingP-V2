@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+use App\Notifications\OrgViewsNotification;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 class TrainingProgram extends Model
@@ -98,5 +99,5 @@ public function getAllAssistants()
                     ->withPivot('status', 'registered_at', 'rejection_reason');
     }
 
-
+    
 }
