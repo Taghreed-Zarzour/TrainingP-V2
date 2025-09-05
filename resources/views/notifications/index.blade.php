@@ -88,7 +88,7 @@
         @endif
     </ul>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
         function fetchNotifications() {
@@ -104,9 +104,9 @@
             });
         }
 
-        // Fetch notifications every 3 seconds
-        setInterval(fetchNotifications, 3000);
+        // Fetch notifications every 8 seconds
+        setInterval(fetchNotifications, 8000);
     });
-</script>
+</script> -->
 </body>
 </html>

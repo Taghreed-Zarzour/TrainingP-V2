@@ -20,9 +20,9 @@ class EnrollmentAcceptedNotification extends Notification
     {
         return ['database']; 
     }
-
     public function toArray($notifiable)
     {
+        dd($notifiable);
         return [
             'message' => 'تم قبول تسجيلك في البرنامج ' . $this->programId, 
             'program_id' => $this->programId,

@@ -107,9 +107,9 @@ namespace App\Models;
             'password' => 'hashed',
         ];
     }
-    public function trainingPrograms()
-{
-    return $this->hasMany(TrainingProgram::class, 'user_id');
-}
+            public function trainingPrograms()
+        {
+            return $this->hasMany(TrainingProgram::class, 'user_id');
+        }
 
 }

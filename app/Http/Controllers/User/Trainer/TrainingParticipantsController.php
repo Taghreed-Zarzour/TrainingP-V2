@@ -26,7 +26,8 @@ class TrainingParticipantsController extends Controller
         $query->where('training_programs_id', $programId);
     }
     $enrollment = $query->firstOrFail();
-    $trainee = User::find($participantId)->first();
+
+    $trainee = User::find($query->firstOrFail()->trainee_id);
     if ($action === 'accept') {
         $trainee->notify(new EnrollmentAcceptedNotification($programId));
         $enrollment->status = 'accepted';
@@ -45,7 +46,7 @@ public function submitReason(rejectParticipantRequst $request, $programId, $part
 
     $isOrgProgram = $request->input('is_org', false);
 
-    $trainee = User::find($participantId)->first();
+    $trainee = User::find($participantId);
     $query = Enrollment::where('trainee_id', $participantId)
                        ->where('status', 'rejected');
 
