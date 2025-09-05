@@ -610,7 +610,7 @@
     const bulkAcceptBtn = document.getElementById('bulkAcceptBtn');
     const selectedCountSpan = document.getElementById('selectedCount');
     const bulkAcceptForm = document.getElementById('bulkAcceptForm');
-    
+
     // إخفاء الزر بشكل ابتدائي
     bulkAcceptForm.style.display = 'none';
 
@@ -621,7 +621,7 @@
             position: relative;
             display: inline-block;
         }
-        
+
         .selection-circle {
             position: absolute;
             bottom: -5px;
@@ -634,7 +634,7 @@
             display: none;
             z-index: 2;
         }
-        
+
         .selection-circle::after {
             content: "✓";
             color: white;
@@ -645,11 +645,11 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        
+
         .trainee-card.has-selection-circle {
             transition: border-color 0.3s ease;
         }
-        
+
         .trainee-card.has-selection-circle.selected {
             border-color: #003090 !important;
             box-shadow: 0 0 0 1px #003090 !important;
@@ -681,10 +681,10 @@
     selectAllCheckbox.addEventListener('change', function() {
         const isChecked = this.checked;
         const newTrainees = document.querySelectorAll('.trainee-card.has-selection-circle');
-        
+
         newTrainees.forEach(card => {
             const circle = card.querySelector('.selection-circle');
-            
+
             if (isChecked) {
                 circle.style.display = 'block';
                 card.classList.add('selected');
@@ -693,7 +693,7 @@
                 card.classList.remove('selected');
             }
         });
-        
+
         // تحديث العدد على الزر وإظهار/إخفاء الفورم
         const selectedCount = isChecked ? newTrainees.length : 0;
         selectedCountSpan.textContent = selectedCount;
@@ -705,7 +705,7 @@
                       </script>
 
                       <script>
-                          //سبب رفض الطلب 
+                          //سبب رفض الطلب
                           const rejectModal = document.getElementById('rejectReasonModal');
                           rejectModal.addEventListener('show.bs.modal', function(event) {
                               const button = event.relatedTarget;

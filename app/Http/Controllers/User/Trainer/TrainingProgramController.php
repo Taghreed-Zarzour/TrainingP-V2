@@ -55,8 +55,10 @@ public function index()
     ]);
 }
 
-  public function show($id)
+  public function show(Request $request, $id)
   {
+    $search = $request->input('search');
+
     $program = TrainingProgram::with([
       'detail',
       'AdditionalSetting',
@@ -82,7 +84,15 @@ public function index()
 
     // المسجلون
     $participantIds = Enrollment::where('training_programs_id', $id)->pluck('trainee_id');
-    $participants = Trainee::whereIn('id', $participantIds)->get();
+    if($search){
+            $participants = Trainee::whereIn('id', $participantIds)
+            ->where('last_name->ar','like',"%{$search}%")
+            ->orWhereHas('user', fn($q) => $q->where('first_name->ar','like',"%{$search}%"))->get();
+    }
+    else{
+        $participants = Trainee::whereIn('id', $participantIds)->get();
+    }
+
 
     // المتدربون
     $traineeIds = Enrollment::where('training_programs_id', $id)->where('status', 'accepted')->pluck('trainee_id');
@@ -105,7 +115,7 @@ public function index()
         ->count();
 
 $sessionCount = count($totalSessions);
-$percentage = $sessionCount > 0 
+$percentage = $sessionCount > 0
     ? round(($attendedSessions / $sessionCount) * 100, 2)
     : 0;
       $attendanceStats[$trainee->id] = $percentage;
@@ -181,7 +191,7 @@ $percentage = $sessionCount > 0
     ));
   }
 
-  
+
   public function destroy($id)
   {
     $this->trainingProgramService->deleteProgram($id);
