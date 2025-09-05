@@ -15,7 +15,7 @@ class TrainingAnnouncementService
         $this->trainingProgramServices = $trainingProgramServices;
     }
 
-    public function index(): array
+    public function index($costType = null , $authorityType = null , $search = null , $programTypeId = null): array
     {
         $allPrograms = TrainingProgram::with(
             'detail',
@@ -24,8 +24,12 @@ class TrainingAnnouncementService
             'assistants'
         )
         ->where('status', 'online')
+        ->freeOrPaid($costType)
+        ->providerType($authorityType)
+        ->searchTitle($search)
+        ->programType($programTypeId)
         ->get();
-        
+
 
         $announced = [];
         foreach ($allPrograms as $program) {

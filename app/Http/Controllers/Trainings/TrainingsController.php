@@ -146,9 +146,15 @@ $diffInSeconds = $now->diffInSeconds($deadline);
     }
 }
 
-public function index()
+public function index(Request $request)
 {
-    $programsResponse = $this->trainingAnnouncementService->index();
+    $costType = $request->input('cost_type', 'all');
+    $authorityType = $request->input('provider', 'all');
+    $programTypeId = $request->input('program_type_id');
+    $search = $request->input('search');
+
+    $programsResponse = $this->trainingAnnouncementService->index($costType, $authorityType, $search, $programTypeId);
+
 
     $programs = $programsResponse['data'] ?? [];
     foreach ($programs as $program) {
@@ -185,6 +191,10 @@ public function index()
             'assistants'
         )
         ->where('status', 'online')
+        ->freeOrPaid($costType)
+        ->providerType($authorityType)
+        ->searchTitle($search)
+        ->programType($programTypeId)
         ->get();
 
         return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));
@@ -292,7 +302,7 @@ public function index()
             'averageTrainerRating',
             'registrationStatus',
              'training_has_ended',
-        
+
         ));
     }
 }

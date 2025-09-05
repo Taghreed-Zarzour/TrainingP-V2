@@ -26,12 +26,21 @@
             <div class="col-12 col-lg-11">
                 <div
                     class="d-flex align-items-center justify-content-between px-3 py-2 shadow-sm bg-white custom-search-bar w-100">
-                    <div class="d-flex align-items-center flex-grow-1 me-3">
+                    <form method="GET" action="{{ route('trainings_announcements') }}" class="d-flex align-items-center flex-grow-1 me-3">
                         <!-- أيقونة البحث + النص (يمين) -->
                         <img src="{{ asset('images/cources/search.svg') }}" alt="search icon" class="me-2" />
-                        <input type="text" class="form-control border-0 flex-grow-1" placeholder="ابحث عن أي شيء"
-                            style="box-shadow: none; background: transparent;" />
-                    </div>
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control border-0 flex-grow-1"
+                            placeholder="ابحث عن أي شيء"
+                            style="box-shadow: none; background: transparent;"
+                            value="{{ request('search') }}"
+                        />
+                        <button type="submit" class="btn btn-link p-0 ms-2">
+                            <svg width="20" height="20" fill="currentColor"><use xlink:href="#search-icon"/></svg>
+                        </button>
+                    </form>
                     <!-- زر فلترة مخصص -->
                     <button class="btn custom-filter-btn d-flex align-items-center gap-2 flex-shrink-0" type="button"
                         data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -54,69 +63,66 @@
         </div>
     </div>
     <!-- ✅ مودال الفلترة -->
-    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-md">
-            <div class="modal-content p-4">
-                <div class="modal-header border-0 justify-content-end">
-                    <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- التكلفة -->
-                    <div class="mb-4">
-                        <label class="form-label">التكلفة</label>
-                        <div class="d-flex gap-4 flex-wrap">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="cost" id="all" checked>
-                                <label class="form-check-label" for="all">جميع التدريبات</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="cost" id="paid">
-                                <label class="form-check-label" for="paid">تدريبات مدفوعة</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="cost" id="free">
-                                <label class="form-check-label" for="free">تدريبات مجانية</label>
-                            </div>
-                        </div>
+    <form method="GET" action="{{ route('trainings_announcements') }}">
+        <div class="modal-body">
+            <!-- التكلفة -->
+            <div class="mb-4">
+                <label class="form-label">التكلفة</label>
+                <div class="d-flex gap-4 flex-wrap">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="cost_type" id="all" value="all" checked>
+                        <label class="form-check-label" for="all">جميع التدريبات</label>
                     </div>
-                    <!-- الجهة المعلنة -->
-                    <div class="mb-4">
-                        <label class="form-label">الجهة المعلنة</label>
-                        <div class="d-flex gap-4 flex-wrap">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="provider" id="all2" checked>
-                                <label class="form-check-label" for="all2">جميع الجهات</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="provider" id="company">
-                                <label class="form-check-label" for="company">مؤسسة</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="provider" id="trainer">
-                                <label class="form-check-label" for="trainer">مدرب</label>
-                            </div>
-                        </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="cost_type" id="paid" value="paid">
+                        <label class="form-check-label" for="paid">تدريبات مدفوعة</label>
                     </div>
-                    <!-- مجال التدريب -->
-                    <div class="mb-4">
-                        <label class="form-label">مجال التدريب</label>
-                        <select name="program_type_id" class="custom-singleselect">
-                            @foreach ($program_classification as $type)
-                                <option value="{{ $type->id }}">
-                                    {{ $type->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="cost_type" id="free" value="free">
+                        <label class="form-check-label" for="free">تدريبات مجانية</label>
                     </div>
-                </div>
-                <!-- أزرار -->
-                <div class="modal-footer border-0 d-flex justify-content-between gap-3">
-                    <button type="button" class="filter-btn flex-fill" data-bs-dismiss="modal">تطبيق الفلترة ←</button>
-                    <button type="button" class="btn btn-outline-secondary flex-fill">إعادة تعيين</button>
                 </div>
             </div>
+
+            <!-- الجهة المعلنة -->
+            <div class="mb-4">
+                <label class="form-label">الجهة المعلنة</label>
+                <div class="d-flex gap-4 flex-wrap">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="provider" id="all2" value="all" checked>
+                        <label class="form-check-label" for="all2">جميع الجهات</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="provider" id="company" value="company">
+                        <label class="form-check-label" for="company">مؤسسة</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="provider" id="trainer" value="trainer">
+                        <label class="form-check-label" for="trainer">مدرب</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- مجال التدريب -->
+            <div class="mb-4">
+                <label class="form-label">مجال التدريب</label>
+                <select name="program_type_id" class="custom-singleselect">
+                    <option value="">جميع المجالات</option>
+                    @foreach ($program_classification as $type)
+                        <option value="{{ $type->id }}" {{ request('program_type_id') == $type->id ? 'selected' : '' }}>
+                            {{ $type->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
         </div>
-    </div>
+
+        <!-- أزرار -->
+        <div class="modal-footer border-0 d-flex justify-content-between gap-3">
+            <button type="submit" class="filter-btn flex-fill">تطبيق الفلترة ←</button>
+            <button type="reset" class="btn btn-outline-secondary flex-fill">إعادة تعيين</button>
+        </div>
+    </form>
     {{-- cards --}}
     <div class="container-fluid my-5" dir="rtl">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -364,7 +370,7 @@
                     <div class="d-flex flex-nowrap" id="orgCardCarousel" style="scroll-behavior: smooth; overflow-x: auto;">
                         @foreach ($allOrgPrograms as $program)
                             <div class="card-slide p-2">
-                          
+
 
                                 <a href="{{ route('org.training.show', $program->id) }}"
                                     class="text-decoration-none text-dark">
@@ -459,7 +465,7 @@
         const prevBtn = document.getElementById('carouselPrev');
         const nextBtn = document.getElementById('carouselNext');
         let currentIndex = 0;
-        
+
         function scrollToCurrentCard() {
             slides[currentIndex].scrollIntoView({
                 behavior: 'smooth',
@@ -467,23 +473,23 @@
                 block: 'nearest'
             });
         }
-        
+
         nextBtn.addEventListener('click', () => {
             currentIndex = (currentIndex + 1) % slides.length;
             scrollToCurrentCard();
         });
-        
+
         prevBtn.addEventListener('click', () => {
             currentIndex = (currentIndex - 1 + slides.length) % slides.length;
             scrollToCurrentCard();
-        });    
+        });
         //التنقل بين الكروت عن طريق الأزرار للمسارات التدريبية
         const orgContainer = document.getElementById('orgCardCarousel');
         const orgSlides = Array.from(orgContainer.querySelectorAll('.card-slide'));
         const orgPrevBtn = document.getElementById('orgCarouselPrev');
         const orgNextBtn = document.getElementById('orgCarouselNext');
         let orgCurrentIndex = 0;
-        
+
         function scrollToCurrentOrgCard() {
             orgSlides[orgCurrentIndex].scrollIntoView({
                 behavior: 'smooth',
@@ -491,17 +497,17 @@
                 block: 'nearest'
             });
         }
-        
+
         orgNextBtn.addEventListener('click', () => {
             orgCurrentIndex = (orgCurrentIndex + 1) % orgSlides.length;
             scrollToCurrentOrgCard();
         });
-        
+
         orgPrevBtn.addEventListener('click', () => {
             orgCurrentIndex = (orgCurrentIndex - 1 + orgSlides.length) % orgSlides.length;
             scrollToCurrentOrgCard();
         });
-        
+
 
     </script>
 @endsection

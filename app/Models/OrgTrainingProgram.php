@@ -76,7 +76,7 @@ class OrgTrainingProgram extends Model
     {
         return $this->belongsTo(trainingLevel::class, 'training_level_id');
     }
-    
+
         public function programType()
     {
         return $this->belongsTo(programType::class, 'program_type');
@@ -97,5 +97,55 @@ public function files()
         return $this->belongsToMany(Trainee::class, 'enrollments', 'org_training_programs_id', 'trainee_id')
                     ->withPivot('status', 'registered_at', 'rejection_reason');
     }
+
+// local scopes
+public function scopeFreeOrPaid($query, $type)
+{
+    if (!$type || $type === 'all') {
+        return $query;
+    }
+
+    return $query->whereHas('registrationRequirements', function ($q) use ($type) {
+        if ($type === 'free') {
+            $q->where('is_free', 1);
+        } elseif ($type === 'paid') {
+            $q->where('is_free', 0);
+        }
+    });
+}
+
+
+public function scopeProviderType($query, $type)
+{
+    if (!$type || $type === 'all' || $type === 'company') {
+        return $query;
+    }
+
+    if ($type === 'trainer') {
+        // Return nothing
+        return $query->whereRaw('0 = 1'); // Always false condition
+    }
+
+    return $query;
+}
+
+
+public function scopeSearchTitle($query, $keyword)
+{
+if (!$keyword) {
+    return $query;
+}
+
+return $query->where('title', 'like', "%{$keyword}%");
+}
+
+public function scopeProgramType($query, $programTypeId)
+{
+    if (!$programTypeId) {
+        return $query;
+    }
+
+    return $query->whereJsonContains('org_training_classification_id', (string)$programTypeId);
+}
 
 }

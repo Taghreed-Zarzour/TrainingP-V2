@@ -16,8 +16,8 @@ class TrainingProgram extends Model
         'user_id',
         'status',
         'schedules_later',
-            'num_of_session', 
-    'num_of_hours', 
+            'num_of_session',
+    'num_of_hours',
     ];
 
     protected $casts = [
@@ -43,11 +43,11 @@ public function assistants()
 public function getAllTrainers()
 {
     $trainers = [];
-    
+
     if ($this->assistants) {
         $trainers = $this->assistants->getAllTrainers();
     }
-    
+
     return $trainers;
 }
 
@@ -55,11 +55,11 @@ public function getAllTrainers()
 public function getAllAssistants()
 {
     $assistants = [];
-    
+
     if ($this->assistants) {
         $assistants = $this->assistants->getAllAssistants();
     }
-    
+
     return $assistants;
 }
 
@@ -99,5 +99,49 @@ public function getAllAssistants()
                     ->withPivot('status', 'registered_at', 'rejection_reason');
     }
 
-    
+    //local Scopes
+    public function scopeFreeOrPaid($query, $type)
+    {
+        if (!$type || $type === 'all') {
+            return $query;
+        }
+        return $query->whereHas('AdditionalSetting', function ($q) use ($type) {
+            if ($type === 'free') {
+                $q->where('is_free', 1);
+            } elseif ($type === 'paid') {
+                $q->where('is_free', 0);
+            }
+        });
+
+    }
+
+    public function scopeProviderType($query, $type)
+    {
+        if (!$type || $type === 'all') {
+            return $query;
+        }
+
+        return $query->when($type === 'company', fn($q) => $q->whereHas('trainer', fn($q2) => $q2->where('user_type_id', 4)))
+                ->when($type === 'trainer', fn($q) => $q->whereHas('trainer', fn($q2) => $q2->where('user_type_id', 1)));
+    }
+
+    public function scopeSearchTitle($query, $keyword)
+    {
+    if (!$keyword) {
+        return $query;
+    }
+
+    return $query->where('title', 'like', "%{$keyword}%");
+    }
+
+
+    public function scopeProgramType($query, $programTypeId)
+{
+    if (!$programTypeId) {
+        return $query;
+    }
+
+    return $query->where('training_classification_id', $programTypeId);
+}
+
 }
