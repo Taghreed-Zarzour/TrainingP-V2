@@ -15,7 +15,7 @@ class TrainingAnnouncementService
         $this->trainingProgramServices = $trainingProgramServices;
     }
 
-    public function index($costType = null , $authorityType = null , $search = null , $programTypeId = null): array
+    public function index($filters = null , $search = null ): array
     {
         $allPrograms = TrainingProgram::with(
             'detail',
@@ -24,10 +24,8 @@ class TrainingAnnouncementService
             'assistants'
         )
         ->where('status', 'online')
-        ->freeOrPaid($costType)
-        ->providerType($authorityType)
+        ->applyFilters($filters)
         ->searchTitle($search)
-        ->programType($programTypeId)
         ->get();
 
 

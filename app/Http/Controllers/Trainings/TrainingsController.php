@@ -148,12 +148,13 @@ $diffInSeconds = $now->diffInSeconds($deadline);
 
 public function index(Request $request)
 {
-    $costType = $request->input('cost_type', 'all');
-    $authorityType = $request->input('provider', 'all');
-    $programTypeId = $request->input('program_type_id');
+    // $costType = $request->input('cost_type', 'all');
+    // $authorityType = $request->input('provider', 'all');
+    // $programTypeId = $request->input('program_type_id');
+    $filters = $request->only(['cost_type', 'provider', 'program_type_id', 'search']);
     $search = $request->input('search');
 
-    $programsResponse = $this->trainingAnnouncementService->index($costType, $authorityType, $search, $programTypeId);
+    $programsResponse = $this->trainingAnnouncementService->index($filters, $search);
 
 
     $programs = $programsResponse['data'] ?? [];
@@ -191,10 +192,8 @@ public function index(Request $request)
             'assistants'
         )
         ->where('status', 'online')
-        ->freeOrPaid($costType)
-        ->providerType($authorityType)
+        ->applyFilters($filters)
         ->searchTitle($search)
-        ->programType($programTypeId)
         ->get();
 
         return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));

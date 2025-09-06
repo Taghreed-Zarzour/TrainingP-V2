@@ -130,14 +130,7 @@ public function scopeProviderType($query, $type)
 }
 
 
-public function scopeSearchTitle($query, $keyword)
-{
-if (!$keyword) {
-    return $query;
-}
 
-return $query->where('title', 'like', "%{$keyword}%");
-}
 
 public function scopeProgramType($query, $programTypeId)
 {
@@ -146,6 +139,23 @@ public function scopeProgramType($query, $programTypeId)
     }
 
     return $query->whereJsonContains('org_training_classification_id', (string)$programTypeId);
+}
+
+public function scopeApplyFilters($query, $filters)
+{
+    return $query
+        ->freeOrPaid($filters['cost_type'] ?? 'all')
+        ->providerType($filters['provider'] ?? 'all')
+        ->programType($filters['program_type_id'] ?? null);
+}
+
+public function scopeSearchTitle($query, $keyword)
+{
+if (!$keyword) {
+    return $query;
+}
+
+return $query->where('title', 'like', "%{$keyword}%");
 }
 
 }

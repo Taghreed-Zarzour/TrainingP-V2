@@ -125,15 +125,6 @@ public function getAllAssistants()
                 ->when($type === 'trainer', fn($q) => $q->whereHas('trainer', fn($q2) => $q2->where('user_type_id', 1)));
     }
 
-    public function scopeSearchTitle($query, $keyword)
-    {
-    if (!$keyword) {
-        return $query;
-    }
-
-    return $query->where('title', 'like', "%{$keyword}%");
-    }
-
 
     public function scopeProgramType($query, $programTypeId)
 {
@@ -142,6 +133,23 @@ public function getAllAssistants()
     }
 
     return $query->where('training_classification_id', $programTypeId);
+}
+
+public function scopeApplyFilters($query, $filters)
+{
+    return $query
+        ->freeOrPaid($filters['cost_type'] ?? 'all')
+        ->providerType($filters['provider'] ?? 'all')
+        ->programType($filters['program_type_id'] ?? null);
+}
+
+public function scopeSearchTitle($query, $keyword)
+{
+if (!$keyword) {
+    return $query;
+}
+
+return $query->where('title', 'like', "%{$keyword}%");
 }
 
 }
