@@ -92,13 +92,15 @@
             </div>
         </div>
     </div>
-    
+  @if(count($OrgProgram->details) > 0 && count($sessionAttendanceCounts) > 0 && array_sum($sessionAttendanceCounts) > 0)
+  
     {{-- العنوان --}}
     <div class="chart-title mt-5">عدد الحضور في كل تدريب</div>
     {{-- الرسم البياني --}}
     <div class="chart-container" style="height: 400px;">
         <canvas id="attendanceChart"></canvas>
     </div>
+        @endif
 </div>
 
 {{-- تمهيد بيانات الرسم --}}

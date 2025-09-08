@@ -108,12 +108,9 @@
                             </div>
                             <div class="mb-3">
                                 <img class="pe-2" src="{{ asset('images/cources/clock2.svg') }}" alt="عدد الساعات">
-                                @php
-                                    $totalHours = $program->total_duration_hours ?? 0;
-                                    $hours = floor($totalHours); // الساعات
-                                    $minutes = round(($totalHours - $hours) * 60); // الدقائق
-                                @endphp
-                                عدد الساعات: {{ $hours }} ساعة {{ $minutes }} دقيقة
+
+عدد الساعات: {{ $program->duration_text }}
+
                             </div>
                             @if ($program->AdditionalSetting?->application_submission_method)
                                 <div class="mb-3">
@@ -127,7 +124,7 @@
                                 <div class="mb-3">
                                     <img class="pe-2" src="{{ asset('images/cources/members.svg') }}"
                                         alt="العدد الأقصى للمشاركين">
-                                    العدد الأقصى للمشاركين: {{ $program->AdditionalSetting->max_trainees }} مشارك
+                                    العدد الأقصى للمشاركين: {{ $program->AdditionalSetting->max_trainees == 0 ? 'لا يوجد عدد محدد' : $program->AdditionalSetting->max_trainees . 'مشارك' }}
                                 </div>
                             @endif
                             @if ($program->AdditionalSetting?->country)
@@ -290,53 +287,76 @@
                     @endif
 
 
-                    <!-- الجلسات التدريبية -->
-                    <div class="container mt-5">
-                        <div class="mt-4 session-schedule">
-                            <h4 class="info-title">جدولة الجلسات</h4>
-                            <div class="card">
-                                <div class="card-body p-0">
-                                    <div class="table-responsive w-100">
-                                        <table class="table table-borderless m-0">
-                                            <thead>
-                                                <tr style="border-bottom: 1px solid #dee2e6;">
-                                                    <th class="p-3 text-center">اليوم</th>
-                                                    <th class="p-3 text-center">التاريخ</th>
-                                                    <th class="p-3 text-center">وقت الجلسة</th>
-                                                    <th class="p-3 text-center">مدة الجلسة</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @if (!$program->sessions || $program->sessions->isEmpty())
-                                                    <tr>
-                                                        <td colspan="4" class="text-center">لا توجد جلسات لهذا
-                                                            البرنامج.</td>
-                                                    </tr>
-                                                @else
-                                                    @foreach ($program->sessions as $i => $session)
-                                                        <tr style="border-bottom: 1px solid #dee2e6;">
-                                                            <td class="p-3 text-center">
-                                                                {{ isset($session_day[$i]) ? \Carbon\Carbon::parse($session_day[$i])->locale('ar')->dayName : '' }}
-                                                            </td>
-                                                            <td class="p-3 text-center">
-                                                                {{ isset($date_display[$i]) ? \Carbon\Carbon::parse($date_display[$i])->locale('ar')->translatedFormat('d F') : '' }}
-                                                            </td>
-                                                            <td class="p-3 text-center">
-                                                                {{ formatTimeArabic($session->session_start_time) }} -
-                                                                {{ formatTimeArabic($session->session_end_time) }}</td>
-                                                            <td class="p-3 text-center">
-                                                                {{ isset($session_duration[$i]) ? $session_duration[$i] : '' }}
-                                                                ساعة</td>
-                                                        </tr>
-                                                    @endforeach
-                                                @endif
-                                            </tbody>
-                                        </table>
+<!-- الجلسات التدريبية -->
+<div class="container mt-5">
+    <div class="mt-4 session-schedule">
+        <h4 class="info-title">جدولة الجلسات</h4>
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive w-100">
+                    @if (!$program->sessions || $program->sessions->isEmpty())
+                      <div class="info-block py-4 px-2">
+                        <!-- عرض عدد الجلسات والساعات عند عدم وجود جلسات -->
+                        <div class="info-block-content">
+                                                      
+                            @if (isset($program->num_of_session))
+                                <div class="info-block-content-item">
+                                    <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+                                    <div class="info-block-content-item-title">
+                                        عدد الجلسات {{ $program->num_of_session }} جلسة
                                     </div>
                                 </div>
-                            </div>
+                            @endif
+                            
+                            @if (isset($program->num_of_hours))
+                                <div class="info-block-content-item">
+                                    <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
+                                    <div class="info-block-content-item-title">
+                                        عدد الساعات
+                                        {{ rtrim(rtrim(number_format($program->num_of_hours, 1), '0'), '.') }}
+                                        ساعة
+                                    </div>
+                                </div>
+                            @endif
                         </div>
-                    </div>
+                            </div>
+                    @else
+                        <!-- عرض جدول الجلسات عند وجود جلسات -->
+                        <table class="table table-borderless m-0">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #dee2e6;">
+                                    <th class="p-3 text-center">اليوم</th>
+                                    <th class="p-3 text-center">التاريخ</th>
+                                    <th class="p-3 text-center">وقت الجلسة</th>
+                                    <th class="p-3 text-center">مدة الجلسة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($program->sessions as $i => $session)
+                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                        <td class="p-3 text-center">
+                                            {{ isset($session_day[$i]) ? \Carbon\Carbon::parse($session_day[$i])->locale('ar')->dayName : '' }}
+                                        </td>
+                                        <td class="p-3 text-center">
+                                            {{ isset($date_display[$i]) ? \Carbon\Carbon::parse($date_display[$i])->locale('ar')->translatedFormat('d F Y') : '' }}
+                                        </td>
+                                        <td class="p-3 text-center">
+                                            {{ formatTimeArabic($session->session_start_time) }} -
+                                            {{ formatTimeArabic($session->session_end_time) }}
+                                        </td>
+                                        <td class="p-3 text-center">
+                                            {{ calculateDurationArabic($session->session_start_time, $session->session_end_time) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                     <!-- مقدم التدريب -->
                     <div class="info-box mt-5">
                         <h4 class="info-title">مقدم التدريب</h4>

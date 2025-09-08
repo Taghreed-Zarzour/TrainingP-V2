@@ -84,6 +84,7 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
                                     <div class="card-img-wrapper">
+                                      <a  href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics">
                                         @if ($p->registrationRequirements && $p->registrationRequirements->training_image)
                                             <img src="{{ asset('storage/' . $p->registrationRequirements->training_image) }}"
                                                 class="card-img-top" alt="صورة المسار">
@@ -91,9 +92,14 @@
                                             <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
                                                 alt="صورة المسار">
                                         @endif
+                                        </a>
                                     </div>
                                     <div class="card-body justify-content-start">
-                                        <h5 class="card-title m-0">{{ $p->title }}</h5>
+                                        <h5 class="card-title m-0">
+                                          <a href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics" class="text-decoration-none">
+                                            {{ $p->title }}
+                                          </a>
+                                        </h5>
                                         <div class="stats">
                                             <div class="stat-item">
                                                 <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
@@ -222,6 +228,7 @@
                                 <div class="card p-3 stopped-program">
                                     <div class="stopped-badge">متوقف</div>
                                     <div class="card-img-wrapper">
+                                      <a  href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics">
                                         @if ($p->registrationRequirements && $p->registrationRequirements->training_image)
                                             <img src="{{ asset('storage/' . $p->registrationRequirements->training_image) }}"
                                                 class="card-img-top" alt="صورة المسار">
@@ -229,9 +236,14 @@
                                             <img src="{{ asset('images/cources/training-default-img.svg') }}"
                                                 class="card-img-top" alt="صورة المسار">
                                         @endif
+                                        </a>
                                     </div>
                                     <div class="card-body justify-content-start">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                        <h5 class="card-title">
+                                          <a href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics" class="text-decoration-none">
+                                            {{ $p->title }}
+                                          </a>
+                                        </h5>
                                         <div class="stats">
                                             <div class="stat-item">
                                                 <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
@@ -315,15 +327,21 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
                                     <div class="card-img-wrapper">
+                                      <a  href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics">
                                         @if ($p->registrationRequirements && $p->registrationRequirements->training_image)
                                             <img src="{{ asset('storage/' . $p->registrationRequirements->training_image) }}"
                                                 class="card-img-top">
                                         @else
                                             <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top">
                                         @endif
+                                        </a>
                                     </div>
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                        <h5 class="card-title">
+                                          <a href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics" class="text-decoration-none">
+                                            {{ $p->title }}
+                                          </a>
+                                        </h5>
                                         <!-- شريط التقدم -->
                                         <div class="progress-container my-3 mt-5"
                                             data-progress="{{ $p->completion_percentage }}">
@@ -408,6 +426,7 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
                                     <div class="card-img-wrapper">
+                                      <a  href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics">
                                         @if ($p->registrationRequirements && $p->registrationRequirements->training_image)
                                             <img src="{{ asset('storage/' . $p->registrationRequirements->training_image) }}"
                                                 class="card-img-top" alt="صورة المسار">
@@ -415,9 +434,14 @@
                                             <img src="{{ asset('images/cources/training-default-img.svg') }}"
                                                 class="card-img-top" alt="صورة المسار">
                                         @endif
+                                        </a>
                                     </div>
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                        <h5 class="card-title">
+                                          <a href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics" class="text-decoration-none">
+                                            {{ $p->title }}
+                                          </a>
+                                        </h5>
                                         <div class="stats">
                                             <div class="stat-item">
                                                 <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
@@ -482,6 +506,7 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
                                     <div class="card-img-wrapper">
+                                      <a  href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics">
                                         @if ($p->registrationRequirements && $p->registrationRequirements->training_image)
                                             <img src="{{ asset('storage/' . $p->registrationRequirements->training_image) }}"
                                                 class="card-img-top" alt="صورة المسار">
@@ -489,9 +514,14 @@
                                             <img src="{{ asset('images/cources/training-default-img.svg') }}"
                                                 class="card-img-top" alt="صورة المسار">
                                         @endif
+                                        </a>
                                     </div>
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                        <h5 class="card-title">
+                                          <a href="{{ route('orgTrainingsManager.show', $p->id) }}#statistics" class="text-decoration-none">
+                                            {{ $p->title }}
+                                          </a>
+                                        </h5>
                                         <div class="stats">
                                             <div class="stat-item">
                                                 <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">

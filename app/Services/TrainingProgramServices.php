@@ -158,100 +158,92 @@ class TrainingProgramServices
     }
     
     // حساب نسبة اكتمال التدريب بشكل احترافي
-    public function calculateCompletion(TrainingProgram $program)
-    {
-        // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب (تم تعديل الأوزان)
-        $weights = [
-            'basic_info' => 0,      // المعلومات الأساسية (الاسم، الوصف، إلخ) — قللنا الوزن
-            'details' => 3,         // التفاصيل (المخرجات، المتطلبات، الفئة المستهدفة، المزايا) — زدنا الوزن
-            'settings' => 3,        // الإعدادات (السعر، الموعد النهائي، الحد الأقصى للمتدربين، إلخ) — زدنا الوزن
-            'sessions' => 3,        // الجلسات — زدنا الوزن
-        ];
-        
-        $totalWeight = array_sum($weights);
-        $completedWeight = 0;
-        
-        // 1. التحقق من المعلومات الأساسية
-        $basicFields = [
-            'title', 'description', 'program_type_id',
-            'language_type_id', 'training_classification_id',
-            'training_level_id', 'program_presentation_method_id',
-        ];
-        
-        $basicCompleted = 0;
-        foreach ($basicFields as $field) {
-            if (!empty($program->$field)) {
-                $basicCompleted++;
-            }
+public function calculateCompletion(TrainingProgram $program)
+{
+    // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب
+    $weights = [
+        'basic_info' => 1,      // المعلومات الأساسية (العنوان)
+        'details' => 3,         // التفاصيل (learning outcomes)
+        'settings' => 3,        // الإعدادات (application deadline، السعر إذا مدفوع)
+        'sessions' => 3,        // الجلسات
+    ];
+
+    $totalWeight = array_sum($weights);
+    $completedWeight = 0;
+
+    // 1. التحقق من المعلومات الأساسية
+    $basicFields = ['title'];
+    $basicCompleted = 0;
+    foreach ($basicFields as $field) {
+        if (!empty($program->$field)) {
+            $basicCompleted++;
         }
-        
-        $basicPercentage = ($basicCompleted / count($basicFields)) * 100;
-        if ($basicPercentage >= 80) {
-            $completedWeight += $weights['basic_info'];
-        } else {
-            $completedWeight += ($basicPercentage / 100) * $weights['basic_info'];
-        }
-        
-        // 2. التحقق من التفاصيل
-        if ($program->detail) {
-            $detailFields = ['learning_outcomes', 'requirements',  'benefits'];
-            $detailCompleted = 0;
-            
-            foreach ($detailFields as $field) {
-                if (!empty($program->detail->$field)) {
-                    $detailCompleted++;
-                }
-            }
-            
-            $detailPercentage = ($detailCompleted / count($detailFields)) * 100;
-            $completedWeight += ($detailPercentage / 100) * $weights['details'];
-        }
-        
-        // 3. التحقق من الإعدادات
-        if ($program->AdditionalSetting) {
-            $settingFields = [
-                'is_free', 'application_deadline', 'max_trainees',
-                'application_submission_method'
-            ];
-            
-            $settingCompleted = 0;
-            foreach ($settingFields as $field) {
-                if (!empty($program->AdditionalSetting->$field)) {
-                    $settingCompleted++;
-                }
-            }
-            
-            // إذا كان التدريب مدفوعاً، يجب تحديد السعر والعملة
-            if (!$program->AdditionalSetting->is_free) {
-                if (!empty($program->AdditionalSetting->cost) && !empty($program->AdditionalSetting->currency)) {
-                    $settingCompleted++;
-                }
-            }
-            
-            $settingPercentage = ($settingCompleted / count($settingFields)) * 100;
-            $completedWeight += ($settingPercentage / 100) * $weights['settings'];
-        }
-        
-        // 4. التحقق من الجلسات
-        if ($program->sessions && $program->sessions->count() > 0) {
-            $validSessions = 0;
-            foreach ($program->sessions as $session) {
-                if (!empty($session->session_date) && 
-                    !empty($session->session_start_time) && 
-                    !empty($session->session_end_time)) {
-                    $validSessions++;
-                }
-            }
-            
-            $sessionsPercentage = ($validSessions / $program->sessions->count()) * 100;
-            $completedWeight += ($sessionsPercentage / 100) * $weights['sessions'];
-        } else {
-            $completedWeight += $weights['sessions'];
-        }
-        
-        $overallPercentage = ($completedWeight / $totalWeight) * 100;
-        return intval($overallPercentage);
     }
+    $basicPercentage = ($basicCompleted / count($basicFields)) * 100;
+    $completedWeight += ($basicPercentage / 100) * $weights['basic_info'];
+
+    // 2. التحقق من التفاصيل
+    $detailFields = ['learning_outcomes'];
+    $detailCompleted = 0;
+
+    if ($program->detail) {
+        foreach ($detailFields as $field) {
+            if (!empty($program->detail->$field)) {
+                $detailCompleted++;
+            }
+        }
+    }
+    // إذا لا يوجد detail أو الحقول فارغة، سيتم حساب 0%
+    $detailPercentage = ($detailCompleted / count($detailFields)) * 100;
+    $completedWeight += ($detailPercentage / 100) * $weights['details'];
+
+    // 3. التحقق من الإعدادات
+    $settingFields = ['application_deadline'];
+    $settingCompleted = 0;
+
+    if ($program->AdditionalSetting) {
+        foreach ($settingFields as $field) {
+            if (!empty($program->AdditionalSetting->$field)) {
+                $settingCompleted++;
+            }
+        }
+
+        // إذا كان التدريب مدفوعًا، تحقق من السعر والعملة
+        if (!$program->AdditionalSetting->is_free) {
+            if (!empty($program->AdditionalSetting->cost) && !empty($program->AdditionalSetting->currency)) {
+                $settingCompleted++;
+            }
+        }
+    }
+
+    $settingPercentage = ($settingCompleted / count($settingFields)) * 100;
+    $completedWeight += ($settingPercentage / 100) * $weights['settings'];
+
+    // 4. التحقق من الجلسات
+    $sessionsWeight = $weights['sessions'];
+    $validSessions = 0;
+
+    if ($program->sessions && $program->sessions->count() > 0) {
+        foreach ($program->sessions as $session) {
+            if (!empty($session->session_date) &&
+                !empty($session->session_start_time) &&
+                !empty($session->session_end_time)) {
+                $validSessions++;
+            }
+        }
+        $sessionsPercentage = ($validSessions / $program->sessions->count()) * 100;
+    } else {
+        $sessionsPercentage = 0; // لا توجد جلسات → 0%
+    }
+
+    $completedWeight += ($sessionsPercentage / 100) * $sessionsWeight;
+
+    // النسبة الإجمالية
+    $overallPercentage = ($completedWeight / $totalWeight) * 100;
+
+    return intval($overallPercentage);
+}
+
     
     // بقية الكود كما هو (جلب، حذف، إيقاف، إعادة نشر)
     public function getProgramWithDetails($id)

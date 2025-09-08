@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Enrollment;
+use App\Helpers\TimeHelper;
+
 class OrgTrainingController extends Controller
 {
 
@@ -773,6 +775,8 @@ if ($orgTraining->files && $orgTraining->files->count() > 0) {
   }
 
 
+
+
 public function show($id){
     $OrgProgram = OrgTrainingProgram::with(
         'details',
@@ -787,49 +791,60 @@ public function show($id){
     $work_sector_ids =  $OrgProgram->goals->first()->work_sector_id;
     $work_sectors = WorkSector::whereIn('id',$work_sector_ids)->pluck('name');
 
-    //   المشاهدات
+    // المشاهدات
     $OrgProgram->increment('views');
     $organization = User::find($OrgProgram->organization_id);
     if ($OrgProgram->views % 30 === 0) {
         $organization->notify(new OrgViewsNotification($OrgProgram->views));
     }
     $grandTotalMinutes = 0;
+
     foreach ($OrgProgram->details as $program) {
-        foreach ($program->trainingSchedules as $session) {
-            $grandTotalMinutes += \Carbon\Carbon::parse($session->session_start_time)
-                ->diffInMinutes(\Carbon\Carbon::parse($session->session_end_time));
-        }
+        // استدعاء الدالة العامة لحساب مدة البرنامج
+        $duration = TimeHelper::calculateProgramDuration(
+            $program->trainingSchedules ?? [],
+            $program->schedule_later ?? 0,
+            $program->num_of_hours ?? null,
+            $program->num_of_session ?? null
+        );
+
+        $program->total_duration_hours = $duration['total_hours'];
+        $program->duration_text = $duration['duration_text'];
+
+        // إضافة للساعات الكلية لكل التفاصيل
+        $grandTotalMinutes += $duration['total_hours'] * 60;
     }
 
-              // حساب حالة التسجيل
-        $deadline = $OrgProgram->registrationRequirements->application_deadline ?? null;
-        $registrationStatus = $this->calculateRegistrationStatus($deadline);
-        $remainingText = $registrationStatus['text'];
+    // حساب حالة التسجيل
+    $deadline = $OrgProgram->registrationRequirements->application_deadline ?? null;
+    $registrationStatus = $this->calculateRegistrationStatus($deadline);
+    $remainingText = $registrationStatus['text'];
 
-            // تحديد ما إذا انتهى موعد التسجيل
-    $training_has_ended = false;
-    if ($deadline) {
-        $training_has_ended = now() > Carbon::parse($deadline);
-    }
+    $training_has_ended = $deadline ? now() > Carbon::parse($deadline) : false;
+
     $participants = Enrollment::where('org_training_programs_id', $OrgProgram->id)->get();
 
-  // التحقق من تسجيل المستخدم
-        $has_enrolled = false;
-        $enrollment = null;
-        if (auth()->check()) {
-            $has_enrolled = Enrollment::where('trainee_id', auth()->id())
-                ->where('org_training_programs_id', $id)
-                ->exists();
+    // التحقق من تسجيل المستخدم
+    $has_enrolled = false;
+    $enrollment = null;
+    if (auth()->check()) {
+        $has_enrolled = Enrollment::where('trainee_id', auth()->id())
+            ->where('org_training_programs_id', $id)
+            ->exists();
 
-            $enrollment = Enrollment::where('trainee_id', auth()->id())
-                ->where('org_training_programs_id', $id)
-                ->first();
-        }
+        $enrollment = Enrollment::where('trainee_id', auth()->id())
+            ->where('org_training_programs_id', $id)
+            ->first();
+    }
 
-    return view('orgTrainings.show',compact('OrgProgram','education_levels','work_sectors','grandTotalMinutes','training_has_ended',
-        'remainingText','participants','has_enrolled','enrollment'));
-
+    return view('orgTrainings.show',compact(
+        'OrgProgram','education_levels','work_sectors','grandTotalMinutes',
+        'training_has_ended','remainingText','participants','has_enrolled','enrollment'
+    ));
 }
+
+
+
 
 public function showProgram($id)
 {
@@ -837,38 +852,42 @@ public function showProgram($id)
 
     $orgProgram = OrgTrainingProgram::where('id', $program->org_training_program_id)->first();
 
-    $grandTotalMinutes = 0;
-    foreach ($orgProgram->details as $detail) {
-        foreach ($detail->trainingSchedules as $session) {
-            $grandTotalMinutes += \Carbon\Carbon::parse($session->session_start_time)
-                ->diffInMinutes(\Carbon\Carbon::parse($session->session_end_time));
-        }
-    }
+    // حساب الوقت الكلي لكل جلسة أو برنامج
+    $duration = TimeHelper::calculateProgramDuration(
+        $program->trainingSchedules ?? [],
+        $program->schedule_later ?? 0,
+        $program->num_of_hours ?? null,
+        $program->num_of_session ?? null
+    );
 
-      // حساب تقييم المدرب
-        $averageTrainerRating = 0;
-        if ($program->Trainer && $program->Trainer->trainer && $program->Trainer->trainer->ratings) {
-            $ratings = $program->Trainer->trainer->ratings;
-            $criteria = ['clarity', 'interaction', 'organization'];
-            $totalRatings = 0;
-            $totalSum = 0;
+    $program->total_duration_hours = $duration['total_hours'];
+    $program->duration_text = $duration['duration_text'];
 
-            foreach ($ratings as $rating) {
-                foreach ($criteria as $criterion) {
-                    if (isset($rating->$criterion)) {
-                        $score = $rating->$criterion;
-                        $totalSum += $score;
-                        $totalRatings++;
-                    }
+    // حساب تقييم المدرب
+    $averageTrainerRating = 0;
+    if ($program->Trainer && $program->Trainer->trainer && $program->Trainer->trainer->ratings) {
+        $ratings = $program->Trainer->trainer->ratings;
+        $criteria = ['clarity', 'interaction', 'organization'];
+        $totalRatings = 0;
+        $totalSum = 0;
+
+        foreach ($ratings as $rating) {
+            foreach ($criteria as $criterion) {
+                if (isset($rating->$criterion)) {
+                    $totalSum += $rating->$criterion;
+                    $totalRatings++;
                 }
             }
-
-            $averageTrainerRating = $totalRatings > 0 ? round($totalSum / $totalRatings, 1) : 0;
         }
 
+        $averageTrainerRating = $totalRatings > 0 ? round($totalSum / $totalRatings, 1) : 0;
+    }
 
-    return view('orgTrainings.show-program', compact('program','orgProgram','grandTotalMinutes','averageTrainerRating'));
+    return view('orgTrainings.show-program', compact(
+        'program','orgProgram','averageTrainerRating'
+    ));
 }
+
 
 private function calculateRegistrationStatus($deadline)
 {

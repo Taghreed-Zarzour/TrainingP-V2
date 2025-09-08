@@ -675,7 +675,7 @@
                 <span class="divider"></span>
                 <span class="arrow-down">🞃</span>
                 <img class="flag-img" id="selectedFlag" 
-                    src="{{ asset('flags/' . ($user->country->iso2 ?? 'sa') . '.svg') }}">
+                    src="{{ asset('flags/' . strtolower($user->country->iso2 ?? 'sa') . '.svg') }}">
             </div>
             <input type="tel" name="phone_number" class="phone-input"
                 value="{{ $user->phone_number }}" placeholder="ادخل رقم الهاتف" required>

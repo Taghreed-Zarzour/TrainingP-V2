@@ -853,7 +853,7 @@
                         class="col-12 w-100 empty-state d-flex flex-column text-center justify-content-center align-items-center">
                         <h4>لا توجد تدريبات مرتقبة حالياً</h4>
                         <p>يمكنك استعراض التدريبات المتاحة والتسجيل فيها</p>
-                        <a href="{{ route('trainings.index') }}" class="custom-btn">استعراض التدريبات</a>
+                        <a href="{{ route('trainings_announcements') }}" class="custom-btn">استعراض التدريبات</a>
                     </div>
                 @endif
             </div>

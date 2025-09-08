@@ -13,9 +13,9 @@
                     <h1 class="d-inline-block lh-base">تدريباتي</h1>
                 </div>
                 <div class="mb-4">
-<div class="mb-4" id="breadcrumb-tab-title">
-    التدريبات/التدريبات الجارية/{{ $program->title }}/<span id="current-tab-name">إحصائيات</span>
-</div>
+                    <div class="mb-4" id="breadcrumb-tab-title">
+                        التدريبات/التدريبات الجارية/{{ $program->title }}/<span id="current-tab-name">إحصائيات</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -90,7 +90,8 @@
                                     <div class="info-item">
                                         <img src="/images/cources/members.svg" class="info-icon" alt="العدد الأقصى">
                                         <span>العدد الأقصى للمشاركين:
-                                            {{ $program->AdditionalSetting->max_trainees ?? 'غير محدد' }} مشارك</span>
+                                            {{ $program->AdditionalSetting->max_trainees == 0 ? 'لا يوجد عدد محدد' : $program->AdditionalSetting->max_trainees . 'مشارك' }}
+                                        </span>
                                     </div>
                                     <div class="info-item">
                                         <img src="/images/cources/location2.svg" class="info-icon" alt="مكان التدريب">
@@ -219,7 +220,8 @@
                     </li>
                 </ul>
                 <div class="tab-content" id="mainTabsContent">
-                    <div class="tab-pane fade show active px-5" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                    <div class="tab-pane fade show active px-5" id="stats" role="tabpanel"
+                        aria-labelledby="stats-tab">
                         @include('trainings.tabs.statistics')
                     </div>
 
@@ -303,42 +305,42 @@
     </script>
 
 
-<script>
-    const tabNames = {
-        '#stats': 'إحصائيات',
-        '#sessions': 'الجلسات التدريبية',
-        '#registrants': 'المسجلون',
-        '#trainees': 'المتدربون',
-        '#info': 'معلومات التدريب',
-        '#attachments': 'المرفقات',
-        '#assistants': 'مساعدو المدرب'
-    };
+    <script>
+        const tabNames = {
+            '#stats': 'إحصائيات',
+            '#sessions': 'الجلسات التدريبية',
+            '#registrants': 'المسجلون',
+            '#trainees': 'المتدربون',
+            '#info': 'معلومات التدريب',
+            '#attachments': 'المرفقات',
+            '#assistants': 'مساعدو المدرب'
+        };
 
-    function updateBreadcrumbTabName(hash) {
-        const name = tabNames[hash] || 'التبويب';
-        const nameElement = document.getElementById('current-tab-name');
-        if (nameElement) nameElement.textContent = name;
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        let activeTab = window.location.hash || localStorage.getItem('activeTab') || '#stats';
-        updateBreadcrumbTabName(activeTab);
-
-        const tabTrigger = document.querySelector(`a.nav-link[href="${activeTab}"]`);
-        if (tabTrigger) {
-            const tab = new bootstrap.Tab(tabTrigger);
-            tab.show();
+        function updateBreadcrumbTabName(hash) {
+            const name = tabNames[hash] || 'التبويب';
+            const nameElement = document.getElementById('current-tab-name');
+            if (nameElement) nameElement.textContent = name;
         }
-    });
 
-    document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(function(tabLink) {
-        tabLink.addEventListener('shown.bs.tab', function(e) {
-            const hash = e.target.getAttribute('href');
-            localStorage.setItem('activeTab', hash);
-            history.replaceState(null, null, hash);
-            updateBreadcrumbTabName(hash);
+        document.addEventListener('DOMContentLoaded', function() {
+            let activeTab = window.location.hash || localStorage.getItem('activeTab') || '#stats';
+            updateBreadcrumbTabName(activeTab);
+
+            const tabTrigger = document.querySelector(`a.nav-link[href="${activeTab}"]`);
+            if (tabTrigger) {
+                const tab = new bootstrap.Tab(tabTrigger);
+                tab.show();
+            }
         });
-    });
-</script>
+
+        document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(function(tabLink) {
+            tabLink.addEventListener('shown.bs.tab', function(e) {
+                const hash = e.target.getAttribute('href');
+                localStorage.setItem('activeTab', hash);
+                history.replaceState(null, null, hash);
+                updateBreadcrumbTabName(hash);
+            });
+        });
+    </script>
 
 @endsection

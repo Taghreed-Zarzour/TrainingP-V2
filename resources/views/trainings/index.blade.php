@@ -1,6 +1,5 @@
 @extends('frontend.layouts.master')
 @section('title', 'تدريباتي')
-
 @section('content')
     <style>
         .card-img-wrapper {
@@ -12,7 +11,6 @@
             border-radius: 8px;
             /* اختياري لتنعيم الزوايا */
         }
-
         .card-img-wrapper img {
             position: absolute;
             top: 0;
@@ -21,6 +19,14 @@
             height: 100%;
             object-fit: cover;
             /* تغطي الحاوية بالكامل بدون تشويه */
+        }
+        .card-title-link {
+            color: inherit;
+            text-decoration: none;
+        }
+        .card-title-link:hover {
+            color: inherit;
+            text-decoration: none;
         }
     </style>
     <!-- Blue Header Section -->
@@ -72,9 +78,7 @@
                         التدريبات المعلنة
                         <span class="section-count">({{ count($announced) }})</span>
                     </span>
-
                 </div>
-
                 <div class="row">
                     @if (empty($announced))
                         <div
@@ -88,16 +92,22 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
                                     <div class="card-img-wrapper">
-                                        @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                            <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                                class="card-img-top" alt="صورة التدريب">
-                                        @else
-                                            <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
-                                                alt="صورة التدريب">
-                                        @endif
+                                        <a href="{{ route('training.details', $p->id) }}#statistics">
+                                            @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                                <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                    class="card-img-top" alt="صورة التدريب">
+                                            @else
+                                                <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top"
+                                                    alt="صورة التدريب">
+                                            @endif
+                                        </a>
                                     </div>
                                     <div class="card-body justify-content-start">
-                                        <h5 class="card-title m-0">{{ $p->title }}</h5>
+                                        <h5 class="card-title m-0">
+                                            <a href="{{ route('training.details', $p->id) }}#statistics" class="card-title-link">
+                                                {{ $p->title }}
+                                            </a>
+                                        </h5>
                                         <div class="stats">
                                             <div class="stat-item">
                                                 <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
@@ -144,7 +154,6 @@
                                                 <a href="{{ route('training.basic', $p->id) }}" title="تعديل">
                                                     <img src="{{ asset('images/cources/edit.svg') }}">
                                                 </a>
-
                                             </div>
                                             <div class="stop-btn">
                                                 <a href="#" class="pb-1" title="إيقاف الإعلان"
@@ -209,17 +218,14 @@
                         @endforeach
                     @endif
                 </div>
-
                 <!-- قسم التدريبات المتوقفة -->
                 @if (!empty($stoppedPrograms) && count($stoppedPrograms) > 0)
-
                 <div class="section-title mt-5">
                     <span>
                         التدريبات المتوقفة
                         <span class="section-count">({{ count($stoppedPrograms ?? []) }})</span>
                     </span>
                 </div>
-
                 <div class="row">
                     @if (empty($stoppedPrograms ?? []))
                         <div
@@ -233,16 +239,22 @@
                                 <div class="card p-3 stopped-program">
                                     <div class="stopped-badge">متوقف</div>
                                     <div class="card-img-wrapper">
-                                        @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                            <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                                class="card-img-top" alt="صورة التدريب">
-                                        @else
-                                            <img src="{{ asset('images/cources/training-default-img.svg') }}"
-                                                class="card-img-top" alt="صورة التدريب">
-                                        @endif
+                                        <a href="{{ route('training.details', $p->id) }}#statistics">
+                                            @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                                <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                    class="card-img-top" alt="صورة التدريب">
+                                            @else
+                                                <img src="{{ asset('images/cources/training-default-img.svg') }}"
+                                                    class="card-img-top" alt="صورة التدريب">
+                                            @endif
+                                        </a>
                                     </div>
                                     <div class="card-body justify-content-start">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                        <h5 class="card-title">
+                                            <a href="{{ route('training.details', $p->id) }}#statistics" class="card-title-link">
+                                                {{ $p->title }}
+                                            </a>
+                                        </h5>
                                         <div class="stats">
                                             <div class="stat-item">
                                                 <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
@@ -292,7 +304,6 @@
                                                     action="{{ route('trainings.rePublish', $p->id) }}">
                                                     @csrf
                                                     <button type="submit" class="restart-btn" title="إعادة نشر التدريب">
-
                                                         إعادة النشر
                                                     </button>
                                                 </form>
@@ -355,7 +366,6 @@
                 </div>
                 @endif
             </div>
-
             <!-- تبويب تدريبات قيد الإنشاء -->
             <div class="tab-pane fade mb-4" id="under-construction" role="tabpanel">
                 <div class="row">
@@ -371,15 +381,21 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
                                       <div class="card-img-wrapper">
-                                    @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                        <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                            class="card-img-top">
-                                    @else
-                                        <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top">
-                                    @endif
-                                        </div>
+                                        <a href="{{ route('training.details', $p->id) }}#statistics">
+                                            @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                                <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                    class="card-img-top">
+                                            @else
+                                                <img src="{{ asset('images/cources/training-default-img.svg') }}" class="card-img-top">
+                                            @endif
+                                        </a>
+                                      </div>
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                        <h5 class="card-title">
+                                            <a href="{{ route('training.details', $p->id) }}#statistics" class="card-title-link">
+                                                {{ $p->title }}
+                                            </a>
+                                        </h5>
                                         <!-- شريط التقدم -->
                                         <div class="progress-container my-3 mt-5"
                                             data-progress="{{ $p->completion_percentage }}">
@@ -450,7 +466,6 @@
                     @endif
                 </div>
             </div>
-
             <!-- تبويب التدريبات الجارية -->
             <div class="tab-pane fade mb-4" id="ongoing" role="tabpanel">
                 <div class="row">
@@ -465,16 +480,22 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
                                     <div class="card-img-wrapper">
-                                        @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                            <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                                class="card-img-top" alt="صورة التدريب">
-                                        @else
-                                            <img src="{{ asset('images/cources/training-default-img.svg') }}"
-                                                class="card-img-top" alt="صورة التدريب">
-                                        @endif
+                                        <a href="{{ route('training.details', $p->id) }}#statistics">
+                                            @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                                <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                    class="card-img-top" alt="صورة التدريب">
+                                            @else
+                                                <img src="{{ asset('images/cources/training-default-img.svg') }}"
+                                                    class="card-img-top" alt="صورة التدريب">
+                                            @endif
+                                        </a>
                                     </div>
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                        <h5 class="card-title">
+                                            <a href="{{ route('training.details', $p->id) }}#statistics" class="card-title-link">
+                                                {{ $p->title }}
+                                            </a>
+                                        </h5>
                                         <div class="stats">
                                             <div class="stat-item">
                                                 <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
@@ -525,7 +546,6 @@
                     @endif
                 </div>
             </div>
-
             <!-- تبويب التدريبات المكتملة -->
             <div class="tab-pane fade mb-4" id="completed" role="tabpanel">
                 <div class="row">
@@ -540,16 +560,22 @@
                             <div class="col-xl-4 col-lg-6 col-md-6">
                                 <div class="card p-3">
                                     <div class="card-img-wrapper">
-                                        @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
-                                            <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
-                                                class="card-img-top" alt="صورة التدريب">
-                                        @else
-                                            <img src="{{ asset('images/cources/training-default-img.svg') }}"
-                                                class="card-img-top" alt="صورة التدريب">
-                                        @endif
+                                        <a href="{{ route('training.details', $p->id) }}#statistics">
+                                            @if ($p->AdditionalSetting && $p->AdditionalSetting->profile_image)
+                                                <img src="{{ asset('storage/' . $p->AdditionalSetting->profile_image) }}"
+                                                    class="card-img-top" alt="صورة التدريب">
+                                            @else
+                                                <img src="{{ asset('images/cources/training-default-img.svg') }}"
+                                                    class="card-img-top" alt="صورة التدريب">
+                                            @endif
+                                        </a>
                                     </div>
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ $p->title }}</h5>
+                                        <h5 class="card-title">
+                                            <a href="{{ route('training.details', $p->id) }}#statistics" class="card-title-link">
+                                                {{ $p->title }}
+                                            </a>
+                                        </h5>
                                         <div class="stats">
                                             <div class="stat-item">
                                                 <img class="pe-2" src="{{ asset('images/cources/member-admin.svg') }}">
@@ -608,19 +634,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             // حفظ واستعادة التبويب النشط
             const activeTabKey = 'myTrainingsActiveTab';
-
             // استعادة التبويب النشط من localStorage
             const savedTab = localStorage.getItem(activeTabKey);
             if (savedTab) {
                 const tab = new bootstrap.Tab(document.querySelector(savedTab));
                 tab.show();
-
                 // تحديث حالة التبويبات
                 document.querySelectorAll('#myTab .nav-link').forEach(tabEl => {
                     tabEl.classList.remove('active');
                 });
                 document.querySelector(savedTab).classList.add('active');
-
                 // تحديث حالة محتوى التبويبات
                 document.querySelectorAll('.tab-pane').forEach(pane => {
                     pane.classList.remove('show', 'active');
@@ -629,14 +652,12 @@
                     'data-bs-target'));
                 targetPane.classList.add('show', 'active');
             }
-
             // حفظ التبويب النشط عند التغيير
             document.querySelectorAll('#myTab .nav-link').forEach(tabEl => {
                 tabEl.addEventListener('click', function() {
                     localStorage.setItem(activeTabKey, `#${this.id}`);
                 });
             });
-
             // معالجة أشرطة التقدم
             document.querySelectorAll('.progress-container').forEach(container => {
                 let progress = container.getAttribute('data-progress');
@@ -650,7 +671,6 @@
                     label.style.left = progress + "%";
                 }
             });
-
             // تأكيد الحذف
             document.querySelectorAll('form[method="DELETE"]').forEach(form => {
                 form.addEventListener('submit', function(e) {
@@ -659,7 +679,6 @@
                     }
                 });
             });
-
             // إضافة عنوان التدريب في رسائل التأكيد
             document.querySelectorAll(
                 '[data-bs-target^="#stopAdModal"], [data-bs-target^="#deleteTrainingModal"], [data-bs-target^="#restartAdModal"]'
@@ -677,7 +696,6 @@
                     }
                 });
             });
-
             // Swipe بين التبويبات على الأجهزة المحمولة
             let touchStartX = 0;
             let touchEndX = 0;
@@ -689,7 +707,6 @@
                 touchEndX = e.changedTouches[0].screenX;
                 handleSwipe();
             }, false);
-
             function handleSwipe() {
                 if (touchEndX < touchStartX - 50) {
                     // swipe left - next tab

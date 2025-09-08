@@ -560,7 +560,7 @@
                         {{ $OrgProgram->program_description ?? 'لا يوجد وصف متاح' }}
                     </div>
                     <div class="creator-info">
-                        <img src="{{ asset('images/icons/user.svg') }}" alt="Syrian Geeks" class="creator-image">
+                        <img src="{{ asset('images/icons/user.svg') }}" alt="" class="creator-image">
                         <span>تم الإنشاء بواسطة 
                         <span class="text-decoration-underline">
                             {{ $OrgProgram->organization->user->getTranslation('name', 'ar') ?? '' }}
@@ -1064,13 +1064,7 @@
                                                     </thead>
                                                     <tbody>
                                                         @foreach ($program->trainingSchedules as $session)
-                                                            @php
-                                                                $sessionDuration = \Carbon\Carbon::parse(
-                                                                    $session->session_start_time,
-                                                                )->diffInMinutes(
-                                                                    \Carbon\Carbon::parse($session->session_end_time),
-                                                                );
-                                                            @endphp
+                                                          
                                                             <tr style="border-bottom: 1px solid #dee2e6;">
                                                                 <td class="p-3 text-center">
                                                                     {{ \Carbon\Carbon::parse($session->session_date)->locale('ar')->dayName }}
@@ -1079,11 +1073,13 @@
                                                                     {{ \Carbon\Carbon::parse($session->session_date)->locale('ar')->translatedFormat('d F') }}
                                                                 </td>
                                                                 <td class="p-3 text-center">
-                                                                    {{ $session->session_start_time }} -
-                                                                    {{ $session->session_end_time }}
+                                                                    {{ formatTimeArabic($session->session_start_time) }} -
+                                                                {{ formatTimeArabic($session->session_end_time) }}
                                                                 </td>
                                                                 <td class="p-3 text-center">
-                                                                    {{ round($sessionDuration / 60, 2) }} ساعة
+                                                                  
+{{ calculateDurationArabic($session->session_start_time, $session->session_end_time) }}
+
                                                                 </td>
                                                             </tr>
                                                         @endforeach

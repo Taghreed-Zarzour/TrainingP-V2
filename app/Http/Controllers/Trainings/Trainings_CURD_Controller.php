@@ -106,7 +106,6 @@ public function updateBasicInformation(StoreBasicInformationRequest $request, $t
 }
 
 
-  // ======= الخطوة 2: أهداف التدريب =======
 // ======= الخطوة 2: أهداف التدريب =======
 public function showGoalsForm($trainingId)
 {

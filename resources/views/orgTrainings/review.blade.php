@@ -545,6 +545,21 @@
                                         </div>
                                     @else
                                         @foreach ($training->details as $detail)
+                                            @php
+                                                $hasSessions = 0;
+                                                $totalMinutes = 0;
+                                                $hasSessions =
+                                                    isset($detail->trainingSchedules) &&
+                                                    $detail->trainingSchedules->count() > 0;
+
+                                                // حساب إجمالي الدقائق إذا كانت هناك جلسات
+                                                if ($hasSessions) {
+                                                    $totalDuration = calculateTotalSessionsDuration(
+                                                        $detail->trainingSchedules,
+                                                    );
+                                                }
+
+                                            @endphp
                                             <div class="training-item">
                                                 <div class="training-item-header" id="header-{{ $detail->id }}">
                                                     <div class="training-title-2 clickable-title"
@@ -559,35 +574,82 @@
                                                             </svg>
                                                         </div>
 
-
                                                         {{ $detail->program_title }}
                                                     </div>
-                                                    <div class="trainer-name m-0">
-                                                        @if ($detail->trainer)
-                                                            @if ($detail->trainer->photo)
-                                                                <img src="{{ asset('storage/' . $detail->trainer->photo) }}"
-                                                                    class="tr-trainee-avatar me-2">
+                                                    <div class="trainer-info">
+                                                        <div class="trainer-name m-0 me-2">
+                                                            @if ($detail->trainer)
+                                                                @if ($detail->trainer->photo)
+                                                                    <img src="{{ asset('storage/' . $detail->trainer->photo) }}"
+                                                                        class="tr-trainee-avatar me-2">
+                                                                @else
+                                                                    <img src="{{ asset('images/icons/user.svg') }}"
+                                                                        class="tr-trainee-avatar me-2">
+                                                                @endif
+                                                                المدرب:
+                                                                {{ $detail->trainer->getTranslation('name', 'ar') }}
+                                                                {{ $detail->trainer->trainer?->getTranslation('last_name', 'ar') }}
                                                             @else
-                                                                <img src="{{ asset('images/icons/user.svg') }}"
-                                                                    class="tr-trainee-avatar me-2">
+                                                                لم يتم تحديد مدرب
                                                             @endif
-                                                            المدرب: {{ $detail->trainer->getTranslation('name', 'ar') }}
-                                                            {{ $detail->trainer->trainer?->getTranslation('last_name', 'ar') }}
-                                                        @else
-                                                            لم يتم تحديد مدرب
-                                                        @endif
+                                                        </div>
+                                                        <div class="training-stats">
+                                                            @if ($hasSessions)
+                                                                <span class="me-2">{{ $detail->trainingSchedules->count() }} جلسة</span>
+                                                                <span>{{$totalDuration}}</span>
+                                                            @else
+                                                                @if (isset($detail->num_of_session))
+                                                                    <span class="me-2">{{ $detail->num_of_session }} جلسة</span>
+                                                                @else
+                                                                    <span class="me-2">غير محدد</span>
+                                                                @endif
+
+                                                                @if (isset($detail->num_of_hours))
+                                                                    <span>{{ $detail->num_of_hours }} ساعة</span>
+                                                                @else
+                                                                    <span>غير محدد</span>
+                                                                @endif
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div id="sessions-{{ $detail->id }}" class="sessions-container">
                                                     <div class="content-training">
                                                         @if ($detail->schedule_later)
-                                                            <div class="no-sessions-message">
-                                                                سيتم تحديد الجلسات لاحقاً بعد اكتمال عدد المشاركين.
-                                                            </div>
+                                                            @if (isset($detail->num_of_session))
+                                                                <div class="learning-item">
+                                                                    <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                                        alt="تحقق">
+                                                                    <span>عدد الجلسات: {{ $detail->num_of_session }}</span>
+                                                                </div>
+                                                            @endif
+                                                            @if (isset($detail->num_of_hours))
+                                                                <div class="learning-item">
+                                                                    <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                                        alt="تحقق">
+                                                                    <span>عدد الساعات: {{ $detail->num_of_hours }}</span>
+                                                                </div>
+                                                            @endif
                                                         @elseif (empty($detail->trainingSchedules) || $detail->trainingSchedules->count() == 0)
-                                                            <div class="no-sessions-message">
-                                                                لم يتم إضافة جلسات بعد.
+                                                            <div class="learning-item">
+                                                                <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                                    alt="تحقق">
+                                                                <span>لم يتم تحديد الجلسات بعد</span>
                                                             </div>
+                                                            @if (isset($detail->num_of_session))
+                                                                <div class="learning-item">
+                                                                    <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                                        alt="تحقق">
+                                                                    <span>عدد الجلسات: {{ $detail->num_of_session }}</span>
+                                                                </div>
+                                                            @endif
+                                                            @if (isset($detail->num_of_hours))
+                                                                <div class="learning-item">
+                                                                    <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                                        alt="تحقق">
+                                                                    <span>عدد الساعات: {{ $detail->num_of_hours }}</span>
+                                                                </div>
+                                                            @endif
                                                         @else
                                                             <div class="info-block-content-item-title">
                                                                 الجدول الزمني للتدريب
@@ -610,13 +672,12 @@
                                                                                 <td>{{ \Carbon\Carbon::parse($schedule->session_date)->locale('ar')->dayName }}
                                                                                 </td>
                                                                                 <td>{{ $schedule->session_date }}</td>
-                                                                                <td>{{ \Carbon\Carbon::parse($schedule->session_start_time)->format('H:i') }}
+                                                                                <td> {{ formatTimeArabic($schedule->session_start_time) }}
                                                                                     -
-                                                                                    {{ \Carbon\Carbon::parse($schedule->session_end_time)->format('H:i') }}
+                                                                                    {{ formatTimeArabic($schedule->session_end_time) }}
                                                                                 </td>
                                                                                 <td>
-                                                                                    {{ \Carbon\Carbon::parse($schedule->session_start_time)->diffInMinutes(\Carbon\Carbon::parse($schedule->session_end_time)) }}
-                                                                                    دقيقة
+                                                                                    {{ calculateDurationArabic($schedule->session_start_time, $schedule->session_end_time) }}
                                                                                 </td>
                                                                             </tr>
                                                                         @endforeach
@@ -714,21 +775,21 @@
                                 </div>
                                 <p>{{ $settings->welcome_message ?? 'لم يتم إدخال رسالة ترحيبية' }}</p>
                             </div>
-                        </div>
-                        <div class="input-group-2col mt-4 training-form-review-actions">
-                            <div class="input-group">
-                                <a href="{{ route('orgTraining.settings', $training->id) }}"
-                                    class="pbtn pbtn-outlined-main">
-                                    السابق
-                                </a>
+                            </>
+                            <div class="input-group-2col mt-4 training-form-review-actions">
+                                <div class="input-group">
+                                    <a href="{{ route('orgTraining.settings', $training->id) }}"
+                                        class="pbtn pbtn-outlined-main">
+                                        السابق
+                                    </a>
+                                </div>
+                                <div class="input-group">
+                                    <button type="submit" class="pbtn pbtn-main piconed">
+                                        <span>تأكيد نشر المسار التدريبي</span>
+                                        <img src="{{ asset('images/arrow-left.svg') }}" alt="">
+                                    </button>
+                                </div>
                             </div>
-                            <div class="input-group">
-                                <button type="submit" class="pbtn pbtn-main piconed">
-                                    <span>تأكيد نشر المسار التدريبي</span>
-                                    <img src="{{ asset('images/arrow-left.svg') }}" alt="">
-                                </button>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>

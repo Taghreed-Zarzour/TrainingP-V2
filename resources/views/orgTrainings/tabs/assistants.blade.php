@@ -269,7 +269,8 @@ document.addEventListener('DOMContentLoaded', function () {
         assistantError.classList.add('d-none');
         
         const selectedId = select.value;
-        const alreadyAddedIds = @json($OrgProgram->assistantUsers->pluck('id'));
+        const alreadyAddedIds = @json(optional($OrgProgram->assistantUsers)->pluck('id') ?? []);
+
         let hasError = false;
         
         // تحقق من الاختيار

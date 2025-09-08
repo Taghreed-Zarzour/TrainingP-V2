@@ -29,22 +29,7 @@
                 </div>
             @endif
 
-            <!-- General Error Messages -->
-            @if(session('error'))
-                <div class="alert alert-danger mb-4 text-center">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div class="alert alert-danger mb-4">
-                    <ul class="mb-0 text-center">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+        
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
@@ -98,6 +83,20 @@
                         </a>
                     @endif
 
+
+                        @if(session('success'))
+                <div class="alert alert-success text-center">{{ session('success') }}</div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
                 <div class="d-flex justify-content-between align-items-center mt-4">
 
 

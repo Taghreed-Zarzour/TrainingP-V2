@@ -152,9 +152,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::prefix('training')->group(function () {
 
-  Route::get('/start-create-training', function () {
+    Route::get('/start-create-training', function () {
       return view('trainings.start_training');
-  })->name('startCreateTraining');
+    })->name('startCreateTraining');
 
 
     // إنشاء جديد - عرض النموذج الأولي
@@ -162,10 +162,10 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
     // الخطوة 1: المعلومات الأساسية
     Route::get('/basic-information/{trainingId?}', [Trainings_CURD_Controller::class, 'showBasicInformationForm'])
-        ->name('training.basic');
+      ->name('training.basic');
     // POST - حفظ البيانات
     Route::post('/basic-information', [Trainings_CURD_Controller::class, 'storeBasicInformation'])
-        ->name('training.store.basic');
+      ->name('training.store.basic');
 
     Route::put('/training/basic/{id}', [Trainings_CURD_Controller::class, 'updateBasicInformation'])->name('training.update.basic');
 
@@ -192,7 +192,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
     Route::get('/{trainingId}/completed', [Trainings_CURD_Controller::class, 'showCompletionPage'])->name('training.completed');
 
 
-});
+  });
 
 
 
@@ -247,9 +247,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::prefix('org-training')->group(function () {
 
-  Route::get('/start-create-training', function () {
+    Route::get('/start-create-training', function () {
       return view('orgTrainings.start_org_trainings');
-  })->name('startCreateOrgTrainings');
+    })->name('startCreateOrgTrainings');
 
 
     Route::get('/basic-information', [OrgTrainingController::class, 'showBasicInformationForm'])->name('orgTraining.create');
@@ -281,7 +281,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::get('/organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTrainingsManager.index');
   Route::get('organization-training-manager/{id}', [OrgTrainingManagerController::class, 'show'])->name('orgTrainingsManager.show');
   Route::delete('organization-training-manager/destroy/{id}', [OrgTrainingManagerController::class, 'destroy'])->name('orgTrainingsManager.destroy');
-    Route::delete('organization-training-manager/destroy-training/{id}', [OrgTrainingManagerController::class, 'deleteOrgTraining'])->name('orgTraining.destroy');
+  Route::delete('organization-training-manager/destroy-training/{id}', [OrgTrainingManagerController::class, 'deleteOrgTraining'])->name('orgTraining.destroy');
 
   Route::delete('organization-training-manager/destroy-session/{id}', [OrgTrainingManagerController::class, 'deleteOrgSession'])->name('orgSessions.destroy');
   Route::put('organization-training-manager/update-session/{id}', [OrgTrainingManagerController::class, 'updateOrgSession'])->name('orgSessions.update');
@@ -289,9 +289,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::put('organization-training-manager/update-image/{id}', [OrgTrainingManagerController::class, 'updateOrgImage'])->name('orgImage.update');
   Route::post('organization-training-manager/assistant/store/{id}', [OrgTrainingManagerController::class, 'storeOrgAssistant'])->name('orgAssistant.store');
   Route::delete('organization-training-manager/delete-assistant/{orgTraining_id}/{assistant_id}', [OrgTrainingManagerController::class, 'deleteOrgAssistant'])
-  ->name('orgAssistant.destroy');
+    ->name('orgAssistant.destroy');
   Route::post('/enroll/{OrgProgram_id}', [OrgTrainingManagerController::class, 'enroll'])->name('orgEnrollment.enroll');
-  Route::get('organization-training-manage/sessions/{session}/attendance',[OrgTrainingManagerController::class,'selectSessionAttendance'])->name('orgSession.attendance');
+  Route::get('organization-training-manage/sessions/{session}/attendance', [OrgTrainingManagerController::class, 'selectSessionAttendance'])->name('orgSession.attendance');
   Route::post('organization-training-manage/sessions/{session}/attendance', [OrgTrainingManagerController::class, 'storeSessionAttendance'])->name('orgSession.attendance.store');
   Route::post('organization-training-manage/{program_id}/upload-files', [OrgTrainingFilesController::class, 'uploadOrgTrainingFiles'])->name('orgTraining.file.upload');
   Route::delete('organization-training-manage/delete-file/{id}', [OrgTrainingFilesController::class, 'deleteOrgTrainingFile'])->name('orgTraining.file.delete');
@@ -302,7 +302,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::get('/stopped', [OrgTrainingManagerController::class, 'showStoppedPrograms'])->name('orgtrainings.stopped');
 
 
-  Route::get('/trainee-trainings/manager',[MyTrainingsController::class, 'index'])->name('trainee.trainings.manager');
+  Route::get('/trainee-trainings/manager', [MyTrainingsController::class, 'index'])->name('trainee.trainings.manager');
 
   Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 });
@@ -312,17 +312,17 @@ Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedbac
 
 Route::get('/trainings/announcements', [TrainingsController::class, 'index'])->name('trainings_announcements');
 
-Route::get('/org/trainings/show/{id}',[OrgTrainingController::class, 'show'])->name('org.training.show');
-Route::get('/org/trainings/show/program/{id}',[OrgTrainingController::class, 'showProgram'])->name('org.training.show.program');
+Route::get('/org/trainings/show/{id}', [OrgTrainingController::class, 'show'])->name('org.training.show');
+Route::get('/org/trainings/show/program/{id}', [OrgTrainingController::class, 'showProgram'])->name('org.training.show.program');
 Route::get('/trainings/announcements/show/{id}', [TrainingsController::class, 'show'])->name('show_trainings_announcements');
 Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
 Route::get('/assistants', [AssistantController::class, 'index'])->name('assistants.index');
 
 //profiles users
-  Route::get('/show-trainer-profile/{id?}', [TrainerProfileController::class, 'showProfile'])->name('show_trainer_profile');
-  Route::get('/show-trainee-profile/{id?}', [TraineeProfileController::class, 'showProfile'])->name('show_trainee_profile');
-  Route::get('/show-assistant-profile/{id?}', [AssistantProfileController::class, 'showProfile'])->name('show_assistant_profile');
-  Route::get('/show-organization-profile/{id?}', [OrganizationProfileController::class, 'showProfile'])->name('show_organization_profile');
+Route::get('/show-trainer-profile/{id?}', [TrainerProfileController::class, 'showProfile'])->name('show_trainer_profile');
+Route::get('/show-trainee-profile/{id?}', [TraineeProfileController::class, 'showProfile'])->name('show_trainee_profile');
+Route::get('/show-assistant-profile/{id?}', [AssistantProfileController::class, 'showProfile'])->name('show_assistant_profile');
+Route::get('/show-organization-profile/{id?}', [OrganizationProfileController::class, 'showProfile'])->name('show_organization_profile');
 
 
 //reset password
@@ -331,5 +331,24 @@ Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLinkEm
 Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
 Route::get('complete-reset-password', [ResetPasswordController::class, 'showCompleteResetPassword'])->name('password.reset.complete');
+
+  Route::get('/subscriptions/trainer', function () {
+    return view('subscriptions.trainer');
+  })->name('subscriptions.trainer');
+
+  Route::get('/subscriptions/organization', function () {
+    return view('subscriptions.organization');
+  })->name('subscriptions.organization');
+
+
+
+Route::middleware('auth')->group(function () {
+  // Route::get('/notifications/dropdown', [NotificationController::class, 'dropdown'])->name('notifications.dropdown');
+  // Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+  // Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+  // Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // صفحة كاملة
+
+
+});
 
 require __DIR__ . '/front_fetch.php';
