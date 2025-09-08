@@ -31,4 +31,18 @@ class EnrollmentController extends Controller
     }
 
   }
+  public function filterByStatus(Request $request)
+{
+    $status = $request->query('status');
+    $validStatuses = ['pending', 'accepted', 'rejected'];
+
+    if (!in_array($status, $validStatuses)) {
+        return redirect()->back()->withErrors(['status' => 'Invalid status provided.']);
+    }
+
+    $results = $this->enrollmentService->getByStatus($status);
+
+    return response()->json($results);
+}
+
 }

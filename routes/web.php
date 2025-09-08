@@ -305,6 +305,15 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::get('/trainee-trainings/manager',[MyTrainingsController::class, 'index'])->name('trainee.trainings.manager');
 
   Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
+  Route::get('/enrollments/filter', [EnrollmentController::class, 'filterByStatus'])->name('enrollments.filter');
+
+
+
+
+
+
+
 });
 
 Route::post('/feedback', [HomeController::class, 'sendFeedback'])->name('feedback.store');

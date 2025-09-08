@@ -95,5 +95,24 @@ class EnrollmentService
             ];
         }
     }
+    public function getByStatus($status)
+    {
+        try{
+            $enrollment = Enrollment::when($status, function ($query, $status) {
+                $query->where('status', 'LIKE', "%{$status}%");
+            })->get();
+            return [
+                'msg' => 'تم استرجاع البيانات',
+                'success' => true,
+                'data' => $enrollment
+            ];
+        }catch (\Exception $e) {
+            return [
+                'msg' => 'حدث خطأ أثناء استرجاع البيانات: ' . $e->getMessage(),
+                'success' => false,
+                'data' => []
+            ];
+        }
+    }
 
 }
