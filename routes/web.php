@@ -7,6 +7,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingFilesController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingManagerController;
+use App\Http\Controllers\OrgTrainings\UpdateTrainingController;
 use App\Http\Controllers\Trainings\TrainingsController;
 use App\Http\Controllers\User\Organization\OrganizationProfileController;
 use App\Http\Controllers\User\partnershipController;
@@ -308,11 +309,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::get('/enrollments/filter', [EnrollmentController::class, 'filterByStatus'])->name('enrollments.filter');
 
-
-
-
-
-
+  Route::get('/organization-show-training/{id}',[UpdateTrainingController::class,'show'])->name('organization.showSpecificTraining');
+  Route::put('/organization-training/update-training/{id}', [UpdateTrainingController::class, 'update'])->name('organizationTraining.update');
+  Route::post('organization-training/sessions/store/{orgTrainingDetailId}', [UpdateTrainingController::class, 'storeSession'])->name('organizationSessions.store');
 
 });
 

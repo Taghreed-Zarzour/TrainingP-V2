@@ -21,20 +21,25 @@ class OrgTrainingFilesController extends Controller
         $originalName = $uploadedFile->getClientOriginalName();
         $storagePath = 'training/files/' . $originalName;
 
-        // تحقق من وجود الملف في التخزين
+        // Check if the file already exists in the storage
         if (Storage::disk('public')->exists($storagePath)) {
             return back()->with('error', 'الملف "' . $originalName . '" موجود مسبقًا في التخزين.');
         }
 
-        // تحقق من وجود الملف في قاعدة البيانات
-        $existsInDatabase = OrgTrainingDetailFile::where('training_files', $storagePath)
+        // Check if the file exists in the database
+        $existingFile = OrgTrainingDetailFile::where('training_files', $storagePath)
             ->where('org_training_program_id', $program_id)
-            ->exists();
+            ->first();
 
-        if ($existsInDatabase) {
-            return back()->with('error', 'الملف "' . $originalName . '" مسجل مسبقًا في قاعدة البيانات.');
+        if ($existingFile) {
+            // Update the existing record
+            $existingFile->training_files = $storagePath;
+            $existingFile->save();
+
+            return back()->with('success', 'تم تحديث الملف "' . $originalName . '" بنجاح.');
         }
 
+        // Store the new file
         $path = $uploadedFile->storeAs('training/files', $originalName, 'public');
 
         OrgTrainingDetailFile::create([
