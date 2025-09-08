@@ -13,6 +13,7 @@
             display: flex;
             flex-direction: row;
             height: 100%;
+            align-items: center;
         }
 
         .assistant-card:hover {
@@ -20,23 +21,48 @@
         }
 
         .assistant-image-container {
-            width: 40%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            margin-left: 20px;
-        }
+    width: 40%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-left: 20px;
+    /* إضافة هذه الخاصية لجعل الحاوية مربعة دائمًا */
+    padding-bottom: 40%; /* نسبة 1:1 */
+    height: 0; /* إلغاء الارتفاع الثابت */
+}
 
-        .assistant-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+.assistant-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* إضافة هذه الخاصية لضمان ملء الصورة للحاوية */
+    object-position: center;
+}
+@media (max-width: 992px) {
+    .assistant-image-container {
+        width: 100%;
+        padding-bottom: 100%; /* نسبة 1:1 */
+        margin: 0 auto 15px;
+        height: 0; /* إلغاء الارتفاع الثابت */
+    }
+}
 
+@media (max-width: 768px) {
+    .assistant-image-container {
+        padding-bottom: 100%; /* نسبة 1:1 */
+        height: 0; /* إلغاء الارتفاع الثابت */
+    }
+}
+
+@media (max-width: 576px) {
+    .assistant-image-container {
+        padding-bottom: 100%; /* نسبة 1:1 */
+        height: 0; /* إلغاء الارتفاع الثابت */
+    }
+}
         .assistant-info {
             flex: 1;
             display: flex;
@@ -262,6 +288,7 @@
             align-items: center;
             justify-content: center;
             margin-top: 15px;
+            text-align: center;
         }
 
         .apply-filter-btn:hover {
@@ -589,11 +616,22 @@
                         </div>
                     </div>
 
-                    <div class="mx-5">
-                        <button class="apply-filter-btn">
-                            <img src="{{ asset('images/icons/Premium.svg') }}" alt="search icon" class="me-2" />
-                            تطبيق التصفية (Premium)
-                        </button>
+                    <div class="mx-lg-55">
+                      @php
+// تحديد إذا المستخدم مؤسسة
+if (auth()->check()) {
+$isOrg = auth()->user()->user_type_id == 4;
+} else {
+// قراءة من الـ type في الرابط إذا ما في تسجيل دخول
+$isOrg = request('type') === 'organization';
+}
+
+$subscriptionsRoute = $isOrg ? 'subscriptions.organization' : 'subscriptions.trainer';
+@endphp
+                        <a href="{{ route($subscriptionsRoute) }}{{ !$isOrg && !auth()->check() ? '?type=individual' : ($isOrg && !auth()->check() ? '?type=organization' : '') }}" class="apply-filter-btn">
+    <img src="{{ asset('images/icons/Premium.svg') }}" alt="search icon" class="me-2" />
+    تطبيق التصفية (Premium)
+</a>
                     </div>
                 </div>
             </div>
@@ -609,73 +647,76 @@
                 </div>
 
                 <div class="row">
-                    @foreach ($assistants->take(4) as $assistant)
-                        <div class="col-12 mb-4">
-                            <div class="assistant-card">
-                                <div class="assistant-image-container">
-                                    @if ($assistant->image)
-                                        <img src="{{ asset('storage/' . $assistant->image) }}"
-                                            alt="{{ $assistant->user->name }}" class="assistant-image">
-                                    @else
-                                        <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية"
-                                            class="assistant-image">
-                                    @endif
-                                </div>
-
-                                <div class="assistant-info align-items-start justify-content-center">
-                                    <div class="assistant-name w-100">
-                                        {{ $assistant->user->getTranslation('name', 'ar') ?? '—' }}
-                                        {{ $assistant->getTranslation('last_name', 'ar') }}
-
-                                    </div>
-                                    @if ($assistant->university && $assistant->graduation_year)
-                                        <div class="location-title">
-                                            <span class="budget-label">
-                                                <img src="{{ asset('images/cources/teach.svg') }}"
-                                                    style="width: 20px; height: 23px;">
-                                            </span>
-                                            {{ $assistant->specialization }} ,
-                                            {{ $assistant->educationLevel->name ?? '—' }} ,
-                                            {{ $assistant->university }} -
-                                            {{ $assistant->graduation_year ? date('Y', strtotime($assistant->graduation_year)) : 'غير محدد' }}
-                                        @else
-                                            غير محدد
-                                    @endif
-                                </div>
-                                <div class="location-title">
-                                    <span class="budget-label">
-                                        <img src="{{ asset('images/cources/location2.svg') }}"
-                                            style="width: 20px; height: 23px;">
-                                    </span>
-                                    {{ $assistant->user->country->name ?? '—' }} , {{ $assistant->user->city ?? '—' }}
-                                </div>
-                                <div class="assistant-section">
-                                    <p class="bio-style text-muted m-0">{{ $assistant->user->bio ?? '—' }}</p>
-                                </div>
-
-
-                                <div class="assistant-section">
-                                    <div class="assistant-section-title">الخدمات:</div>
-                                    <div>
-                                        @foreach ($assistant->provided_services as $serviceId)
-                                            <span class="badge">{{ $services[$serviceId] ?? 'Unknown' }}</span>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <div class="assistant-section">
-                                    <div class="assistant-section-title">مجالات الخبرة:</div>
-                                    <div>
-                                        @foreach ($assistant->experience_areas as $areaId)
-                                            <span class="badge">{{ $experience_areas[$areaId] ?? 'Unknown' }}</span>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
+@foreach ($assistants->take(4) as $assistant)
+    <div class="col-12 mb-4">
+        <a href="{{ route('show_assistant_profile', ['id' => $assistant->id]) }}" class="assistant-card-link" style="text-decoration: none; color: inherit;">
+            <div class="assistant-card">
+                <div class="assistant-image-container">
+                    @if ($assistant->image)
+                        <img src="{{ asset('storage/' . $assistant->image) }}"
+                            alt="{{ $assistant->user->name }}" class="assistant-image">
+                    @else
+                        <img src="{{ asset('images/icons/user.svg') }}" alt="صورة افتراضية"
+                            class="assistant-image">
+                    @endif
                 </div>
-                @endforeach
+                <div class="assistant-info align-items-start justify-content-center">
+                    <div class="assistant-name w-100">
+                        {{ $assistant->user->getTranslation('name', 'ar') ?? '—' }}
+                        {{ $assistant->getTranslation('last_name', 'ar') }}
+                    </div>
+                    @if ($assistant->university && $assistant->graduation_year)
+                        <div class="location-title">
+                            <span class="budget-label">
+                                <img src="{{ asset('images/cources/teach.svg') }}"
+                                    style="width: 20px; height: 23px;">
+                            </span>
+                            {{ $assistant->specialization }} ,
+                            {{ $assistant->educationLevel->name ?? '—' }} ,
+                            {{ $assistant->university }} -
+                            {{ $assistant->graduation_year ? date('Y', strtotime($assistant->graduation_year)) : 'غير محدد' }}
+                        </div>
+                    @else
+                        <div class="location-title">
+                            <span class="budget-label">
+                                <img src="{{ asset('images/cources/teach.svg') }}"
+                                    style="width: 20px; height: 23px;">
+                            </span>
+                            غير محدد
+                        </div>
+                    @endif
+                    <div class="location-title">
+                        <span class="budget-label">
+                            <img src="{{ asset('images/cources/location2.svg') }}"
+                                style="width: 20px; height: 23px;">
+                        </span>
+                        {{ $assistant->user->country->name ?? '—' }} , {{ $assistant->user->city ?? '—' }}
+                    </div>
+                    <div class="assistant-section">
+                        <p class="bio-style text-muted m-0">{{ $assistant->user->bio ?? '—' }}</p>
+                    </div>
+
+                    <div class="assistant-section">
+                        <div class="assistant-section-title">الخدمات:</div>
+                        <div>
+                            @foreach ($assistant->provided_services as $serviceId)
+                                <span class="badge">{{ $services[$serviceId] ?? 'Unknown' }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="assistant-section">
+                        <div class="assistant-section-title">مجالات الخبرة:</div>
+                        <div>
+                            @foreach ($assistant->experience_areas as $areaId)
+                                <span class="badge">{{ $experience_areas[$areaId] ?? 'Unknown' }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+@endforeach
             </div>
         </div>
     </div>
@@ -686,10 +727,10 @@
         <div class="premium-promo-section">
             <div class="premium-card">
                 <h3 class="premium-title">اشترك بباقة البريميوم لتتمكن من تصفح جميع ميزاتنا الذكية</h3>
-                <button class="subscribe-btn">
+              <a href="{{ route($subscriptionsRoute) }}{{ !$isOrg && !auth()->check() ? '?type=individual' : ($isOrg && !auth()->check() ? '?type=organization' : '') }}" class="subscribe-btn">
                     <img src="{{ asset('images/icons/Premium.svg') }}" alt="Premium Icon">
                     اشترك الآن
-                </button>
+              </a>
             </div>
         </div>
     </div>

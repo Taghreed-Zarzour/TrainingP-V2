@@ -40,6 +40,10 @@
                 </button>
 
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-2">
+
+                  @guest
+                    
+                
                     @php
                         // تحديد إذا المستخدم مؤسسة
                         if (auth()->check()) {
@@ -58,7 +62,7 @@
                             الرئيسية
                         </a>
                     </li>
-
+  @endguest
 
 
 
@@ -75,7 +79,30 @@
                     <li class="nav-item {{ request()->is('assistants') ? 'active' : '' }}">
                         <a class="nav-link nav-font pb-0" href="{{ route('assistants.index') }}">المساعدون</a>
                     </li>
+                    
+
+                    @php
+                        // تحديد إذا المستخدم مؤسسة
+                        if (auth()->check()) {
+                            $isOrg = auth()->user()->user_type_id == 4;
+                        } else {
+                            // قراءة من الـ type في الرابط إذا ما في تسجيل دخول
+                            $isOrg = request('type') === 'organization';
+                        }
+
+                        $subscriptionsRoute = $isOrg ? 'subscriptions.organization' : 'subscriptions.trainer';
+                    @endphp
+
+                    <li class="nav-item {{ request()->routeIs($subscriptionsRoute) ? 'active' : '' }}">
+                        <a class="nav-link nav-font va pb-0"
+                            href="{{ route($subscriptionsRoute) }}{{ !$isOrg && !auth()->check() ? '?type=individual' : ($isOrg && !auth()->check() ? '?type=organization' : '') }}">
+                            الباقات
+                        </a>
+                    </li>
+
+
                 </ul>
+            
 
                 <!-- الروابط بحسب حالة تسجيل الدخول -->
                 @auth
@@ -99,33 +126,7 @@
                             </li>
                         @endif
 
-<li class="nav-item position-relative">
-  <img src="{{ asset('images/icons/notification.svg') }}" class="" />
-
-  <!-- الدائرة الحمراء -->
-  <span class="badge-notification">3</span>
-</li>
-
-<style>
-/* الدائرة */
-.badge-notification {
-  position: absolute;
-  top: -5px;
-  right: 0px;
-  background: red;
-  color: white;
-  border-radius: 50%;
-  width: 24px; /* حجم الأيقونة */
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 0 5px;    /* مساحة صغيرة يمين ويسار */
-  box-sizing: border-box;
-}
-</style>
+@include('frontend.partials.notifications-dropdown')
 
                         <!-- القائمة المنسدلة للملف الشخصي -->
                         <li class="nav-item dropdown">

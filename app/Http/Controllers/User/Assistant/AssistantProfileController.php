@@ -26,11 +26,22 @@ class AssistantProfileController extends Controller
       $this->assistantService = $assistantService;
     }
 
-    public function showProfile()
+    public function showProfile($userIdentifier = null)
     {
-        $id = Auth::id();
-        $user = User::with('country')->findOrFail($id);
-        $assistant = Assistant::where('id', $id)->firstOrFail();
+         // الحالة 1: إذا كان الرابط يحتوي على ID فقط (مثال: /show-profile/123)
+    if (is_numeric($userIdentifier)) {
+        $userId = $userIdentifier;
+    }
+    // الحالة 2: إذا كان الرابط يحتوي على Slug (مثال: /show-profile/john-doe-123)
+    elseif (strpos($userIdentifier, '-') !== false) {
+        $userId = (int) substr($userIdentifier, strrpos($userIdentifier, '-') + 1);
+    }
+    // الحالة 3: إذا لم يتم تمرير أي معرف، استخدم ID المستخدم الحالي
+    else {
+        $userId = Auth::id();
+    }
+        $user = User::with('country')->findOrFail($userId);
+        $assistant = Assistant::where('id', $userId)->firstOrFail();
         $sexs = SexEnum::cases();
         $provided_services = ProvidedService::all();
         $countries = Country::all();

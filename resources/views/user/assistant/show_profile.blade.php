@@ -383,7 +383,7 @@
 
                                 <h4 class="title fw-bold mb-0">ملخص الخبرات والتعليم</h4>
 
-                                <button class="btn btn-sm" onclick="openModal('professional-summary')">
+                                <button class="btn btn-sm edit-button-container" onclick="openModal('professional-summary')">
                                     <img src="{{ asset('images/pencil-simple.svg') }}" />
                                 </button>
                             </div>

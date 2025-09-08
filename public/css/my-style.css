@@ -102,7 +102,9 @@ font-size: 1.3rem;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
         }
-
+.card-title a{
+  color: #333;
+        }
         .stats {
             display: flex;
             justify-content: space-between;
@@ -3104,3 +3106,261 @@ font-size: 1.3rem;
     font-size: 15px;
     color: #444444;
   }
+
+    .baqat-pricing-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        background-color: #fff;
+        border: 2px solid;
+        border-top-width: 30px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .baqat-card-free {
+        border-color: #003090;
+    }
+    
+    .baqat-card-ads {
+        border-color: #005FDC;
+    }
+    
+    .baqat-card-paid {
+        border-color: #FFC62A;
+    }
+    
+    .baqat-card-header-custom {
+        padding: 20px 30px;
+        text-align: right;
+        border-bottom: none;
+        flex-shrink: 0;
+    }
+    
+    .baqat-plan-title {
+        font-weight: 400;
+        font-size: 24px;
+        leading-trim: NONE;
+        line-height: 36px;
+        text-align: right;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .baqat-plan-description {
+        color: #424242;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+    
+    .baqat-price-section {
+        padding: 25px 30px;
+        text-align: right1;
+        min-height: 190px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        flex-shrink: 0;
+    }
+    
+    .baqat-original-price {
+        font-size: 1rem;
+        color: #787878;
+        margin-bottom: 5px;
+    }
+    
+    .baqat-strikethrough {
+        text-decoration: line-through;
+        color: #787878;
+        font-style: normal;
+    }
+    
+    .baqat-discount-price {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #000000;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+    
+    .baqat-price-period {
+        color: #000000;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+    
+    .baqat-price-details {
+        margin-top: 15px;
+        text-align: right;
+    }
+    
+    .baqat-per-training {
+        font-family: IBM Plex Sans Arabic;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 16px;
+        leading-trim: NONE;
+        line-height: 25.6px;
+        letter-spacing: 0%;
+        text-align: right;
+        vertical-align: middle;
+        color: #424242;
+        margin-bottom: 5px;
+    }
+    
+    .baqat-discount-badge {
+        font-family: IBM Plex Sans Arabic;
+        font-weight: 600;
+        font-style: SemiBold;
+        font-size: 14px;
+        leading-trim: NONE;
+        line-height: 22.4px;
+        letter-spacing: 0%;
+        text-align: right;
+        vertical-align: middle;
+        color: #0D0D0D;
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .baqat-feature-item {
+        padding: 12px 30px;
+        color: #000000;
+        font-size: 0.9rem;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+    }
+    
+    .baqat-check-icon {
+        margin-left: 10px;
+        font-size: 1.1rem;
+        display: inline-block;
+        vertical-align: middle;
+        flex-shrink: 0;
+    }
+    
+    .baqat-btn-container {
+        padding: 0 30px 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: auto;
+    }
+    
+    .baqat-btn-plan {
+        border-radius: 4px;
+        padding: 15px 25px;
+        font-weight: 600;
+        border: none;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .baqat-btn-free {
+        background: #003090;
+        color: white;
+        cursor: default !important;
+    }
+    
+    .baqat-btn-ads {
+        background: #005FDC;
+        color: white;
+    }
+        .baqat-btn-ads:hover {
+        background: #02469f;
+      
+    }
+    .baqat-btn-paid {
+        background: #FFC62A;
+        color: white;
+    }
+    .baqat-btn-paid:hover {
+        background: #eeb720;
+      
+    }
+    
+    .baqat-premium-icon {
+        margin-right: 8px;
+        width: 20px;
+        height: 20px;
+    }
+    
+    .baqat-feature-text {
+        flex-grow: 1;
+    }
+    
+    .baqat-features-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+  /* Styles for the trust section */
+.baqat-trust-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-direction: row-reverse; /* عكس الاتجاه لوضع الصور على اليسار */
+}
+.baqat-trust-bubble {
+  display: flex;
+    align-items: center;
+    background-color: #E1E9FC;
+    border-radius: 50px;
+    padding: 8px 30px;
+    position: relative;
+    margin-left: -19px;
+    Z-INDEX: 10;
+}
+.baqat-trust-images {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    width: 100px; /* عرض مناسب للصور المتراكبة */
+    height: 50px; /* ارتفاع مناسب */
+}
+.baqat-trainer-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+    position: absolute;
+    background-color: #f0f0f0;
+    top: 5px; /* محاذاة عمودية */
+}
+.baqat-trust-text {
+    font-size: 1rem;
+    color: #1F408C;
+    font-weight: 600;
+    text-align: right;
+    flex-grow: 1;
+}
+    
+    /* Modal styles */
+    
+    .baqat-btn-cancel {
+        background-color: transparent;
+        color: #005FDC;
+        border: 1px solid #005FDC;
+        border-radius: 4px;
+        padding: 10px 25px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    /* Wider modal */
+    .modal-dialog {
+        max-width: 700px;
+    }

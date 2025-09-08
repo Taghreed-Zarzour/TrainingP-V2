@@ -8,18 +8,20 @@ use Illuminate\Support\Facades\Auth;
 
 class OrgTrainingManagerService
 {
+  
     public function categorizePrograms()
 {
     $organizationId = Auth::id();
 
     // Retrieve active (online) and stopped training programs
-    $activePrograms = OrgTrainingProgram::with([
-        'goals', 'details', 'assistants',
-        'assistantUsers', 'registrationRequirements',
-    ])
-    ->where('organization_id', $organizationId)
-    ->where('status', 'online')
-    ->get();
+$activePrograms = OrgTrainingProgram::with([
+    'goals', 'details', 'assistants',
+    'assistantUsers', 'registrationRequirements',
+])
+->where('organization_id', $organizationId)
+->where('status', 'online')
+->get();
+
 
     $stoppedPrograms = OrgTrainingProgram::with([
         'goals', 'details', 'assistants',
@@ -53,28 +55,31 @@ foreach ($activePrograms as $program) {
     }
 
     // معلن
-    if ($program->completion_percentage === 100 && $deadlineDate && $deadlineDate->isFuture()) {
-        $announced[] = $program;
-        continue;
-    }
+if ($program->completion_percentage === 100 && $deadlineDate && now()->lessThanOrEqualTo($deadlineDate->endOfDay())) {
+    $announced[] = $program;
+    continue;
+}
 
-    // جارية
-    if ($program->completion_percentage === 100 && $hasSessions && $deadlineDate && $deadlineDate->isPast()) {
-        foreach ($program->details as $detail) {
-            $firstSession = $detail->trainingSchedules->sortBy('session_date')->first();
-            $lastSession = $detail->trainingSchedules->sortByDesc('session_date')->first();
 
-            if ($firstSession && $lastSession) {
-                $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
+// جارية
+if ($program->completion_percentage === 100 && $hasSessions && $deadlineDate && $deadlineDate->isPast()) {
 
-                if ($now->between($startTime, $endTime)) {
-                    $ongoing[] = $program;
-                    continue 2;
-                }
+    foreach ($program->details as $detail) {
+        $firstSession = $detail->trainingSchedules->sortBy('session_date')->first();
+        $lastSession = $detail->trainingSchedules->sortByDesc('session_date')->first();
+
+        if ($firstSession && $lastSession) {
+            $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+            $endTime = Carbon::parse($lastSession->session_date . ' ' . $lastSession->session_end_time);
+
+            // التعديل هنا: التدريب جاري إذا اليوم الحالي <= آخر جلسة
+            if ($now->lessThanOrEqualTo($endTime)) {
+                $ongoing[] = $program;
+                continue 2;
             }
         }
     }
+}
 
     // مكتمل
     if ($program->completion_percentage === 100 && $hasSessions && $deadlineDate && $deadlineDate->isPast()) {

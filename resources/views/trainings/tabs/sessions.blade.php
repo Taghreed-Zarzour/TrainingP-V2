@@ -402,7 +402,7 @@
 
 <!-- مودال إضافة جلسة جديدة -->
 <div class="modal fade" id="addSessionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content px-3 py-3">
             <div class="modal-header border-0 pb-0 justify-content-end align-self-end">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>

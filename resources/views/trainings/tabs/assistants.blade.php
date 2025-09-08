@@ -131,7 +131,7 @@ form.addEventListener('submit', function (e) {
     assistantError.classList.add('d-none');
 
     const selectedId = select.value;
-    const alreadyAddedIds = @json($program->assistants->pluck('id'));
+    const alreadyAddedIds = @json(optional($program->assistants)->pluck('id') ?? []);
     let hasError = false;
 
     // تحقق من الاختيار

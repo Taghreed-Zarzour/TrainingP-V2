@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
     DB::table('program_types')->truncate();
     DB::table('training_classifications')->truncate();
     DB::table('training_levels')->truncate();
-
+  DB::table('admins')->truncate();
     // إعادة تفعيل قيود المفتاح الأجنبي
     DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 

@@ -97,36 +97,41 @@ public function uploadTrainingFiles(Request $request, $program_id)
 
 
 
-    public function updateTrainingInfo(updateTrainingInfo $request , $id)
-    {
-        $program = TrainingProgram::findOrFail($id);
-
-        $data = $request->validated();
-
-        $program->update([
-            'description' => $data['description']
-        ]);
-
-        $program->detail->update([
-            'requirements' => json_encode($data['requirements']),
-            'target_audience' => json_encode($data['target_audience']),
-            'learning_outcomes' => json_encode($data['learning_outcomes']),
-            'benefits' => json_encode($data['benefits']),
-        ]);
-
-        $paymentMethod = $data['payment_method'] ?? null; // استخدام قيمة افتراضية null إذا لم يكن المفتاح موجودًا
-// تعريف الرسالة الترحيبية الافتراضية
-$WelcomeMessage = "شكرًا لتسجيلك في التدريب. يسعدنا أن تكون/ي جزءًا من هذا البرنامج، ونتطلع إلى رحلة مليئة بالتعلّم والتطوير.
-سيتم مراجعة طلبك وإشعارك بالقبول أو الاعتذار في أقرب وقت، لذا تأكد/ي من متابعة بريدك الإلكتروني أو الإشعارات داخل المنصة.";
-
-// تحديث البيانات
-$program->AdditionalSetting->update([
-    'payment_method' => $data['payment_method'] ?? null,
-    'welcome_message' => $data['welcome_message'] ?? $WelcomeMessage
-]);
-
-        return redirect()->back()->with('success', 'تم تحديث معلومات التدريب بنجاح');
-    }
+public function updateTrainingInfo(updateTrainingInfo $request, $id)
+{
+    $program = TrainingProgram::findOrFail($id);
+    $data = $request->validated();
+    
+    $program->update([
+        'description' => $data['description']
+    ]);
+    
+    // تحديث تفاصيل التدريب
+    $program->detail->update([
+        'requirements' => json_encode($data['requirements'] ?? []),
+        'learning_outcomes' => json_encode($data['learning_outcomes'] ?? []),
+        'benefits' => json_encode($data['benefits'] ?? []),
+        
+        // تحديث بيانات الفئة المستهدفة
+        'education_level_id' => json_encode($data['education_level_id'] ?? []),
+        'work_status' => json_encode($data['work_status'] ?? []),
+        'work_sector_id' => json_encode($data['work_sector_id'] ?? []),
+        'job_position' => json_encode($data['job_position'] ?? []),
+        'country_id' => json_encode($data['country_id'] ?? []),
+    ]);
+    
+    // تحديث الإعدادات الإضافية
+    $paymentMethod = $data['payment_method'] ?? null;
+    $WelcomeMessage = "شكرًا لتسجيلك في التدريب. يسعدنا أن تكون/ي جزءًا من هذا البرنامج، ونتطلع إلى رحلة مليئة بالتعلّم والتطوير.
+    سيتم مراجعة طلبك وإشعارك بالقبول أو الاعتذار في أقرب وقت، لذا تأكد/ي من متابعة بريدك الإلكتروني أو الإشعارات داخل المنصة.";
+    
+    $program->AdditionalSetting->update([
+        'payment_method' => $paymentMethod,
+        'welcome_message' => $data['welcome_message'] ?? $WelcomeMessage
+    ]);
+    
+    return redirect()->back()->with('success', 'تم تحديث معلومات التدريب بنجاح');
+}
 
     public function deleteProgramPhoto($program_id){
         $program = additional_setting::where('training_program_id', $program_id)->firstOrFail();

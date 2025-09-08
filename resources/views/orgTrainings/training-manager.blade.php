@@ -98,7 +98,7 @@
                                     </div>
                                     <div>
                                         <div class="text-muted small">العدد الأقصى للمشاركين</div>
-                                        <div class="fw-bold">{{ $OrgProgram->registrationRequirements->max_trainees ?? 'غير محدد' }} متدرب</div>
+                                        <div class="fw-bold">{{ $OrgProgram->registrationRequirements->max_trainees == 0 ? 'لا يوجد عدد محدد' :$OrgProgram->registrationRequirements->max_trainees . 'مشارك'  }}</div>
                                     </div>
                                 </div>
                             </div>

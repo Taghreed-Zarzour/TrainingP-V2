@@ -124,26 +124,25 @@
                             
                             <div class="mb-3">
                                 <img class="pe-2" src="{{ asset('images/cources/clock2.svg') }}" alt="عدد الساعات">
-                                @php
-                                    $totalHours = $grandTotalMinutes / 60 ?? 0;
-                                    $hours = floor($totalHours); // الساعات
-                                    $minutes = round(($totalHours - $hours) * 60); // الدقائق
-                                @endphp
-                                عدد الساعات: {{ $hours }} ساعة {{ $minutes }} دقيقة
+
+                                عدد الساعات: {{ $program->duration_text }}
                             </div>
                             
                             @if ($orgProgram->registrationRequirements?->application_submission_method)
                                 <div class="mb-3">
                                     <img class="pe-2" src="{{ asset('images/cources/Register.svg') }}" alt="طريقة التسجيل">
                                     طريقة التسجيل:
-                                    {{ $orgProgram->registrationRequirements->application_submission_method }}
+                                  
+                                    {{ $orgProgram->registrationRequirements->application_submission_method == 'inside_platform' ? 'داخل المنصة' : 'خارج المنصة' }}
                                 </div>
                             @endif
                             
                             @if ($orgProgram->registrationRequirements?->max_trainees)
                                 <div class="mb-3">
                                     <img class="pe-2" src="{{ asset('images/cources/members.svg') }}" alt="العدد الأقصى للمشاركين">
-                                    العدد الأقصى للمشاركين: {{ $orgProgram->registrationRequirements->max_trainees }} مشارك
+                                    العدد الأقصى للمشاركين: {{ $orgProgram->registrationRequirements->max_trainees  == 0 ? 'لا يوجد عدد محدد' :$orgProgram->registrationRequirements->max_trainees . 'مشارك'}}
+
+        
                                 </div>
                             @endif
                             

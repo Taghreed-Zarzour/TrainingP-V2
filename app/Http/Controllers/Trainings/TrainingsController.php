@@ -1,6 +1,5 @@
 <?php
 namespace App\Http\Controllers\Trainings;
-
 use App\Enums\TrainingAttendanceType;
 use App\Http\Controllers\Controller;
 use App\Models\Language;
@@ -15,15 +14,18 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Enrollment;
 use App\Models\OrgTrainingProgram;
-
+use App\Services\OrgTrainingManagerService;
 class TrainingsController extends Controller
+{ 
+protected $trainingAnnouncementService;
+protected $orgTrainingManagerService;
+public function __construct(TrainingAnnouncementService $trainingAnnouncementService)
 {
-    protected $trainingAnnouncementService;
-
-    public function __construct(TrainingAnnouncementService $trainingAnnouncementService)
-    {
-        $this->trainingAnnouncementService = $trainingAnnouncementService;
-    }
+    // تهيئة الـ service الأصلي 
+    $this->trainingAnnouncementService = $trainingAnnouncementService;
+    // تهيئة خدمة OrgTrainingManagerService
+    $this->orgTrainingManagerService = new OrgTrainingManagerService();
+}
 
     // دالة مساعدة للجمع العربي
     private function arabicPlural($number, $word)
@@ -35,11 +37,9 @@ class TrainingsController extends Controller
         'أسبوع' => ['أسبوع', 'أسبوعين', 'أسابيع'],
         'شهر'   => ['شهر', 'شهرين', 'أشهر'],
     ];
-
     if (!isset($forms[$word])) {
         return $word; // في حال ما وجدنا الكلمة
     }
-
     if ($number == 1) {
         return $forms[$word][0];
     } elseif ($number == 2) {
@@ -51,27 +51,22 @@ class TrainingsController extends Controller
     }
 }
 
-
     // دالة مساعدة لحساب الوقت المتبقي/المنقضي
 private function calculateRegistrationStatus($deadline)
 {
     $now = Carbon::now();
-
     if (!$deadline) {
         return [
             'text' => 'تاريخ انتهاء التسجيل غير محدد',
             'status' => 'unknown'
         ];
     }
-
     $deadline = Carbon::parse($deadline);
-
     if ($deadline->isFuture()) {
         // الوقت المتبقي
 $diffInSeconds = $now->diffInSeconds($deadline);
         $days = (int) floor($diffInSeconds / (60 * 60 * 24));
         $hours = (int) floor(($diffInSeconds % (60 * 60 * 24)) / (60 * 60));
-
         if ($days > 0) {
             $daysText = $this->arabicPlural($days, 'يوم');
             $hoursText = $this->arabicPlural($hours, 'ساعة');
@@ -89,7 +84,6 @@ $diffInSeconds = $now->diffInSeconds($deadline);
     } else {
         // الوقت المنقضي
         $daysAgo = (int) abs($now->diffInDays($deadline));
-
         if ($daysAgo === 0) {
             return [
                 'text' => "انتهت فترة التسجيل اليوم",
@@ -115,13 +109,10 @@ $diffInSeconds = $now->diffInSeconds($deadline);
             ];
       } else {
     $monthsAgo = (int) abs($now->diffInMonths($deadline));
-
     if ($monthsAgo >= 12) {
         $yearsAgo = floor($monthsAgo / 12);
         $remainingMonths = $monthsAgo % 12;
-
         $yearsText = $this->arabicPlural($yearsAgo, 'سنة');
-
         if ($remainingMonths > 0) {
             $monthsText = $this->arabicPlural($remainingMonths, 'شهر');
             return [
@@ -142,88 +133,132 @@ $diffInSeconds = $now->diffInSeconds($deadline);
         ];
     }
 }
-
     }
 }
-
+// Controller Code
 public function index(Request $request)
 {
-    // $costType = $request->input('cost_type', 'all');
-    // $authorityType = $request->input('provider', 'all');
-    // $programTypeId = $request->input('program_type_id');
+    // تحديد ما إذا كان هناك بحث أو فلترة نشطة
+    $hasActiveFilters = $request->filled('search') || 
+                       $request->filled('cost_type') || 
+                       $request->filled('provider') || 
+                       $request->filled('program_type_id');
+
+    // الحصول على الفلاتر والبحث
     $filters = $request->only(['cost_type', 'provider', 'program_type_id', 'search']);
     $search = $request->input('search');
-
+    
+    // جلب البرامج التدريبية مع تطبيق الفلاتر
     $programsResponse = $this->trainingAnnouncementService->index($filters, $search);
-
-
     $programs = $programsResponse['data'] ?? [];
+    
+    // معالجة البيانات الإضافية للبرامج
     foreach ($programs as $program) {
+        // حساب الساعات الكلية
         $minutes = 0;
-        if ($program->sessions) {
-            foreach ($program->sessions as $session) {
-                $start = Carbon::createFromTimeString($session->session_start_time);
-                $end = Carbon::createFromTimeString($session->session_end_time);
-                $adjustedEnd = $end->copy();
-                if ($adjustedEnd->lessThanOrEqualTo($start)) {
-                    $adjustedEnd->addDay();
+        if (isset($program->schedules_later) && $program->schedules_later == 1) {
+            $minutes = ($program->num_of_hours ?? 0) * 60;
+        } else {
+            if (!empty($program->sessions)) {
+                foreach ($program->sessions as $session) {
+                    $start = Carbon::createFromTimeString($session->session_start_time);
+                    $end = Carbon::createFromTimeString($session->session_end_time);
+                    if ($end->lessThanOrEqualTo($start)) $end->addDay();
+                    $minutes += $end->diffInMinutes($start, true);
                 }
-                $diff = $adjustedEnd->diffInMinutes($start, true);
-                $minutes += $diff;
             }
         }
         $program->total_duration_hours = round($minutes / 60, 2);
-
-        // حساب حالة التسجيل لكل برنامج
+        // تحويل الساعات إلى نص عربي
+        $program->duration_text = $this->formatDuration($program);
+        // حالة التسجيل
         $deadline = $program->AdditionalSetting->application_deadline ?? null;
         $program->registration_status = $this->calculateRegistrationStatus($deadline);
     }
-
+    
+    // جلب التصنيفات التدريبية
     $program_classification = TrainingClassification::all();
+    
+    // جلب المدربين
     $trainerIds = TrainingProgram::pluck('user_id');
     $trainers = User::with('trainee')->whereIn('id', $trainerIds)->get();
-
+    
     $currentDateTime = now(); // الحصول على الوقت الحالي
-
-        $allOrgPrograms = OrgTrainingProgram::with(
-            'details',
-            'goals',
-            'registrationRequirements',
-            'assistants'
-        )
-        ->where('status', 'online')
-        ->applyFilters($filters)
-        ->searchTitle($search)
-        ->get();
-
-        return view('trainingAnnouncement.index', compact('programs', 'trainers', 'program_classification', 'allOrgPrograms'));
+    
+    // جلب المسارات التدريبية مع تطبيق الفلاتر
+    $allOrgPrograms = OrgTrainingProgram::with(
+        'details',
+        'goals',
+        'registrationRequirements',
+        'assistants'
+    )
+    ->where('status', 'online')
+    ->applyFilters($filters)  // تطبيق الفلترة
+    ->searchTitle($search)    // تطبيق البحث
+    ->get();
+    
+    // تصفية البرامج بناءً على الشروط المحددة
+    $filteredOrgPrograms = [];
+    foreach ($allOrgPrograms as $program) {
+        // حساب نسبة الإكمال
+        $completion = $this->orgTrainingManagerService->calculateCompletion($program);
+        // جلب تاريخ انتهاء التقديم
+        $applicationDeadline = $program->registrationRequirements->application_deadline ?? null;
+        $deadlineValid = $applicationDeadline
+            ? $currentDateTime->lessThanOrEqualTo(Carbon::parse($applicationDeadline)->endOfDay())
+            : false;
+        // التحقق من وجود جلسات
+        $hasSessions = $program->details && $program->details->some(function ($detail) {
+            return $detail->trainingSchedules && $detail->trainingSchedules->count() > 0;
+        });
+        if ($completion === 100 && $deadlineValid) {
+            // إذا لا توجد جلسات، نضيف البرنامج مباشرة
+            if (!$hasSessions) {
+                $filteredOrgPrograms[] = $program;
+                continue;
+            }
+            // الحصول على أول جلسة
+            foreach ($program->details as $detail) {
+                $firstSession = $detail->trainingSchedules->sortBy('session_date')->first();
+                if ($firstSession) {
+                    $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                    if ($startTime->isFuture()) {
+                        $filteredOrgPrograms[] = $program;
+                        break;
+                    }
+                }
+            }
+        }
     }
-
-    public function show($id)
+    
+    // تمرير البيانات إلى العرض
+    return view('trainingAnnouncement.index', [
+        'programs' => $programs,
+        'trainers' => $trainers,
+        'program_classification' => $program_classification,
+        'allOrgPrograms' => $filteredOrgPrograms,
+        'hasActiveFilters' => $hasActiveFilters
+    ]);
+}    public function show($id)
     {
         $program = $this->trainingAnnouncementService->getById($id);
-
         if (!$program) {
             return redirect()->route('trainings.index')->with('error', 'التدريب المطلوب غير موجود');
         }
-
         // حساب حالة التسجيل
         $deadline = $program->AdditionalSetting->application_deadline ?? null;
         $registrationStatus = $this->calculateRegistrationStatus($deadline);
         $remainingText = $registrationStatus['text'];
-
 
             // تحديد ما إذا انتهى موعد التسجيل
     $training_has_ended = false;
     if ($deadline) {
         $training_has_ended = now() > Carbon::parse($deadline);
     }
-
         // حساب جدول الجلسات
         $session_day = [];
         $session_duration = [];
         $date_display = [];
-
         if ($program->sessions) {
             foreach ($program->sessions as $session) {
                 $start = Carbon::createFromTimeString($session->session_start_time);
@@ -238,13 +273,11 @@ public function index(Request $request)
                 $date_display[] = Carbon::parse($session->session_date)->translatedFormat('d F');
             }
         }
-
         // الحصول على بيانات المدرب
         $trainer = null;
         if ($program->user_id) {
             $trainer = User::find($program->user_id);
         }
-
         // الحصول على المساعدين
         $assistantUsers = collect();
         if ($program->id) {
@@ -253,7 +286,6 @@ public function index(Request $request)
                 ->get();
             $assistantUsers = $assistantLinks->pluck('assistant')->filter();
         }
-
         // التحقق من تسجيل المستخدم
         $has_enrolled = false;
         $enrollment = null;
@@ -261,12 +293,10 @@ public function index(Request $request)
             $has_enrolled = Enrollment::where('trainee_id', auth()->id())
                 ->where('training_programs_id', $id)
                 ->exists();
-
             $enrollment = Enrollment::where('trainee_id', auth()->id())
                 ->where('training_programs_id', $id)
                 ->first();
         }
-
         // حساب تقييم المدرب
         $averageTrainerRating = 0;
         if ($trainer && $trainer->trainer && $trainer->trainer->ratings) {
@@ -274,7 +304,6 @@ public function index(Request $request)
             $criteria = ['clarity', 'interaction', 'organization'];
             $totalRatings = 0;
             $totalSum = 0;
-
             foreach ($ratings as $rating) {
                 foreach ($criteria as $criterion) {
                     if (isset($rating->$criterion)) {
@@ -284,10 +313,30 @@ public function index(Request $request)
                     }
                 }
             }
-
             $averageTrainerRating = $totalRatings > 0 ? round($totalSum / $totalRatings, 1) : 0;
         }
-
+// حساب عدد الساعات الكلي بناءً على schedules_later
+$minutes = 0;
+if (isset($program->schedules_later) && $program->schedules_later == 1) {
+    // الحالة الأولى: استخدام عدد الساعات الكلي
+    $minutes = ($program->num_of_hours ?? 0) * 60;
+} else {
+    // الحالة الثانية: حساب من الجلسات
+    if (!empty($program->sessions)) {
+        foreach ($program->sessions as $session) {
+            $start = Carbon::createFromTimeString($session->session_start_time);
+            $end = Carbon::createFromTimeString($session->session_end_time);
+            $adjustedEnd = $end->copy();
+            if ($adjustedEnd->lessThanOrEqualTo($start)) {
+                $adjustedEnd->addDay();
+            }
+            $minutes += $adjustedEnd->diffInMinutes($start, true);
+        }
+    }
+}
+$program->total_duration_hours = round($minutes / 60, 2);
+// بعد حساب total_duration_hours
+$program->duration_text = $this->formatDuration($program);
         return view('trainingAnnouncement.show', compact(
             'program',
             'trainer',
@@ -301,7 +350,57 @@ public function index(Request $request)
             'averageTrainerRating',
             'registrationStatus',
              'training_has_ended',
-
         ));
     }
+
+    // تحويل عدد الساعات الكلي إلى نص عربي
+private function formatDuration($program)
+{
+    $durationText = '';
+    $totalHours = $program->total_duration_hours ?? null;
+    if (!is_null($totalHours) && $totalHours > 0) {
+        $hours = floor($totalHours);
+        $minutes = round(($totalHours - $hours) * 60);
+        if ($hours > 0 && $minutes > 0) {
+            $durationText = "{$hours} " . $this->arabicPlural($hours, 'ساعة') . " و {$minutes} " . $this->arabicPlural($minutes, 'دقيقة');
+        } elseif ($hours > 0) {
+            $durationText = "{$hours} " . $this->arabicPlural($hours, 'ساعة');
+        } elseif ($minutes > 0) {
+            $durationText = "{$minutes} " . $this->arabicPlural($minutes, 'دقيقة');
+        }
+    } else {
+        if (isset($program->schedules_later) && $program->schedules_later == 1) {
+            $durationText = 'سيحدد لاحقاً';
+        } elseif (!empty($program->sessions) && $program->sessions->count() > 0) {
+            $totalMinutes = 0;
+            foreach ($program->sessions as $session) {
+                if (!empty($session->session_start_time) && !empty($session->session_end_time)) {
+                    $start = \Carbon\Carbon::parse($session->session_start_time);
+                    $end = \Carbon\Carbon::parse($session->session_end_time);
+                    if ($end->lessThanOrEqualTo($start)) {
+                        $end->addDay();
+                    }
+                    $totalMinutes += $start->diffInMinutes($end);
+                }
+            }
+            if ($totalMinutes > 0) {
+                $hours = floor($totalMinutes / 60);
+                $minutes = $totalMinutes % 60;
+                if ($hours > 0 && $minutes > 0) {
+                    $durationText = "{$hours} " . $this->arabicPlural($hours, 'ساعة') . " و {$minutes} " . $this->arabicPlural($minutes, 'دقيقة');
+                } elseif ($hours > 0) {
+                    $durationText = "{$hours} " . $this->arabicPlural($hours, 'ساعة');
+                } else {
+                    $durationText = "{$minutes} " . $this->arabicPlural($minutes, 'دقيقة');
+                }
+            } else {
+                $durationText = 'قيد الإعداد';
+            }
+        } else {
+            $durationText = 'غير محدد';
+        }
+    }
+    return $durationText;
+}
+
 }
