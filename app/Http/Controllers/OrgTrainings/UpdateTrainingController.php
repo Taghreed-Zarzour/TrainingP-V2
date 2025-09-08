@@ -16,6 +16,7 @@ class UpdateTrainingController extends Controller
             'trainer'
         ])
         ->findOrFail($id);
+        $training->increment('views');
         $trainers = Trainer::all();
         return view('orgTrainings.training.show',compact('training','trainers'));
     }
