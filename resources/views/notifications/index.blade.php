@@ -1,114 +1,99 @@
-{{-- resources/views/notifications/index.blade.php --}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Notifications</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .notification {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            background: #f1f1f1;
-        }
-        .notification-time {
-            font-size: 0.8em;
-            color: gray;
-        }
-        .notification a {
-            color: blue;
-            text-decoration: underline;
-        }
-        .no-notifications {
-            font-style: italic;
-            color: #888;
-        }
-    </style>
-</head>
-<body>
+@extends('frontend.layouts.master')
 
+
+@section('title', 'الإشعارات')
+
+@section('content')
 <div class="container">
-    <h1>Your Notifications</h1>
-    <ul id="notifications-list">
-        @if($notifications->isEmpty())
-            <li class="no-notifications">No notifications available.</li>
-        @else
-            @foreach($notifications as $notification)
-                <li class="notification">
-                    <strong>{{ $notification->data['message'] }}</strong>
-                    <span class="notification-time">{{ $notification->created_at->toFormattedDateString() }}</span>
-                    <div>
-                        @if(isset($notification->data['rejection_reason']))
-                            <p>Reason: {{ $notification->data['rejection_reason'] }}</p>
-                        @endif
-                        <div>
-                        @if(isset($notification->data['type']))
-                            @if($notification->data['type'] === 'enrollmentRequest')
-                                <p>Trainer ID: {{ $notification->data['trainee_id'] }}</p>
-                                <div class="button-container">
-                                    <form action="{{ route('participants.handleAction', ['program' => $notification->data['program_id'], 'participant' => $notification->data['trainee_id']]) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        <input type="hidden" name="action" value="accept">
-                                        <input type="hidden" name="is_org" value="{{ $notification->data['is_org'] }}">
-                                        <button type="submit" class="btn">Accept</button>
-                                    </form>
-                                    <form action="{{ route('participants.handleAction', ['program' => $notification->data['program_id'], 'participant' => $notification->data['trainee_id']]) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        <input type="hidden" name="action" value="reject">
-                                        <input type="hidden" name="is_org" value="{{ $notification->data['is_org'] }}">
-                                        <button type="submit" class="btn reject">Reject</button>
-                                    </form>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">الإشعارات</h3>
+                    @if(Auth::user()->unreadNotifications()->count() > 0)
+                        <form action="{{ route('notifications.markAllRead') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-primary">تعريف الكل كمقروء</button>
+                        </form>
+                    @endif
+                </div>
+                <div class="card-body">
+                    <div class="notifications-list">
+                        @if($notifications->isEmpty())
+                            <div class="text-center py-4">
+                                <p>لا توجد إشعارات</p>
+                            </div>
+                        @else
+                            @foreach($notifications as $notification)
+                                <div class="notification-item {{ $notification->read_at ? 'read' : 'unread' }} mb-3 p-3 border rounded">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="notification-message">
+                                            <strong>{{ $notification->data['message'] ?? 'إشعار جديد' }}</strong>
+                                            <div class="text-muted small">{{ $notification->created_at->diffForHumans() }}</div>
+                                            
+                                            @if(isset($notification->data['rejection_reason']))
+                                                <p class="mt-2">السبب: {{ $notification->data['rejection_reason'] }}</p>
+                                            @endif
+                                            
+                                            @if(isset($notification->data['type']) && $notification->data['type'] === 'enrollmentRequest')
+                                                <div class="notification-actions mt-3">
+                                                    <form action="{{ route('participants.handleAction', ['program' => $notification->data['program_id'], 'participant' => $notification->data['trainee_id']]) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <input type="hidden" name="action" value="accept">
+                                                        <input type="hidden" name="is_org" value="{{ $notification->data['is_org'] }}">
+                                                        <button type="submit" class="btn btn-sm btn-success">قبول</button>
+                                                    </form>
+                                                    <form action="{{ route('participants.handleAction', ['program' => $notification->data['program_id'], 'participant' => $notification->data['trainee_id']]) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <input type="hidden" name="action" value="reject">
+                                                        <input type="hidden" name="is_org" value="{{ $notification->data['is_org'] }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger">رفض</button>
+                                                    </form>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        
+                                        @if(!$notification->read_at)
+                                            <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">تعريف كمقروء</button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </div>
-                            @endif
+                            @endforeach
                         @endif
                     </div>
-                    </div>
-                </li>
-            @endforeach
-        @endif
-    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
- 
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+@endsection
 
+@section('scripts')
+<script>
     $(document).ready(function() {
-        function fetchNotifications() {
+        // تحديث الإشعارات كل 30 ثانية
+        setInterval(function() {
             $.ajax({
-                url: '{{ route("notifications.index") }}', // Adjust this route as necessary
+                url: '{{ route('notifications.refresh') }}',
                 method: 'GET',
                 success: function(data) {
-                    $('#notifications-list').html(data);
+                    // تحديث عدد الإشعارات غير المقروءة في الهيدر
+                    let unreadCount = data.filter(n => !n.read_at).length;
+                    let badge = $('.notification-badge');
+                    if (unreadCount > 0) {
+                        badge.text(unreadCount > 99 ? '99+' : unreadCount).show();
+                    } else {
+                        badge.hide();
+                    }
                 },
                 error: function(xhr, status, error) {
-                    console.error("Error fetching notifications:", error);
+                    console.error("Error refreshing notifications:", error);
                 }
             });
-        }
-
-        // Fetch notifications every 8 seconds
-        setInterval(fetchNotifications, 8000);
+        }, 30000);
     });
-</script> 
-</body>
-</html>
+</script>
+@endsection

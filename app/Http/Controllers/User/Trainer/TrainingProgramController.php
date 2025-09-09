@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use App\Enums\TrainingAttendanceType;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\NotificationHelper;
 
 class TrainingProgramController extends Controller
 {
@@ -68,10 +69,15 @@ public function index()
 
     // المشاهدات
     $program->increment('views');
-    $programUser = User::find($program->user_id);
-    if ($program->views % 30 === 0) {
-        $programUser->notify(new OrgViewsNotification($program->views));
-    }
+$programUser = User::find($program->user_id);
+if ($program->views % 30 === 0) {
+    NotificationHelper::sendNotification(
+        $programUser->id,
+        'لقد تم مشاهدة برنامجك ' . $program->views . ' مرة.',
+        'views',
+        ['views' => $program->views, 'program_id' => $program->id]
+    );
+}
     $programTypes = ProgramType::pluck('name', 'id');
     $languages = Language::pluck('name', 'id');
     $classifications = TrainingClassification::pluck('name', 'id');

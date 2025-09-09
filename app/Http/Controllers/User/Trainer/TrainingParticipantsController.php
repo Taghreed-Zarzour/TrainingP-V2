@@ -10,6 +10,7 @@ use App\Notifications\EnrollmentAcceptedNotification;
 use App\Notifications\EnrollmentRejectedMessageNotification;
 use App\Notifications\EnrollmentRejectedNotification;
 use Illuminate\Http\Request;
+use App\Helpers\NotificationHelper;
 
 class TrainingParticipantsController extends Controller
 {
@@ -28,13 +29,24 @@ class TrainingParticipantsController extends Controller
     $enrollment = $query->firstOrFail();
 
     $trainee = User::find($query->firstOrFail()->trainee_id);
-    if ($action === 'accept') {
-        $trainee->notify(new EnrollmentAcceptedNotification($programId));
-        $enrollment->status = 'accepted';
-    } elseif ($action === 'reject') {
-        $enrollment->status = 'rejected';
-        $trainee->notify(new EnrollmentRejectedMessageNotification($programId));
-    }
+  
+if ($action === 'accept') {
+    NotificationHelper::sendNotification(
+        $trainee->id,
+        'تم قبول تسجيلك في البرنامج',
+        'enrollmentAccepted',
+        ['program_id' => $programId]
+    );
+    $enrollment->status = 'accepted';
+} elseif ($action === 'reject') {
+    $enrollment->status = 'rejected';
+    NotificationHelper::sendNotification(
+        $trainee->id,
+        'تم رفض تسجيلك في البرنامج',
+        'enrollmentRejected',
+        ['program_id' => $programId]
+    );
+}
 
     $enrollment->save();
 
@@ -61,8 +73,15 @@ public function submitReason(rejectParticipantRequst $request, $programId, $part
     $enrollment->rejection_reason = $request->input('rejection_reason');
     $enrollment->save();
 
-    $trainee->notify(new EnrollmentRejectedNotification($programId, $request->input('rejection_reason')));
-
+NotificationHelper::sendNotification(
+    $trainee->id,
+    'تم رفض تسجيلك في البرنامج بسبب: ' . $request->input('rejection_reason'),
+    'enrollmentRejected',
+    [
+        'program_id' => $programId,
+        'rejection_reason' => $request->input('rejection_reason')
+    ]
+);
     return redirect()->back()->with('success', 'تم حفظ سبب الرفض بنجاح.');
 }
 
@@ -82,8 +101,12 @@ public function bulkAccept(Request $request, $programId)
     $enrollments = $query->get();
     foreach ($enrollments as $enrollment) {
         $enrollment->update(['status' => 'accepted']);
-        $enrollment->trainee->notify(new EnrollmentAcceptedNotification($programId));
-    }
+NotificationHelper::sendNotification(
+    $enrollment->trainee->id,
+    'تم قبول تسجيلك في البرنامج',
+    'enrollmentAccepted',
+    ['program_id' => $programId]
+);    }
 
     return back()->with('success', 'تم قبول جميع المتدربين بنجاح.');
 }

@@ -512,7 +512,7 @@
                 } else {
                     // توجيه المستخدم لإنشاء تدريب واحد
                     window.location.href =
-                        "{{ auth()->check() ?  route('startCreateTraining') : route('login') }}";
+                        "{{ auth()->check() ?  route('startCreateTraining-org') : route('login') }}";
                 }
             }
         });

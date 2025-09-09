@@ -1,16 +1,66 @@
 <?php
 namespace App\Http\Controllers;
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Cache;
 class NotificationController extends Controller
 {
+    protected $cacheDuration = 60; // دقيقة
+    
     public function index()
-{
-    $notifications = Auth::user()->notifications()->orderBy('created_at', 'desc')->get();
-    // if (request()->ajax()) {
-    //     return response()->json($notifications);
-    // }
-    return view('notifications.index', compact('notifications'));
-}
+    {
+        $userId = Auth::id();
+        $cacheKey = 'user_notifications_' . $userId;
+        
+        $notifications = Cache::remember($cacheKey, $this->cacheDuration, function() {
+            return Auth::user()
+                ->notifications()
+                ->latest()
+                ->limit(10)
+                ->get(['id', 'data', 'created_at', 'read_at']);
+        });
+        
+        if (request()->ajax()) {
+            return response()->json($notifications);
+        }
+        
+        return view('notifications.index', compact('notifications'));
+    }
+    
+    public function markAsRead($id)
+    {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        
+        $userId = Auth::id();
+        $cacheKey = 'user_notifications_' . $userId;
+        Cache::forget($cacheKey);
+        
+        return response()->json(['success' => true]);
+    }
+    
+    public function markAllAsRead()
+    {
+        Auth::user()->unreadNotifications()->update(['read_at' => now()]);
+        
+        $userId = Auth::id();
+        $cacheKey = 'user_notifications_' . $userId;
+        Cache::forget($cacheKey);
+        
+        return response()->json(['success' => true]);
+    }
+    
+    // إضافة دالة جديدة لحفظ FCM Token
+    public function saveFcmToken(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string'
+        ]);
+        
+        $user = Auth::user();
+        $user->fcm_token = $request->token;
+        $user->save();
+        
+        return response()->json(['success' => true]);
+    }
 }

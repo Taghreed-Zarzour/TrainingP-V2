@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Enrollment;
 use App\Helpers\TimeHelper;
+use App\Helpers\NotificationHelper;
 
 class OrgTrainingController extends Controller
 {
@@ -793,10 +794,19 @@ public function show($id){
 
     // المشاهدات
     $OrgProgram->increment('views');
-    $organization = User::find($OrgProgram->organization_id);
-    if ($OrgProgram->views % 30 === 0) {
-        $organization->notify(new OrgViewsNotification($OrgProgram->views));
-    }
+$organization = User::find($OrgProgram->organization_id);
+if ($OrgProgram->views % 30 === 0) {
+    NotificationHelper::sendNotification(
+      
+        $organization->id,
+        'لقد تم مشاهدة برنامجك ' . $OrgProgram->views . ' مرة.',
+        'views',
+        ['views' => $OrgProgram->views, 'program_id' => $OrgProgram->id],
+        
+    
+      );
+    
+}
     $grandTotalMinutes = 0;
 
     foreach ($OrgProgram->details as $program) {

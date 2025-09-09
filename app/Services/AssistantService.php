@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Education;
 use Illuminate\Support\Facades\Auth;
-
+use App\Helpers\NotificationHelper;
 class AssistantService
 {
    public function completeRegister($data , $id){
@@ -55,8 +55,12 @@ class AssistantService
             $Assistant->save();
 
             DB::commit();
-            $user->notify(new RegistrationCompleted('شكرًا لك على إكمال ملفك الشخصي!'));
-            return [
+
+
+NotificationHelper::sendToCurrentUser(
+    'شكرًا لك على إكمال ملفك الشخصي!',
+    'registrationCompleted'
+);            return [
                 'msg' => 'تم تخزين البيانات.',
                 'success' => true,
                 'data'=> [

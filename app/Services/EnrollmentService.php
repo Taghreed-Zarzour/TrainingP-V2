@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\EnrollmentRequest;
+use App\Helpers\NotificationHelper;
 
 class EnrollmentService
 {
@@ -43,8 +44,20 @@ class EnrollmentService
                 $trainer  = TrainingProgram::where('id',$program_id)->first();
                 $trainer = User::where('id', $trainer->user_id)->first();
                 if ($trainer) {
-                    $trainer->notify(new EnrollmentRequest($enrollment , false));
-                }
+
+if ($trainer) {
+    NotificationHelper::sendNotification(
+        $trainer->id,
+        'قام متدرب بتقديم طلب للانضمام إلى البرنامج.',
+        'enrollmentRequest',
+        [
+            'enrollment_id' => $enrollment->id,
+            'trainee_id' => $enrollment->trainee_id,
+            'program_id' => $program_id,
+            'is_org' => false
+        ]
+    );
+}                }
             } elseif ($orgProgram_id) {
                 $existing = Enrollment::where('trainee_id', $trainee_id)
                     ->where('org_training_programs_id', $orgProgram_id)
@@ -67,9 +80,20 @@ class EnrollmentService
                 ]);
                 $orgtraining  = OrgTrainingProgram::where('id',$orgProgram_id)->first();
                 $organization = User::where('id', $orgtraining->organization_id)->first();
-                if ($organization) {
-                    $organization->notify(new EnrollmentRequest($enrollment , true));
-                }
+
+if ($organization) {
+    NotificationHelper::sendNotification(
+        $organization->id,
+        'قام متدرب بتقديم طلب للانضمام إلى البرنامج.',
+        'enrollmentRequest',
+        [
+            'enrollment_id' => $enrollment->id,
+            'trainee_id' => $enrollment->trainee_id,
+            'program_id' => $orgProgram_id,
+            'is_org' => true
+        ]
+    );
+}
             } else {
                 return [
                     'msg' => 'يجب تحديد معرف البرنامج.',

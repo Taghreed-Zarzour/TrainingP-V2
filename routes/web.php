@@ -157,6 +157,10 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
       return view('trainings.start_training');
     })->name('startCreateTraining');
 
+        Route::get('/start-create-training-org', function () {
+      return view('trainings.start_training_org');
+    })->name('startCreateTraining-org');
+
 
     // إنشاء جديد - عرض النموذج الأولي
     Route::get('/create', [Trainings_CURD_Controller::class, 'showBasicInformationForm'])->name('training.create');
@@ -351,13 +355,75 @@ Route::get('complete-reset-password', [ResetPasswordController::class, 'showComp
 
 
 
+
+
 Route::middleware('auth')->group(function () {
-  // Route::get('/notifications/dropdown', [NotificationController::class, 'dropdown'])->name('notifications.dropdown');
-  // Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-  // Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
-  // Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // صفحة كاملة
-
-
+    // طرق الإشعارات
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/refresh', [NotificationController::class, 'refresh'])->name('notifications.refresh');
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::post('/notifications/send', [NotificationController::class, 'sendNotification'])->name('notifications.send');
+    Route::post('/notifications/fcm-token', [NotificationController::class, 'saveFcmToken'])->name('notifications.fcmToken');
+    // طرق معالجة الإشعارات
+    Route::post('/participants/{program}/{participant}/handle-action', [TrainingParticipantsController::class, 'handleAction'])->name('participants.handleAction');
 });
+
+
+Route::get('/test-notification', function () {
+    try {
+        $notification = \App\Helpers\NotificationHelper::sendToCurrentUser(
+            'هذا إشعار اختباري',
+            'test'
+        );
+        
+        if ($notification) {
+            \Log::info('Test notification created successfully', [
+                'notification_id' => $notification->id,
+                'user_id' => auth()->id(),
+                'data' => $notification->data
+            ]);
+            
+            return 'تم إرسال الإشعار بنجاح. ID: ' . $notification->id;
+        } else {
+            \Log::error('Failed to create test notification');
+            return 'فشل إرسال الإشعار';
+        }
+    } catch (\Exception $e) {
+        \Log::error('Error creating test notification: ' . $e->getMessage());
+        return 'خطأ: ' . $e->getMessage();
+    }
+})->middleware('auth');
+
+Route::get('/test-views-notification', function () {
+    try {
+        $organization = \App\Models\User::find(auth()->id());
+        $views = rand(30, 60);
+        
+        $notification = \App\Helpers\NotificationHelper::sendNotification(
+            $organization->id,
+            'لقد تم مشاهدة برنامجك ' . $views . ' مرة.',
+            'views',
+            ['views' => $views, 'program_id' => 1]
+        );
+        
+        if ($notification) {
+            \Log::info('Views notification created successfully', [
+                'notification_id' => $notification->id,
+                'user_id' => $organization->id,
+                'data' => $notification->data
+            ]);
+            
+            return 'تم إرسال إشعار المشاهدات بنجاح. ID: ' . $notification->id;
+        } else {
+            \Log::error('Failed to create views notification');
+            return 'فشل إرسال إشعار المشاهدات';
+        }
+    } catch (\Exception $e) {
+        \Log::error('Error creating views notification: ' . $e->getMessage());
+        return 'خطأ: ' . $e->getMessage();
+    }
+})->middleware('auth');
+
 
 require __DIR__ . '/front_fetch.php';

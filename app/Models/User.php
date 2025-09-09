@@ -31,6 +31,7 @@ namespace App\Models;
             'photo',
             'profile_message_shown',
         ];
+    
 
         public function userType()
         {

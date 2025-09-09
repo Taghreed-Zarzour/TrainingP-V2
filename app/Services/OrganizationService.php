@@ -7,6 +7,7 @@ use App\Notifications\RegistrationCompleted;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Helpers\NotificationHelper;
 
 class OrganizationService
 {
@@ -67,8 +68,11 @@ class OrganizationService
             // dd($branches);
 
             $organization->save();
-            $user->notify(new RegistrationCompleted('شكرًا لك على إكمال ملفك الشخصي!'));
-            DB::commit();
+
+NotificationHelper::sendToCurrentUser(
+    'شكرًا لك على إكمال ملفك الشخصي!',
+    'registrationCompleted'
+);            DB::commit();
             return [
                 'msg' => 'تم تخزين البيانات.',
                 'success' => true,

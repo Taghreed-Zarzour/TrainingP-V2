@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\RegistrationCompleted;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\NotificationHelper;
 
 class TrainerService
 {
@@ -66,8 +67,11 @@ class TrainerService
 // ربط الجنسيات عبر جدول وسيط
     $user->nationalities()->sync($data['nationality']); // مصفوفة IDs
       DB::commit();
-      $user->notify(new RegistrationCompleted('شكرًا لك على إكمال ملفك الشخصي!'));
 
+NotificationHelper::sendToCurrentUser(
+    'شكرًا لك على إكمال ملفك الشخصي!',
+    'registrationCompleted'
+);
       return [
         'msg' => 'تم تخزين البيانات.',
         'success' => true,
