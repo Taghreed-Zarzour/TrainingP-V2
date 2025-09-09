@@ -214,6 +214,16 @@ class OrgTrainingManagerController extends Controller
         $traineeIds = Enrollment::where('org_training_programs_id', $org_training_programs_id)->where('status', 'accepted')->pluck('trainee_id');
         $trainees = Trainee::whereIn('id', $traineeIds)->get();
 
+        // المسجلون
+        $participantIds = Enrollment::where('org_training_programs_id', $org_training_programs_id)->where('status', 'pending')->pluck('trainee_id');
+        $participants = Trainee::whereIn('id', $participantIds)
+        ->with(['enrollments' => function ($query) use ($org_training_programs_id) {
+            $query->where('org_training_programs_id', $org_training_programs_id);
+        }])->get();
+
+        //Assistants
+        $assistantIds = OrgAssistantManagement::where('org_training_program_id',$org_training_programs_id)->pluck('id');
+        $assistants = User::whereIn('id', $assistantIds)->with('assistant')->get();
         //نسبة الحضور
         $totalSessions = OrgTrainingSchedule::where('org_training_detail_id',$id)->pluck('id');
         $attendanceStats = [];
@@ -286,6 +296,8 @@ class OrgTrainingManagerController extends Controller
         'work_sectors',
         'orgTrainingClassification',
         'education_levels',
+        'assistants',
+        'participants',
         'attendanceStats',
         'sessionStatuses',
         'trainees',
