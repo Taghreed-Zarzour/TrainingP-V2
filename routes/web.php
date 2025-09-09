@@ -281,6 +281,7 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::get('/organization-training-manager', [OrgTrainingManagerController::class, 'index'])->name('orgTrainingsManager.index');
   Route::get('organization-training-manager/{id}', [OrgTrainingManagerController::class, 'show'])->name('orgTrainingsManager.show');
+  Route::get('organization-training-manager/detail/{id}', [OrgTrainingManagerController::class, 'showProgramDetail'])->name('orgTrainingsDetailManager.show');
   Route::delete('organization-training-manager/destroy/{id}', [OrgTrainingManagerController::class, 'destroy'])->name('orgTrainingsManager.destroy');
   Route::delete('organization-training-manager/destroy-training/{id}', [OrgTrainingManagerController::class, 'deleteOrgTraining'])->name('orgTraining.destroy');
 

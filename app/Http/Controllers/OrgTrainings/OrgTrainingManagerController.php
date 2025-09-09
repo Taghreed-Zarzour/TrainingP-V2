@@ -190,23 +190,128 @@ class OrgTrainingManagerController extends Controller
     }
 
 
+
+    public function showProgramDetail($id)
+    {
+        $OrgProgramDetail = OrgTrainingDetail::with(
+            'trainingProgram',
+            'trainingSchedules',
+            'trainer',
+        )->findOrFail($id);
+
+        $trainingClassificationIds =  $OrgProgramDetail->trainingProgram->org_training_classification_id;
+        $orgTrainingClassification = TrainingClassification::whereIn('id',$trainingClassificationIds)->pluck('name');
+
+        $education_levels_ids =  $OrgProgramDetail->trainingProgram->goals->first()->education_level_id;
+        $education_levels = EducationLevel::whereIn('id',$education_levels_ids)->pluck('name');
+
+        $work_sector_ids =  $OrgProgramDetail->trainingProgram->goals->first()->work_sector_id;
+        $work_sectors = WorkSector::whereIn('id',$work_sector_ids)->pluck('name');
+
+        $org_training_programs_id = $OrgProgramDetail->trainingProgram->id;
+        $OrgProgram = OrgTrainingProgram::where('id', $org_training_programs_id)->get();
+        // المتدربون
+        $traineeIds = Enrollment::where('org_training_programs_id', $org_training_programs_id)->where('status', 'accepted')->pluck('trainee_id');
+        $trainees = Trainee::whereIn('id', $traineeIds)->get();
+
+        //نسبة الحضور
+        $totalSessions = OrgTrainingSchedule::where('org_training_detail_id',$id)->pluck('id');
+        $attendanceStats = [];
+        foreach ($trainees as $trainee) {
+            $attendedSessions = OrgSessionAttendance::where('trainee_id', $trainee->id)
+            ->where('attended', 1)
+            ->whereIn('session_id', $totalSessions)
+            ->count();
+
+        $sessionCount = count($totalSessions);
+        $percentage = $sessionCount > 0
+            ? round(($attendedSessions / $sessionCount) * 100, 2)
+            : 0;
+                $attendanceStats[$trainee->id] = $percentage;
+        }
+
+      //حالة الجلسة لكل جلسة
+      $sessionStatuses = [];
+      $sessionAttendanceCounts = [];
+      $now = Carbon::now();
+            foreach ($OrgProgramDetail->trainingSchedules as $session) {
+                $date = $session->session_date;
+                $startTime = $session->session_start_time;
+                $endTime = $session->session_end_time;
+
+                $sessionStart = Carbon::createFromFormat('Y-m-d H:i:s', "$date $startTime");
+                $sessionEnd = Carbon::createFromFormat('Y-m-d H:i:s', "$date $endTime");
+
+                if ($sessionEnd->lessThan($sessionStart)) {
+                $sessionEnd->addDay();
+                }
+
+                if ($now->lt($sessionStart)) {
+                $status = 'لم تبدأ';
+                } elseif ($now->between($sessionStart, $sessionEnd)) {
+                $status = 'قيد التقدم';
+                } else {
+                $status = 'مكتمل';
+                }
+
+                $sessionStatuses[$session->id] = $status;
+
+                $attendeeCount = OrgSessionAttendance::where('session_id', $session->id)
+                ->where('attended', 1)
+                ->count();
+
+              $sessionAttendanceCounts[$session->id] = $attendeeCount;
+            }
+
+
+    //نسبة الحضور العامة
+      $totalSessionsCount = count($totalSessions);
+      $totalTraineesCount = count($trainees);
+      $totalExpectedAttendance = $totalSessionsCount * $totalTraineesCount;
+      $totalActualAttendance = OrgSessionAttendance::whereIn('session_id', $totalSessions)
+        ->where('attended', 1)
+        ->count();
+
+      if ($totalExpectedAttendance > 0) {
+        $overallAttendancePercentage = round(($totalActualAttendance / $totalExpectedAttendance) * 100, 2);
+      } else {
+        $overallAttendancePercentage = 0;
+      }
+
+    //   الملفات
+      $attachments = OrgTrainingDetailFile::where('org_training_program_id', $org_training_programs_id)->get();
+
+      return view('orgTrainings.training.training-manager', compact(
+        'OrgProgram',
+        'work_sectors',
+        'orgTrainingClassification',
+        'education_levels',
+        'attendanceStats',
+        'sessionStatuses',
+        'trainees',
+        'sessionAttendanceCounts',
+        'overallAttendancePercentage',
+        'attachments',
+      ));
+    }
+
     public function destroy($id)
     {
       $program = OrgTrainingProgram::findOrFail($id);
         $program->details()->delete();
         $program->delete();
-      
+
       return redirect()->back()->with('deleted', true);
 
     }
   public function deleteOrgTraining($id)
     {
-     
+
       $program = OrgTrainingDetail::findOrFail($id);
-  
+
         $program->trainingSchedules()->delete();
         $program->delete();
-      
+
       return redirect()->back()->with('deleted', true);
 
     }
