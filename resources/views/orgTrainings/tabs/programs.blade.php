@@ -419,7 +419,7 @@
                             @endif
                         </div>
                         <div class="tr-action-buttons">
-                            <a href="{{ route('orgTraining.trainingDetail', $OrgProgram->id) }}" class="tr-action-btn tr-action-edit" onclick="event.stopPropagation();">
+                            <a href="{{ route('organization.showSpecificTraining', $program->id) }}" class="tr-action-btn tr-action-edit" onclick="event.stopPropagation();">
                                 <img src="/images/cources/edit-session.svg">
                             </a>
                             <form class="p-0" action="{{ route('orgTraining.destroy', $program->id) }}" method="POST" style="display:inline;" onclick="event.stopPropagation();">
@@ -431,7 +431,7 @@
                             </form>
                         </div>
 <button type="button" class="custom-btn" 
-    onclick="event.stopPropagation(); window.location.href='{{ route('org.training.show.program', $program->id) }}'">
+    onclick="event.stopPropagation(); window.location.href='{{ route('orgTrainingsDetailManager.show', $program->id) }}'">
     تفاصيل التدريب
 </button>
 

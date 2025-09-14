@@ -42,7 +42,8 @@
                     <div class="content">
                         <div class="title">
                             طوّر مسيرتك التدريبية ووسّع
-                            <div class="text-top">فرصك</div>
+                            <div class="text-top me-3">فرصك</div>
+                            
                             المهنية مع
                             <div
                                 class="text-underlined"
@@ -100,7 +101,7 @@
                                         >انضم كمتدرب</a
                                     >
                                     <a class="pbtn pbtn-success" href="{{ route('register') }}?user_type=2"
-                                        >سجّل كمساعد مدرب</a
+                                        >انضم كخبير دعم</a
                                     >
                                 </div>
                             </div>
@@ -442,7 +443,10 @@
                         <div class="bullet"></div>
                     </div>
                 </div>
-                <div class="pfeatured style2">
+              
+            </section>
+
+              <div class="pfeatured style2 mb-5">
                     <div class="pfeatured-content">
                         <div class="grid">
                             <div class="col">
@@ -463,7 +467,6 @@
                         </div>
                     </div>
                 </div>
-            </section>
         </main>
 
 

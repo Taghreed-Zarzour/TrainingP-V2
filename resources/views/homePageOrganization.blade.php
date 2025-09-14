@@ -292,20 +292,30 @@
             <div class="bullet"></div>
           </div>
         </div>
-        <div class="pfeatured reverse">
-          <div class="pfeatured-content">
-            <div class="grid">
-              <div class="col">
-                <div class="title">
-                  سجّل مؤسستك اليوم وابدأ رحلتك نحو نجاح تدريبي أسرع وأكثر
-                  احترافية
-                </div>
-                <a href="{{ route('register-org') }}" class="pbtn pbtn-main top-white"> تسجيل المؤسسة </a>
-              </div>
-            </div>
-          </div>
-        </div>
+
       </section>
+
+          <div class="pfeatured style2 mb-5">
+                    <div class="pfeatured-content">
+                        <div class="grid">
+                            <div class="col">
+                                <img src="./images/featured-box-right.svg" />
+                            </div>
+                            <div class="col">
+                                <div class="subtitle">
+                                    سجّل مؤسستك اليوم
+                                </div>
+                                <div class="title">
+                                    وابدأ رحلتك نحو نجاح تدريبي أسرع وأكثر
+                  احترافية.
+                                </div>
+                                <a href="{{ route('register-org') }}" class="pbtn pbtn-light top-white">
+                                    تسجيل المؤسسة
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
     </main>
 
 

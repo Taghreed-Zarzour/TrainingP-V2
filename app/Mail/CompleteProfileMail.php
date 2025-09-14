@@ -22,6 +22,7 @@ class CompleteProfileMail extends Mailable
 {
     return $this->subject('Complete Your Profile')
                 ->view('emails.complete_profile')
+                 ->text('emails.verify_plain') // نسخة نصية بسيطة
                 ->with([
                     'user' => $this->user,
                     'link' => $this->link

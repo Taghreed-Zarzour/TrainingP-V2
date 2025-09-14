@@ -25,26 +25,27 @@
     <div class="container-fluid py-4 bg-white">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-11">
-                <div class="d-flex align-items-center justify-content-between px-3 py-2 shadow-sm bg-white custom-search-bar w-100">
-                    <form method="GET" action="{{ route('trainings_announcements') }}" class="d-flex flex-row gap-0 p-0 align-items-center flex-grow-1 me-3">
+                <div
+                    class="d-flex align-items-center justify-content-between px-3 py-2 shadow-sm bg-white custom-search-bar w-100">
+                    <form method="GET" action="{{ route('trainings_announcements') }}"
+                        class="d-flex flex-row gap-0 p-0 align-items-center flex-grow-1 me-3">
                         <!-- أيقونة البحث + النص (يمين) -->
                         <img src="{{ asset('images/cources/search.svg') }}" alt="search icon" class="me-2" />
-                        <input
-                            type="text"
-                            name="search"
+                        <input type="text" name="search"
                             class="form-control border-0 flex-grow-1 {{ request()->filled('search') ? 'is-active' : '' }}"
-                            placeholder="ابحث عن أي شيء"
-                            style="box-shadow: none; background: transparent;"
-                            value="{{ request('search') }}"
-                        />
+                            placeholder="ابحث عن أي شيء" style="box-shadow: none; background: transparent;"
+                            value="{{ request('search') }}" />
                         <!-- زر البحث -->
                         <button type="submit" class="btn btn-link p-0 ms-2">
-                            <svg width="20" height="20" fill="currentColor"><use xlink:href="#search-icon"/></svg>
+                            <svg width="20" height="20" fill="currentColor">
+                                <use xlink:href="#search-icon" />
+                            </svg>
                         </button>
                     </form>
                     <!-- زر فلترة مخصص -->
-                    <button class="btn custom-filter-btn d-flex align-items-center gap-2 flex-shrink-0 {{ $hasActiveFilters ? 'active-filter' : '' }}" type="button"
-                        data-bs-toggle="modal" data-bs-target="#filterModal">
+                    <button
+                        class="btn custom-filter-btn d-flex align-items-center gap-2 flex-shrink-0 {{ $hasActiveFilters ? 'active-filter' : '' }}"
+                        type="button" data-bs-toggle="modal" data-bs-target="#filterModal">
                         <svg width="23" height="22" viewBox="0 0 23 22" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -60,57 +61,60 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <!-- ✅ مؤشر حالة البحث والفلترة -->
-                @if($hasActiveFilters)
+                @if ($hasActiveFilters)
                     <div class="d-flex align-items-center justify-content-between px-3 py-2 bg-light rounded-bottom">
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             <span class="badge bg-primary">نتائج مفلترة</span>
-                            
+
                             @php
                                 $activeFilters = [];
-                                
+
                                 // التحقق من وجود بحث
-                                if(request()->filled('search')) {
+                                if (request()->filled('search')) {
                                     $activeFilters[] = [
                                         'type' => 'search',
                                         'label' => 'بحث',
-                                        'value' => request('search')
+                                        'value' => request('search'),
                                     ];
                                 }
-                                
+
                                 // التحقق من فلترة التكلفة
-                                if(request()->filled('cost_type') && request('cost_type') != 'all') {
+                                if (request()->filled('cost_type') && request('cost_type') != 'all') {
                                     $activeFilters[] = [
                                         'type' => 'cost',
                                         'label' => 'التكلفة',
-                                        'value' => request('cost_type') == 'paid' ? 'مدفوعة' : 'مجانية'
+                                        'value' => request('cost_type') == 'paid' ? 'مدفوعة' : 'مجانية',
                                     ];
                                 }
-                                
+
                                 // التحقق من فلترة الجهة المعلنة
-                                if(request()->filled('provider') && request('provider') != 'all') {
+                                if (request()->filled('provider') && request('provider') != 'all') {
                                     $activeFilters[] = [
                                         'type' => 'provider',
                                         'label' => 'الجهة',
-                                        'value' => request('provider') == 'company' ? 'مؤسسة' : 'مدرب'
+                                        'value' => request('provider') == 'company' ? 'مؤسسة' : 'مدرب',
                                     ];
                                 }
-                                
+
                                 // التحقق من فلترة مجال التدريب
-                                if(request()->filled('program_type_id')) {
-                                    $selectedType = $program_classification->firstWhere('id', request('program_type_id'));
-                                    if($selectedType) {
+                                if (request()->filled('program_type_id')) {
+                                    $selectedType = $program_classification->firstWhere(
+                                        'id',
+                                        request('program_type_id'),
+                                    );
+                                    if ($selectedType) {
                                         $activeFilters[] = [
                                             'type' => 'program_type',
                                             'label' => 'المجال',
-                                            'value' => $selectedType->name
+                                            'value' => $selectedType->name,
                                         ];
                                     }
                                 }
                             @endphp
-                            
-                            @foreach($activeFilters as $filter)
+
+                            @foreach ($activeFilters as $filter)
                                 <span class="text-muted small">
                                     {{ $filter['label'] }}: {{ $filter['value'] }}
                                 </span>
@@ -139,15 +143,19 @@
                             <label class="form-label">التكلفة</label>
                             <div class="d-flex gap-4 flex-wrap">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="cost_type" id="all" value="all" {{ request('cost_type') == 'all' || !request('cost_type') ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" name="cost_type" id="all"
+                                        value="all"
+                                        {{ request('cost_type') == 'all' || !request('cost_type') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="all">جميع التدريبات</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="cost_type" id="paid" value="paid" {{ request('cost_type') == 'paid' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" name="cost_type" id="paid"
+                                        value="paid" {{ request('cost_type') == 'paid' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="paid">تدريبات مدفوعة</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="cost_type" id="free" value="free" {{ request('cost_type') == 'free' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" name="cost_type" id="free"
+                                        value="free" {{ request('cost_type') == 'free' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="free">تدريبات مجانية</label>
                                 </div>
                             </div>
@@ -157,15 +165,19 @@
                             <label class="form-label">الجهة المعلنة</label>
                             <div class="d-flex gap-4 flex-wrap">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="provider" id="all2" value="all" {{ request('provider') == 'all' || !request('provider') ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" name="provider" id="all2"
+                                        value="all"
+                                        {{ request('provider') == 'all' || !request('provider') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="all2">جميع الجهات</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="provider" id="company" value="company" {{ request('provider') == 'company' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" name="provider" id="company"
+                                        value="company" {{ request('provider') == 'company' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="company">مؤسسة</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="provider" id="trainer" value="trainer" {{ request('provider') == 'trainer' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" name="provider" id="trainer"
+                                        value="trainer" {{ request('provider') == 'trainer' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="trainer">مدرب</label>
                                 </div>
                             </div>
@@ -176,7 +188,8 @@
                             <select name="program_type_id" class="custom-singleselect">
                                 <option value="">جميع المجالات</option>
                                 @foreach ($program_classification as $type)
-                                    <option value="{{ $type->id }}" {{ request('program_type_id') == $type->id ? 'selected' : '' }}>
+                                    <option value="{{ $type->id }}"
+                                        {{ request('program_type_id') == $type->id ? 'selected' : '' }}>
                                         {{ $type->name }}
                                     </option>
                                 @endforeach
@@ -188,7 +201,8 @@
                     <!-- أزرار -->
                     <div class="modal-footer border-0 d-flex justify-content-between gap-3">
                         <button type="submit" class="filter-btn flex-fill">تطبيق الفلترة ←</button>
-                        <button type="button" class="btn btn-outline-secondary flex-fill" onclick="resetFilters()">إعادة تعيين</button>
+                        <button type="button" class="btn btn-outline-secondary flex-fill" onclick="resetFilters()">إعادة
+                            تعيين</button>
                     </div>
                 </form>
             </div>
@@ -220,7 +234,7 @@
                 </div>
             @endif
         </div>
-        
+
         @if (empty($programs) && $hasActiveFilters)
             <div class="alert alert-info text-center py-4 my-4">
                 <div class="d-flex flex-column align-items-center">
@@ -275,7 +289,24 @@
                                                             ? asset('storage/' . $trainer->photo)
                                                             : asset('images/icons/user.svg');
                                                 @endphp
-                                                <a href="{{ route('show_trainer_profile', ['id' => $program->user_id]) }}"
+                                                @php
+                                                    $publisher = $trainers->find($program->user_id);
+                                                    $profileRoute = '#'; // مسار افتراضي في حال لم يتم العثور على المستخدم
+
+                                                    if ($publisher) {
+                                                        if ($publisher->user_type_id == 1) {
+                                                            $profileRoute = route('show_trainer_profile', [
+                                                                'id' => $publisher->id,
+                                                            ]);
+                                                        } elseif ($publisher->user_type_id == 4) {
+                                                            $profileRoute = route('show_organization_profile', [
+                                                                'id' => $publisher->id,
+                                                            ]);
+                                                        }
+                                                    }
+                                                @endphp
+
+                                                <a href="{{ $profileRoute }}"
                                                     style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
                                                     <img class="trainer-img" src="{{ $trainerPhoto }}"
                                                         alt="صورة المدرب" />
@@ -368,7 +399,7 @@
                 </div>
             @endif
         </div>
-        
+
         @if (empty($allOrgPrograms) && $hasActiveFilters)
             <div class="alert alert-info text-center py-4 my-4">
                 <div class="d-flex flex-column align-items-center">
@@ -398,7 +429,8 @@
         @else
             <div class="carousel-wrapper position-relative">
                 <div class="overflow-hidden" style="width: 100%;">
-                    <div class="d-flex flex-nowrap" id="orgCardCarousel" style="scroll-behavior: smooth; overflow-x: auto;">
+                    <div class="d-flex flex-nowrap" id="orgCardCarousel"
+                        style="scroll-behavior: smooth; overflow-x: auto;">
                         @foreach ($allOrgPrograms as $program)
                             <div class="card-slide p-2">
                                 <a href="{{ route('org.training.show', $program->id) }}"
@@ -437,18 +469,29 @@
                                                     <img src="{{ asset('images/cources/clock.svg') }}" alt="المدة">
                                                     @php
                                                         // عرض عدد التدريبات في المسار
-                                                        $trainingCount = $program->details ? $program->details->count() : 0;
+                                                        $trainingCount = $program->details
+                                                            ? $program->details->count()
+                                                            : 0;
                                                         echo $trainingCount . ' تدريب';
                                                     @endphp
                                                 </li>
-                                                <li class="d-flex align-items-center gap-2">
-                                                    <img src="{{ asset('images/cources/location.svg') }}"
-                                                        alt="الموقع">
-                                                    {{ $program->city ?? '---' }}
-                                                    {{ $program->country
-                                                        ? ', ' . $program->country->name
-                                                        : '' }}
-                                                </li>
+                                              
+
+<li class="d-flex align-items-center gap-2">
+    @if (
+        $program->program_presentation_method === \App\Enums\TrainingAttendanceType::HYBRID->value ||
+        $program->program_presentation_method === \App\Enums\TrainingAttendanceType::REMOTE->value
+    )
+        <img src="{{ asset('images/cources/online.svg') }}" alt="نوع الدورة">
+        أونلاين
+    @else
+        <img src="{{ asset('images/cources/location.svg') }}" alt="الموقع">
+        {{ $program->city ? $program->city : '---' }}
+        {{  $program->country ? ', ' . $program->country->name : '' }}
+    @endif
+</li>
+
+
                                                 @php
                                                     \Carbon\Carbon::setLocale('ar');
                                                 @endphp
@@ -462,7 +505,10 @@
                                                 </li>
                                             </ul>
                                             <div class="text-start mt-2">
-                                                @if (!$program->registrationRequirements || $program->registrationRequirements->is_free || $program->registrationRequirements->cost == 0)
+                                                @if (
+                                                    !$program->registrationRequirements ||
+                                                        $program->registrationRequirements->is_free ||
+                                                        $program->registrationRequirements->cost == 0)
                                                     <span class="price-tag price-free">مجاني</span>
                                                 @else
                                                     <span class="price-tag">
@@ -492,14 +538,14 @@
         function resetFilters() {
             window.location.href = "{{ route('trainings_announcements') }}";
         }
-        
+
         // التنقل بين الكروت عن طريق الأزرار للبرامج التدريبية
         const container = document.getElementById('cardCarousel');
         const slides = Array.from(container.querySelectorAll('.card-slide'));
         const prevBtn = document.getElementById('carouselPrev');
         const nextBtn = document.getElementById('carouselNext');
         let currentIndex = 0;
-        
+
         function scrollToCurrentCard() {
             slides[currentIndex].scrollIntoView({
                 behavior: 'smooth',
@@ -507,24 +553,24 @@
                 block: 'nearest'
             });
         }
-        
+
         nextBtn.addEventListener('click', () => {
             currentIndex = (currentIndex + 1) % slides.length;
             scrollToCurrentCard();
         });
-        
+
         prevBtn.addEventListener('click', () => {
             currentIndex = (currentIndex - 1 + slides.length) % slides.length;
             scrollToCurrentCard();
-        });    
-        
+        });
+
         // التنقل بين الكروت عن طريق الأزرار للمسارات التدريبية
         const orgContainer = document.getElementById('orgCardCarousel');
         const orgSlides = Array.from(orgContainer.querySelectorAll('.card-slide'));
         const orgPrevBtn = document.getElementById('orgCarouselPrev');
         const orgNextBtn = document.getElementById('orgCarouselNext');
         let orgCurrentIndex = 0;
-        
+
         function scrollToCurrentOrgCard() {
             orgSlides[orgCurrentIndex].scrollIntoView({
                 behavior: 'smooth',
@@ -532,27 +578,27 @@
                 block: 'nearest'
             });
         }
-        
+
         orgNextBtn.addEventListener('click', () => {
             orgCurrentIndex = (orgCurrentIndex + 1) % orgSlides.length;
             scrollToCurrentOrgCard();
         });
-        
+
         orgPrevBtn.addEventListener('click', () => {
             orgCurrentIndex = (orgCurrentIndex - 1 + orgSlides.length) % orgSlides.length;
             scrollToCurrentOrgCard();
         });
-        
+
         // إظهار حالة البحث والفلترة النشطة
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.querySelector('input[name="search"]');
             const filterBtn = document.querySelector('.custom-filter-btn');
-            
+
             // إذا كان هناك بحث نشط، أبرز حقل البحث
             if (searchInput && searchInput.value) {
                 searchInput.classList.add('is-active');
             }
-            
+
             // إذا كان هناك فلترة نشطة، أبرز زر الفلترة
             const hasActiveFilters = {{ $hasActiveFilters ? 'true' : 'false' }};
             if (hasActiveFilters && filterBtn) {
@@ -560,26 +606,26 @@
             }
         });
     </script>
-    
+
     <style>
         /* أنماط لحالة البحث والفلترة النشطة */
         input[name="search"].is-active {
             border-bottom: 2px solid #0d6efd !important;
             background-color: rgba(13, 110, 253, 0.05) !important;
         }
-        
+
         .custom-filter-btn.active-filter {
             background-color: rgba(13, 110, 253, 0.1) !important;
             color: #0d6efd !important;
             border-color: #0d6efd !important;
         }
-        
+
         /* تحسين مظهر رسائل عدم وجود نتائج */
         .alert-info {
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        
+
         /* تحسين مظهر مؤشر الفلترة النشطة */
         .filter-indicator {
             background-color: #f8f9fa;
@@ -587,7 +633,7 @@
             padding: 8px 16px;
             font-size: 0.9rem;
         }
-        
+
         .filter-indicator .badge {
             font-weight: 500;
         }

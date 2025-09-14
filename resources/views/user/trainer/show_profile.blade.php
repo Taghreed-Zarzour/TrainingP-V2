@@ -329,15 +329,18 @@
                                     </a>
                                 </div>
                             @else
-@php
-    $wage = $trainer->hourly_wage;
-    $formattedWage = is_numeric($wage) && floor($wage) == $wage ? number_format($wage, 0, '.', '') : $wage;
-@endphp
+                                @php
+                                    $wage = $trainer->hourly_wage;
+                                    $formattedWage =
+                                        is_numeric($wage) && floor($wage) == $wage
+                                            ? number_format($wage, 0, '.', '')
+                                            : $wage;
+                                @endphp
 
-<div class="bi-price">
-    الأجر في الساعة {{ $formattedWage }} {{ \App\Enums\Currency::tryFrom($trainer->currency)?->symbol() ?? '' }}
-</div>
-
+                                <div class="bi-price">
+                                    الأجر في الساعة {{ $formattedWage }}
+                                    {{ \App\Enums\Currency::tryFrom($trainer->currency)?->symbol() ?? '' }}
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -501,10 +504,10 @@
                                 </div>
                             </div>
                             @php
-                                
+
                                 $user->update(['profile_message_shown' => true]);
                             @endphp
-                            @endif
+                        @endif
                         @if ($profileCompletion < 100)
                             <div class="warning-message">
                                 <div class="sm-badge">
@@ -518,12 +521,12 @@
                                     <div class="circular-progress">
                                         <svg viewBox="0 0 36 36" class="circular-chart">
                                             <path class="circle-bg" d="M18 2.0845
-                                                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                                                        a 15.9155 15.9155 0 0 1 0 -31.831" />
                                             <path class="circle_percentage"
                                                 stroke-dasharray="{{ $profileCompletion ?? 30 }}, 100" d="M18 2.0845
-                                                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                                                        a 15.9155 15.9155 0 0 1 0 -31.831" />
                                             <text x="18" y="20.35" class="percentage">
                                                 {{ $profileCompletion ?? 30 }}%
                                             </text>
@@ -534,96 +537,97 @@
                         @endif
                     </div>
                     {{-- تحقق أولًا إذا كان المستخدم مسجل دخول وإذا كان صاحب الحساب --}}
-{{-- تحقق إذا كان صاحب الحساب أو إذا هناك فيديو --}}
-@if(($trainer->previousTraining) || (auth()->check() && auth()->id() == $trainer->id))
-    <div class="add-item-block prev-training">
-        <div class="title-wrap pt-title-wrap">
-            <div class="title">مقطع من تدريب سابق</div>
+                    {{-- تحقق إذا كان صاحب الحساب أو إذا هناك فيديو --}}
+                    @if ($trainer->previousTraining || (auth()->check() && auth()->id() == $trainer->id))
+                        <div class="add-item-block prev-training">
+                            <div class="title-wrap pt-title-wrap">
+                                <div class="title">مقطع من تدريب سابق</div>
 
-            {{-- أزرار التعديل تظهر فقط لصاحب الحساب --}}
-            @if(auth()->check() && auth()->id() == $trainer->id)
-                @if ($trainer->previousTraining)
-                    <div class="edit-button-container">
-                        <a href="#" onclick="openModal('prev-training')">
-                            <img src="../images/pencil-simple.svg" />
-                        </a>
-                    </div>
-                @else
-                    <div class="edit-button-container">
-                        <button onclick="openModal('prev-training')"
-                            class="pbtn pbtn-main pbtn-small piconed">
-                            <img src="{{ asset('images/icons/plus.svg') }}" />
-                        </button>
-                    </div>
-                @endif
-            @endif
-        </div>
-
-        <div class="card-block">
-            <div class="card-body align-content-center">
-                @if ($trainer->previousTraining)
-                    <div class="prev-training-item w-100">
-                        <div class="card-body">
-                            @php
-                                $videoLink = $trainer->previousTraining->video_link;
-                            @endphp
-
-                            {{-- عرض الفيديو بناءً على المصدر --}}
-                            @if (Str::contains($videoLink, ['youtube.com', 'youtu.be']))
-                                <iframe class="vedio_profile"
-                                    src="{{ Str::contains($videoLink, 'watch?v=') ? str_replace('watch?v=', 'embed/', $videoLink) : str_replace('youtu.be/', 'www.youtube.com/embed/', $videoLink) }}"
-                                    frameborder="0" allowfullscreen>
-                                </iframe>
-                            @elseif (Str::contains($videoLink, 'vimeo.com'))
-                                <iframe class="vedio_profile"
-                                    src="https://player.vimeo.com/video/{{ basename($videoLink) }}"
-                                    frameborder="0" allowfullscreen>
-                                </iframe>
-                            @elseif (Str::contains($videoLink, 'drive.google.com'))
-                                <iframe class="vedio_profile"
-                                    src="https://drive.google.com/file/d/{{ getGoogleDriveId($videoLink) }}/preview"
-                                    frameborder="0" allowfullscreen>
-                                </iframe>
-                            @elseif (Str::contains($videoLink, ['dropbox.com']))
-                                <iframe class="vedio_profile"
-                                    src="{{ str_replace('?dl=0', '?raw=1', $videoLink) }}"
-                                    frameborder="0" allowfullscreen>
-                                </iframe>
-                            @else
-                                <video width="100%" height="auto" controls>
-                                    <source src="{{ $videoLink }}" type="video/mp4">
-                                    المتصفح لا يدعم تشغيل الفيديو.
-                                </video>
-                            @endif
-
-                            <div class="pti-title">
-                                {{ $trainer->previousTraining->training_title }}
+                                {{-- أزرار التعديل تظهر فقط لصاحب الحساب --}}
+                                @if (auth()->check() && auth()->id() == $trainer->id)
+                                    @if ($trainer->previousTraining)
+                                        <div class="edit-button-container">
+                                            <a href="#" onclick="openModal('prev-training')">
+                                                <img src="../images/pencil-simple.svg" />
+                                            </a>
+                                        </div>
+                                    @else
+                                        <div class="edit-button-container">
+                                            <button onclick="openModal('prev-training')"
+                                                class="pbtn pbtn-main pbtn-small piconed">
+                                                <img src="{{ asset('images/icons/plus.svg') }}" />
+                                            </button>
+                                        </div>
+                                    @endif
+                                @endif
                             </div>
-                            <div class="pti-desc">
-                                {{ $trainer->previousTraining->description }}
+
+                            <div class="card-block">
+                                <div class="card-body align-content-center">
+                                    @if ($trainer->previousTraining)
+                                        <div class="prev-training-item w-100">
+                                            <div class="card-body">
+                                                @php
+                                                    $videoLink = $trainer->previousTraining->video_link;
+                                                @endphp
+
+                                                {{-- عرض الفيديو بناءً على المصدر --}}
+                                                @if (Str::contains($videoLink, ['youtube.com', 'youtu.be']))
+                                                    <iframe class="vedio_profile"
+                                                        src="{{ Str::contains($videoLink, 'watch?v=') ? str_replace('watch?v=', 'embed/', $videoLink) : str_replace('youtu.be/', 'www.youtube.com/embed/', $videoLink) }}"
+                                                        frameborder="0" allowfullscreen>
+                                                    </iframe>
+                                                @elseif (Str::contains($videoLink, 'vimeo.com'))
+                                                    <iframe class="vedio_profile"
+                                                        src="https://player.vimeo.com/video/{{ basename($videoLink) }}"
+                                                        frameborder="0" allowfullscreen>
+                                                    </iframe>
+                                                @elseif (Str::contains($videoLink, 'drive.google.com'))
+                                                    <iframe class="vedio_profile"
+                                                        src="https://drive.google.com/file/d/{{ getGoogleDriveId($videoLink) }}/preview"
+                                                        frameborder="0" allowfullscreen>
+                                                    </iframe>
+                                                @elseif (Str::contains($videoLink, ['dropbox.com']))
+                                                    <iframe class="vedio_profile"
+                                                        src="{{ str_replace('?dl=0', '?raw=1', $videoLink) }}"
+                                                        frameborder="0" allowfullscreen>
+                                                    </iframe>
+                                                @else
+                                                    <video width="100%" height="auto" controls>
+                                                        <source src="{{ $videoLink }}" type="video/mp4">
+                                                        المتصفح لا يدعم تشغيل الفيديو.
+                                                    </video>
+                                                @endif
+
+                                                <div class="pti-title">
+                                                    {{ $trainer->previousTraining->training_title }}
+                                                </div>
+                                                <div class="pti-desc">
+                                                    {{ $trainer->previousTraining->description }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @elseif(auth()->check() && auth()->id() == $trainer->id)
+                                        {{-- لا يوجد فيديو، يظهر فقط لصاحب الحساب --}}
+                                        <div class="content">
+                                            <img src="{{ asset('images/trainer-account/prev-training.svg') }}"
+                                                alt="تدريب سابق" />
+                                            <div class="desc">
+                                                ارفع مقطع فيديو يبرز مهاراتك التدريبية ويُظهر تميزك في تقديم المحتوى.
+                                                هذا يساعد المؤسسات والمتدربين على التعرف عليك بشكل أفضل وزيادة فرص اختيارك.
+                                            </div>
+                                            <div class="edit-button-container">
+                                                <button onclick="openModal('prev-training')">
+                                                    <img src="{{ asset('images/icons/plus-dark.svg') }}" />
+                                                    رفع مقطعًا من تدريب سابق
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @elseif(auth()->check() && auth()->id() == $trainer->id)
-                    {{-- لا يوجد فيديو، يظهر فقط لصاحب الحساب --}}
-                    <div class="content">
-                        <img src="{{ asset('images/trainer-account/prev-training.svg') }}" alt="تدريب سابق" />
-                        <div class="desc">
-                            ارفع مقطع فيديو يبرز مهاراتك التدريبية ويُظهر تميزك في تقديم المحتوى.
-                            هذا يساعد المؤسسات والمتدربين على التعرف عليك بشكل أفضل وزيادة فرص اختيارك.
-                        </div>
-                        <div class="edit-button-container">
-                            <button onclick="openModal('prev-training')">
-                                <img src="{{ asset('images/icons/plus-dark.svg') }}" />
-                                رفع مقطعًا من تدريب سابق
-                            </button>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-@endif
+                    @endif
 
 
 
@@ -921,9 +925,15 @@
                                 <div class="card-body align-content-center">
                                     <div class="content d-flex align-items-center gap-3">
                                         <img src="{{ asset('images/trainer-account/reviews.svg') }}" alt="تقييمات" />
-                                        <div class="desc">
-                                            لم تتلقَ أية تقييمات أو مراجعات بعد، عندما ستحصل على تقييم فسيظهر هنا
-                                        </div>
+                                        @if (auth()->check() && auth()->id() == $user->id)
+                                            <div class="desc">
+                                                لم تتلقَ أية تقييمات أو مراجعات بعد، عندما ستحصل على تقييم فسيظهر هنا
+                                            </div>
+                                        @else
+                                            <div class="desc">
+                                                لم يتلق أية تقييمات أو مراجعات بعد
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -932,137 +942,137 @@
 
 
 
-  @if (!(auth()->check() && auth()->id() == $user->id) && $tariningPrograms->count() > 0)
-    <div class="reviews mt-4">
-        <div class="reviews-title-wrap d-flex flex-column flex-sm-row gap-2">
-            <div class="reviews-title">
-                تدريبات قام بها المدرب
-            </div>
-            <div class="reviews-slider-buttons">
-                <button class="prev pbtn pbtn-outlined" id="carouselPrev" type="button">
-                    <!-- Prev SVG -->
-                    <img src="{{ asset('images/reviews/prev.svg') }}" />
-                </button>
-                <button class="next pbtn pbtn-main" id="carouselNext" type="button">
-                    <!-- Next SVG -->
-                    <img src="{{ asset('images/reviews/next.svg') }}" />
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="carousel-wrapper position-relative">
-        <div class="overflow-hidden w-100">
-            <div class="d-flex flex-nowrap gap-3 custom-carousel" id="cardCarousel">
-                @foreach ($tariningPrograms as $tariningProgram)
-                    <div class="carousel-card flex-shrink-0">
-                        <a href="{{ route('show_trainings_announcements', $tariningProgram->id) }}"
-                            class="text-decoration-none text-dark">
-                            <div class="h-100 border rounded-4 position-relative">
-                                <div class="d-flex flex-column justify-content-between image-custom">
-                                    @if ($tariningProgram->AdditionalSetting && $tariningProgram->AdditionalSetting->profile_image)
-                                        <img src="{{ asset('storage/' . $tariningProgram->AdditionalSetting->profile_image) }}"
-                                            class="card-img-top" alt="صورة التدريب">
-                                    @else
-                                        <img src="{{ asset('images/cources/training-default-img.svg') }}"
-                                            alt="صورة افتراضية" class="card-img-top">
-                                    @endif
+                    @if (!(auth()->check() && auth()->id() == $user->id) && $tariningPrograms->count() > 0)
+                        <div class="reviews mt-4">
+                            <div class="reviews-title-wrap d-flex flex-column flex-sm-row gap-2">
+                                <div class="reviews-title">
+                                    تدريبات قام بها المدرب
                                 </div>
-                                @php
-                                    $trainer = $tariningProgram->trainer;
-                                    $trainerPhoto =
-                                        $trainer && $trainer->photo
-                                            ? asset('storage/' . $trainer->photo)
-                                            : asset('images/icons/user.svg');
-                                @endphp
-                                <div
-                                    class="card-body d-flex flex-column justify-content-between gap-1 p-3">
-                                    <h6 class="fw-bold">{{ $tariningProgram->title }}</h6>
-                                    <div class="trainer-info mt-2 mb-2">
-                                        <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
-                                            style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
-                                            <img class="trainer-img" src="{{ $trainerPhoto }}"
-                                                alt="صورة المدرب" />
-                                            <span>{{ $trainer->getTranslation('name', 'ar') }}
-                                                {{ $trainer->trainer->getTranslation('last_name', 'ar') }}</span>
-                                        </a>
-                                    </div>
-                                    <ul
-                                        class="list-unstyled d-flex flex-wrap gap-3 text-muted small mb-2">
-                                        <li class="d-flex align-items-center gap-2">
-                                            <img src="{{ asset('images/cources/clock.svg') }}"
-                                                alt="المدة">
-                                            @php
-                                                $hours = floor(
-                                                    $tariningProgram->total_duration_hours,
-                                                );
-                                                $minutes = round(
-                                                    ($tariningProgram->total_duration_hours -
-                                                        $hours) *
-                                                        60,
-                                                );
-                                            @endphp
-                                            @if ($hours > 0 && $minutes > 0)
-                                                {{ $hours }} ساعة و {{ $minutes }} دقيقة
-                                            @elseif($hours > 0)
-                                                {{ $hours }} ساعة
-                                            @else
-                                                {{ $minutes }} دقيقة
-                                            @endif
-                                        </li>
-                                        @if (
-                                            $tariningProgram->program_presentation_method_id === \App\Enums\TrainingAttendanceType::HYBRID->value ||
-                                                $tariningProgram->program_presentation_method_id === \App\Enums\TrainingAttendanceType::REMOTE->value)
-                                            <li class="d-flex align-items-center gap-2">
-                                                <img src="{{ asset('images/cources/online.svg') }}"
-                                                    alt="نوع الدورة">
-                                                أونلاين
-                                            </li>
-                                        @else
-                                            <li class="d-flex align-items-center gap-2">
-                                                <img src="{{ asset('images/cources/location.svg') }}"
-                                                    alt="الموقع">
-                                                @if ($tariningProgram->AdditionalSetting)
-                                                    {{ $tariningProgram->AdditionalSetting->city }},
-                                                    {{ $tariningProgram->AdditionalSetting->country->name ?? '---' }}
-                                                @else
-                                                    ---
-                                                @endif
-                                            </li>
-                                        @endif
-                                    </ul>
+                                <div class="reviews-slider-buttons">
+                                    <button class="prev pbtn pbtn-outlined" id="carouselPrev" type="button">
+                                        <!-- Prev SVG -->
+                                        <img src="{{ asset('images/reviews/prev.svg') }}" />
+                                    </button>
+                                    <button class="next pbtn pbtn-main" id="carouselNext" type="button">
+                                        <!-- Next SVG -->
+                                        <img src="{{ asset('images/reviews/next.svg') }}" />
+                                    </button>
                                 </div>
                             </div>
-                        </a>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const carousel = document.getElementById('cardCarousel');
-            const card = document.querySelector('.carousel-card');
-            // التحقق من وجود البطاقات قبل تنفيذ الكود
-            if (carousel && card) {
-                const cardWidth = card.offsetWidth + 16; // 16px = gap-3
-                document.getElementById('carouselNext').addEventListener('click', () => {
-                    if (carousel.scrollLeft + cardWidth * 3 >= carousel.scrollWidth) {
-                        carousel.scrollLeft = 0;
-                    } else {
-                        carousel.scrollLeft += cardWidth;
-                    }
-                });
-                document.getElementById('carouselPrev').addEventListener('click', () => {
-                    if (carousel.scrollLeft <= 0) {
-                        carousel.scrollLeft = carousel.scrollWidth;
-                    } else {
-                        carousel.scrollLeft -= cardWidth;
-                    }
-                });
-            }
-        });
-    </script>
-@endif
+                        </div>
+                        <div class="carousel-wrapper position-relative">
+                            <div class="overflow-hidden w-100">
+                                <div class="d-flex flex-nowrap gap-3 custom-carousel" id="cardCarousel">
+                                    @foreach ($tariningPrograms as $tariningProgram)
+                                        <div class="carousel-card flex-shrink-0">
+                                            <a href="{{ route('show_trainings_announcements', $tariningProgram->id) }}"
+                                                class="text-decoration-none text-dark">
+                                                <div class="h-100 border rounded-4 position-relative">
+                                                    <div class="d-flex flex-column justify-content-between image-custom">
+                                                        @if ($tariningProgram->AdditionalSetting && $tariningProgram->AdditionalSetting->profile_image)
+                                                            <img src="{{ asset('storage/' . $tariningProgram->AdditionalSetting->profile_image) }}"
+                                                                class="card-img-top" alt="صورة التدريب">
+                                                        @else
+                                                            <img src="{{ asset('images/cources/training-default-img.svg') }}"
+                                                                alt="صورة افتراضية" class="card-img-top">
+                                                        @endif
+                                                    </div>
+                                                    @php
+                                                        $trainer = $tariningProgram->trainer;
+                                                        $trainerPhoto =
+                                                            $trainer && $trainer->photo
+                                                                ? asset('storage/' . $trainer->photo)
+                                                                : asset('images/icons/user.svg');
+                                                    @endphp
+                                                    <div
+                                                        class="card-body d-flex flex-column justify-content-between gap-1 p-3">
+                                                        <h6 class="fw-bold">{{ $tariningProgram->title }}</h6>
+                                                        <div class="trainer-info mt-2 mb-2">
+                                                            <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
+                                                                style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
+                                                                <img class="trainer-img" src="{{ $trainerPhoto }}"
+                                                                    alt="صورة المدرب" />
+                                                                <span>{{ $trainer->getTranslation('name', 'ar') }}
+                                                                    {{ $trainer->trainer->getTranslation('last_name', 'ar') }}</span>
+                                                            </a>
+                                                        </div>
+                                                        <ul
+                                                            class="list-unstyled d-flex flex-wrap gap-3 text-muted small mb-2">
+                                                            <li class="d-flex align-items-center gap-2">
+                                                                <img src="{{ asset('images/cources/clock.svg') }}"
+                                                                    alt="المدة">
+                                                                @php
+                                                                    $hours = floor(
+                                                                        $tariningProgram->total_duration_hours,
+                                                                    );
+                                                                    $minutes = round(
+                                                                        ($tariningProgram->total_duration_hours -
+                                                                            $hours) *
+                                                                            60,
+                                                                    );
+                                                                @endphp
+                                                                @if ($hours > 0 && $minutes > 0)
+                                                                    {{ $hours }} ساعة و {{ $minutes }} دقيقة
+                                                                @elseif($hours > 0)
+                                                                    {{ $hours }} ساعة
+                                                                @else
+                                                                    {{ $minutes }} دقيقة
+                                                                @endif
+                                                            </li>
+                                                            @if (
+                                                                $tariningProgram->program_presentation_method_id === \App\Enums\TrainingAttendanceType::HYBRID->value ||
+                                                                    $tariningProgram->program_presentation_method_id === \App\Enums\TrainingAttendanceType::REMOTE->value)
+                                                                <li class="d-flex align-items-center gap-2">
+                                                                    <img src="{{ asset('images/cources/online.svg') }}"
+                                                                        alt="نوع الدورة">
+                                                                    أونلاين
+                                                                </li>
+                                                            @else
+                                                                <li class="d-flex align-items-center gap-2">
+                                                                    <img src="{{ asset('images/cources/location.svg') }}"
+                                                                        alt="الموقع">
+                                                                    @if ($tariningProgram->AdditionalSetting)
+                                                                        {{ $tariningProgram->AdditionalSetting->city }},
+                                                                        {{ $tariningProgram->AdditionalSetting->country->name ?? '---' }}
+                                                                    @else
+                                                                        ---
+                                                                    @endif
+                                                                </li>
+                                                            @endif
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const carousel = document.getElementById('cardCarousel');
+                                const card = document.querySelector('.carousel-card');
+                                // التحقق من وجود البطاقات قبل تنفيذ الكود
+                                if (carousel && card) {
+                                    const cardWidth = card.offsetWidth + 16; // 16px = gap-3
+                                    document.getElementById('carouselNext').addEventListener('click', () => {
+                                        if (carousel.scrollLeft + cardWidth * 3 >= carousel.scrollWidth) {
+                                            carousel.scrollLeft = 0;
+                                        } else {
+                                            carousel.scrollLeft += cardWidth;
+                                        }
+                                    });
+                                    document.getElementById('carouselPrev').addEventListener('click', () => {
+                                        if (carousel.scrollLeft <= 0) {
+                                            carousel.scrollLeft = carousel.scrollWidth;
+                                        } else {
+                                            carousel.scrollLeft -= cardWidth;
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                    @endif
 
 
 
@@ -1214,26 +1224,27 @@
                 <textarea name="bio" placeholder="شارك نبذة مختصرة تبرز خبرتك وهويتك المهنية" rows="5" required>{{ old('bio', $user->bio) }}</textarea>
             </div>
             <div class="input-group-2col">
-@php
-    $wage = $trainer->hourly_wage ?? 0;
-    $formattedWage = is_numeric($wage) && floor($wage) == $wage ? number_format($wage, 0, '.', '') : $wage;
-@endphp
+                @php
+                    $wage = $trainer->hourly_wage ?? 0;
+                    $formattedWage =
+                        is_numeric($wage) && floor($wage) == $wage ? number_format($wage, 0, '.', '') : $wage;
+                @endphp
 
-<div class="input-group">
-    <label>الأجر في الساعة</label>
-    <input name="hourly_wage" type="number" value="{{ $formattedWage }}" placeholder="مثال: 20" />
-</div>
+                <div class="input-group">
+                    <label>الأجر في الساعة</label>
+                    <input name="hourly_wage" type="number" value="{{ $formattedWage }}" placeholder="مثال: 20" />
+                </div>
 
                 <div class="input-group">
                     <label>العملة</label>
-<select name="currency" class="custom-singleselect">
-    @foreach(\App\Enums\Currency::cases() as $currency)
-        <option value="{{ $currency->value }}"
-            {{ ($trainer->currency ?? '') === $currency->value ? 'selected' : '' }}>
-            {{ $currency->label() }}
-        </option>
-    @endforeach
-</select>
+                    <select name="currency" class="custom-singleselect">
+                        @foreach (\App\Enums\Currency::cases() as $currency)
+                            <option value="{{ $currency->value }}"
+                                {{ ($trainer->currency ?? '') === $currency->value ? 'selected' : '' }}>
+                                {{ $currency->label() }}
+                            </option>
+                        @endforeach
+                    </select>
 
                 </div>
             </div>

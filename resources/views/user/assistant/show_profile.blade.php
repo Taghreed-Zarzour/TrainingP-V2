@@ -479,8 +479,8 @@
                     </div>
                 </div>
             </div>
+  @if (!$user->userCv && auth()->check() && auth()->id() == $user->id)
 
-            @if (!$user->userCv)
                 <div class="card-header d-flex justify-content-between align-items-center mt-5">
                     <h4 class="title fw-bold">السيرة الذاتية CV</h4>
                     <div class="edit-button-container">

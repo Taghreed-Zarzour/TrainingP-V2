@@ -195,8 +195,8 @@ $(document).ready(function() {
 /* إشعارات الهيدر */
 .notifications-dropdown .notification-badge {
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: 7px;
+    right: 7px;
     background-color: #dc3545;
     color: white;
     border-radius: 50%;

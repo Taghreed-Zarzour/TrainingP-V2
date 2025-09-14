@@ -504,6 +504,8 @@
                     <div class="info-box mt-5">
                         <h4 class="info-title">نبذة عن المؤسسة المُعلنة</h4>
                         <div class="trainer-card d-flex flex-column flex-md-row align-items-start gap-4">
+                            <a href="{{ route('show_organization_profile', ['id' => $orgProgram->organization->user->id]) }}"
+                        style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
                             <div class="trainer-image text-center">
                                 @if ($orgProgram->organization->user->photo)
                                     <img src="{{ asset('storage/' . $orgProgram->organization->user->photo) }}"
@@ -518,6 +520,7 @@
                                 <h5 class="trainer-name mb-1">{{ $orgProgram->organization->user->getTranslation('name', 'ar') }}</h5>
                                 <p class="trainer-position mb-2">{{ $orgProgram->organization->type->name }}</p>
                             </div>
+                          </a>
                         </div>
                         <p class="trainer-bio mt-3">{{ $orgProgram->organization->user->bio ?? 'لا يوجد نبذة متاحة' }}</p>
                     </div>
@@ -609,7 +612,7 @@
                         التدريب؟</h5>
                     <p class="text-muted mb-4">
                         عند تأكيد الاشتراك، سيتم إضافتك إلى قائمة المشاركين في تدريب "{{ $program->program_title ?? '' }}".<br>
-                        قد يتطلب الأمر موافقة من المدرب أو خطوات إضافية.
+                        قد يتطلب الأمر موافقة من المؤسسة أو خطوات إضافية.
                     </p>
                 </div>
                 <div class="modal-footer border-0 d-flex flex-column flex-sm-row gap-3 justify-content-center">

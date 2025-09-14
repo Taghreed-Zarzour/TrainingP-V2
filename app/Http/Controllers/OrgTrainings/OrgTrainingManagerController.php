@@ -150,7 +150,10 @@ class OrgTrainingManagerController extends Controller
         }
 
     //Assistants
-    $assistants= User::where('user_type_id',2)->with('assistant')->get();
+$assistants = User::where('user_type_id', 2)
+                  ->whereNotNull('email_verified_at') // فقط اللي مأكّدين الإيميل
+                  ->with('assistant')
+                  ->get();
 
     //نسبة الحضور العامة
       $totalSessionsCount = count($totalSessions);
@@ -188,8 +191,6 @@ class OrgTrainingManagerController extends Controller
 
       ));
     }
-
-
 
     public function showProgramDetail($id)
     {
@@ -292,7 +293,7 @@ class OrgTrainingManagerController extends Controller
       $attachments = OrgTrainingDetailFile::where('org_training_program_id', $org_training_programs_id)->get();
 
       return view('orgTrainings.training.training-manager', compact(
-        'OrgProgram',
+        'OrgProgramDetail',
         'work_sectors',
         'orgTrainingClassification',
         'education_levels',

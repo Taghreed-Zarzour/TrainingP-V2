@@ -78,7 +78,7 @@
                 </div>
 
                     @if (Route::has('password.request'))
-                        <a class="forgot-password w-100" href="{{ route('password.request') }}">
+                        <a class="forgot-password w-100 mb-2" href="{{ route('password.request') }}">
                             نسيت كلمة المرور؟
                         </a>
                     @endif

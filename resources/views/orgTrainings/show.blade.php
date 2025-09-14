@@ -3,9 +3,10 @@
 @section('content')
 
     <style>
-      h3{
+        h3 {
             margin-bottom: 1.5rem;
-      }
+        }
+
         .blue-light-header {
             background-color: #D9E6FF;
             background-size: cover;
@@ -544,7 +545,7 @@
                             <span class="training-type ms-2">{{ $OrgProgram->trainingClassification->name ?? '' }}</span>
                         </h1>
                     </div>
-                    
+
                     <div
                         class="training-meta d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start text-center text-lg-start">
                         <span class="mb-2 mb-sm-0">
@@ -560,119 +561,138 @@
                         {{ $OrgProgram->program_description ?? 'لا يوجد وصف متاح' }}
                     </div>
                     <div class="creator-info">
-                        <img src="{{ asset('images/icons/user.svg') }}" alt="" class="creator-image">
-                        <span>تم الإنشاء بواسطة 
-                        <span class="text-decoration-underline">
-                            {{ $OrgProgram->organization->user->getTranslation('name', 'ar') ?? '' }}
-                        </span></span>
-                      </div>
-                  <div class="join-section">
-    @if (!auth()->check())
-        <!-- الحالة 1: المستخدم غير مسجل دخول -->
-        <div class="alert alert-info text-center mb-0">
-            <i class="fas fa-info-circle me-2"></i>
-            الرجاء تسجيل الدخول أولاً بحساب متدرب للانضمام إلى المسار التدريبي
-            <div class="mt-2">
-                <a href="{{ route('login') }}" class="btn btn-primary btn-sm me-2">تسجيل الدخول</a>
-                <span>ليس لديك حساب؟</span>
-                <a href="{{ route('register') }}" class="btn btn-outline-primary btn-sm ms-2">إنشاء حساب</a>
-            </div>
-        </div>
-    @elseif (auth()->user()->userType?->type !== 'متدرب')
-        <!-- الحالة 2: المستخدم مسجل ولكن ليس من نوع متدرب -->
-        <div class="alert alert-warning text-center mb-0">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            الرجاء التسجيل بحساب متدرب للانضمام إلى المسار التدريبي
-            <div class="mt-2">
-                <span>الحساب الحالي: {{ auth()->user()->userType?->type }}</span>
-            </div>
-        </div>
-    @else
-        <!-- المستخدم متدرب، نتحقق من الحالات الأخرى -->
-        @if ($training_has_ended)
-            <!-- الحالة 3: انتهى موعد التسجيل -->
-            <div class="alert alert-danger text-center mb-0">
-                <i class="fas fa-calendar-times me-2"></i>
-                انتهى موعد التسجيل في هذا المسار التدريبي
-                <div class="mt-2">
-                    <small>آخر موعد للتسجيل كان: {{ \Carbon\Carbon::parse($OrgProgram->registrationRequirements->application_deadline)->format('d/m/Y') }}</small>
-                </div>
-            </div>
-        @elseif ($has_enrolled)
-            <!-- الحالة 4: المستخدم مسجل بالفعل، نتحقق من حالة تسجيله -->
-            @switch($enrollment?->status)
-                @case('pending')
-                    <!-- الحالة 4.1: طلب قيد الانتظار -->
-                    <div class="alert alert-warning text-center mb-0">
-                        <i class="fas fa-clock me-2"></i>
-                        تم إرسال طلبك مسبقًا، في انتظار الموافقة.
-                        <div class="mt-2">
-                            <small>تاريخ التقديم: {{ \Carbon\Carbon::parse($enrollment->created_at)->format('d/m/Y') }}</small>
-                        </div>
-                    </div>
-                    @break
-                @case('accepted')
-                    <!-- الحالة 4.2: تم قبول الطلب -->
-                    <div class="alert alert-success text-center mb-0">
-                        <i class="fas fa-check-circle me-2"></i>
-                        تم قبولك في المسار التدريبي، بالتوفيق!
-
-                    </div>
-                    @break
-                @case('rejected')
-                    <!-- الحالة 4.3: تم رفض الطلب -->
-                    <div class="alert alert-danger text-center mb-0">
-                        <i class="fas fa-times-circle me-2"></i>
-                        تم رفض طلبك للانضمام.
-                        @if (!empty($enrollment?->rejection_reason))
-                            <div class="mt-2">
-                                <strong>السبب:</strong> {{ $enrollment->rejection_reason }}
-                            </div>
-                        @endif
-
-                    </div>
-                    @break
-                @default
-                    <!-- الحالة 4.5: حالة غير معروفة -->
-                    <div class="alert alert-info text-center mb-0">
-                        <i class="fas fa-question-circle me-2"></i>
-                        حالة طلبك: {{ $enrollment?->status ?? 'غير محدد' }}
-                        <div class="mt-2">
-                            <small>يرجى التواصل مع إدارة المسار التدريبي</small>
-                        </div>
-                    </div>
-            @endswitch
-        @else
-            <!-- الحالة 5: المستخدم لم يسجل بعد -->
-            @if ($OrgProgram->registrationRequirements->max_trainees > 0 && count($participants) >= $OrgProgram->registrationRequirements->max_trainees)
-                <!-- الحالة 5.1: وصل العدد الأقصى للمتدربين -->
-                <div class="alert alert-warning text-center mb-0">
-                    <i class="fas fa-users me-2"></i>
-                    وصل العدد الأقصى للمتدربين في هذا المسار التدريبي
-                    <div class="mt-2">
-                        <small>العدد الأقصى: {{ $OrgProgram->registrationRequirements->max_trainees }} متدرب</small>
-                    </div>
-                </div>
-            @else
-                <!-- الحالة 5.2: يمكن للمستخدم التسجيل -->
-                <button class=" custom-btn w-100" data-bs-toggle="modal" data-bs-target="#confirmEnrollmentModal">
-                    انضم الآن
-                    <br>
-                    <span dir="ltr">
-                        @php
-                            $cost = $OrgProgram->registrationRequirements->cost ?? 0;
-                        @endphp
-                        @if ($cost > 0)
-                            ${{ number_format($cost, 2) }}
+                        @if ($OrgProgram->organization->user->photo)
+                            <img src="{{ asset('storage/' . $OrgProgram->organization->user->photo) }}" alt="صورة الميسر"
+                                class="creator-image">
                         @else
-                            المسار مجاني
+                            <img src="{{ asset('images/icons/user.svg') }}" alt="ميسر" class="creator-image">
                         @endif
-                    </span>
-                </button>
-            @endif
-        @endif
-    @endif
-</div>
+
+                        {{-- <img src="{{ asset('images/icons/user.svg') }}" alt="" class="creator-image"> --}}
+                        <span>تم الإنشاء بواسطة
+                            <a href="{{ route('show_organization_profile', ['id' => $OrgProgram->organization->user->id]) }}"
+                                style="display: contents;  text-decoration: none; color: inherit;"><span
+                                    class="text-decoration-underline">
+                                    {{ $OrgProgram->organization->user->getTranslation('name', 'ar') ?? '' }}
+                                </span></a></span>
+                    </div>
+                    <div class="join-section">
+                        @if (!auth()->check())
+                            <!-- الحالة 1: المستخدم غير مسجل دخول -->
+                            <div class="alert alert-info text-center mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                الرجاء تسجيل الدخول أولاً بحساب متدرب للانضمام إلى المسار التدريبي
+                                <div class="mt-2">
+                                    <a href="{{ route('login') }}" class="btn btn-primary btn-sm me-2">تسجيل الدخول</a>
+                                    <span>ليس لديك حساب؟</span>
+                                    <a href="{{ route('register') }}" class="btn btn-outline-primary btn-sm ms-2">إنشاء
+                                        حساب</a>
+                                </div>
+                            </div>
+                        @elseif (auth()->user()->userType?->type !== 'متدرب')
+                            <!-- الحالة 2: المستخدم مسجل ولكن ليس من نوع متدرب -->
+                            <div class="alert alert-warning text-center mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                الرجاء التسجيل بحساب متدرب للانضمام إلى المسار التدريبي
+                                <div class="mt-2">
+                                    <span>الحساب الحالي: {{ auth()->user()->userType?->type }}</span>
+                                </div>
+                            </div>
+                        @else
+                            <!-- المستخدم متدرب، نتحقق من الحالات الأخرى -->
+                            @if ($training_has_ended)
+                                <!-- الحالة 3: انتهى موعد التسجيل -->
+                                <div class="alert alert-danger text-center mb-0">
+                                    <i class="fas fa-calendar-times me-2"></i>
+                                    انتهى موعد التسجيل في هذا المسار التدريبي
+                                    <div class="mt-2">
+                                        <small>آخر موعد للتسجيل كان:
+                                            {{ \Carbon\Carbon::parse($OrgProgram->registrationRequirements->application_deadline)->format('d/m/Y') }}</small>
+                                    </div>
+                                </div>
+                            @elseif ($has_enrolled)
+                                <!-- الحالة 4: المستخدم مسجل بالفعل، نتحقق من حالة تسجيله -->
+                                @switch($enrollment?->status)
+                                    @case('pending')
+                                        <!-- الحالة 4.1: طلب قيد الانتظار -->
+                                        <div class="alert alert-warning text-center mb-0">
+                                            <i class="fas fa-clock me-2"></i>
+                                            تم إرسال طلبك مسبقًا، في انتظار الموافقة.
+                                            <div class="mt-2">
+                                                <small>تاريخ التقديم:
+                                                    {{ \Carbon\Carbon::parse($enrollment->created_at)->format('d/m/Y') }}</small>
+                                            </div>
+                                        </div>
+                                    @break
+
+                                    @case('accepted')
+                                        <!-- الحالة 4.2: تم قبول الطلب -->
+                                        <div class="alert alert-success text-center mb-0">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            تم قبولك في المسار التدريبي، بالتوفيق!
+
+                                        </div>
+                                    @break
+
+                                    @case('rejected')
+                                        <!-- الحالة 4.3: تم رفض الطلب -->
+                                        <div class="alert alert-danger text-center mb-0">
+                                            <i class="fas fa-times-circle me-2"></i>
+                                            تم رفض طلبك للانضمام.
+                                            @if (!empty($enrollment?->rejection_reason))
+                                                <div class="mt-2">
+                                                    <strong>السبب:</strong> {{ $enrollment->rejection_reason }}
+                                                </div>
+                                            @endif
+
+                                        </div>
+                                    @break
+
+                                    @default
+                                        <!-- الحالة 4.5: حالة غير معروفة -->
+                                        <div class="alert alert-info text-center mb-0">
+                                            <i class="fas fa-question-circle me-2"></i>
+                                            حالة طلبك: {{ $enrollment?->status ?? 'غير محدد' }}
+                                            <div class="mt-2">
+                                                <small>يرجى التواصل مع إدارة المسار التدريبي</small>
+                                            </div>
+                                        </div>
+                                @endswitch
+                            @else
+                                <!-- الحالة 5: المستخدم لم يسجل بعد -->
+                                @if (
+                                    $OrgProgram->registrationRequirements->max_trainees > 0 &&
+                                        count($participants) >= $OrgProgram->registrationRequirements->max_trainees)
+                                    <!-- الحالة 5.1: وصل العدد الأقصى للمتدربين -->
+                                    <div class="alert alert-warning text-center mb-0">
+                                        <i class="fas fa-users me-2"></i>
+                                        وصل العدد الأقصى للمتدربين في هذا المسار التدريبي
+                                        <div class="mt-2">
+                                            <small>العدد الأقصى: {{ $OrgProgram->registrationRequirements->max_trainees }}
+                                                متدرب</small>
+                                        </div>
+                                    </div>
+                                @else
+                                    <!-- الحالة 5.2: يمكن للمستخدم التسجيل -->
+                                    <button class=" custom-btn w-100" data-bs-toggle="modal"
+                                        data-bs-target="#confirmEnrollmentModal">
+                                        انضم الآن
+                                        <br>
+                                        <span dir="ltr">
+                                            @php
+                                                $cost = $OrgProgram->registrationRequirements->cost ?? 0;
+                                            @endphp
+                                            @if ($cost > 0)
+                                                ${{ number_format($cost, 2) }}
+                                            @else
+                                                المسار مجاني
+                                            @endif
+                                        </span>
+                                    </button>
+                                @endif
+                            @endif
+                        @endif
+                    </div>
 
 
 
@@ -702,48 +722,47 @@
                     @endphp
                     <div class="time-left">{{ $remainingText }}</div>
                     <!-- تعديل قسم المشاركين ليكون في سطرين -->
-                  @php
-    $participants = $OrgProgram->trainees;
-    $participantsCount = $participants->count();
-    $maxVisible = 10;
-@endphp
+                    @php
+                        $participants = $OrgProgram->trainees;
+                        $participantsCount = $participants->count();
+                        $maxVisible = 10;
+                    @endphp
 
-@if ($participantsCount > 0)
-<div class="participants">
-    <div class="mb-2">
-        @php
-            $firstParticipant = $participants->first();
-            $fullName = trim($firstParticipant->user->getTranslation('name', 'ar') ?? '');
-            $remainingCount = $participantsCount - 1; // العدد الباقي بعد أول اسم
-        @endphp
+                    @if ($participantsCount > 0)
+                        <div class="participants">
+                            <div class="mb-2">
+                                @php
+                                    $firstParticipant = $participants->first();
+                                    $fullName = trim($firstParticipant->user->getTranslation('name', 'ar') ?? '');
+                                    $remainingCount = $participantsCount - 1; // العدد الباقي بعد أول اسم
+                                @endphp
 
-        <span>
-            @if($participantsCount == 1)
-                انضم {{ $fullName ?: 'مشارك' }}
-            @else
-                انضم {{ $fullName ?: 'مشارك' }}
-                و {{ $remainingCount }} {{ $remainingCount == 1 ? 'آخر' : 'آخرون' }}
-            @endif
-        </span>
-    </div>
+                                <span>
+                                    @if ($participantsCount == 1)
+                                        انضم {{ $fullName ?: 'مشارك' }}
+                                    @else
+                                        انضم {{ $fullName ?: 'مشارك' }}
+                                        و {{ $remainingCount }} {{ $remainingCount == 1 ? 'آخر' : 'آخرون' }}
+                                    @endif
+                                </span>
+                            </div>
 
-    <div class="avatar-stack">
-        @foreach($participants->take($maxVisible) as $participant)
-            @php
-                $participantName = trim($participant->user->getTranslation('name', 'ar') ?? '');
-            @endphp
-            <img src="{{ asset('images/icons/user.svg') }}"
-                 alt="{{ $participantName ?: 'مشارك' }}"
-                 class="user-avatar"
-                 title="{{ $participantName ?: 'مشارك' }}">
-        @endforeach
+                            <div class="avatar-stack">
+                                @foreach ($participants->take($maxVisible) as $participant)
+                                    @php
+                                        $participantName = trim($participant->user->getTranslation('name', 'ar') ?? '');
+                                    @endphp
+                                    <img src="{{ asset('images/icons/user.svg') }}"
+                                        alt="{{ $participantName ?: 'مشارك' }}" class="user-avatar"
+                                        title="{{ $participantName ?: 'مشارك' }}">
+                                @endforeach
 
-        @if($participantsCount > $maxVisible)
-            <div class="more-avatars">+{{ $participantsCount - $maxVisible }}</div>
-        @endif
-    </div>
-</div>
-@endif
+                                @if ($participantsCount > $maxVisible)
+                                    <div class="more-avatars">+{{ $participantsCount - $maxVisible }}</div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
 
                 </div>
                 <!-- العمود الثاني للصورة -->
@@ -759,16 +778,16 @@
         <div class="info-card">
             <div class="info-card-row">
                 <div class="info-card-item">
-                  @php
-    $count = $OrgProgram->details->count();
-@endphp
+                    @php
+                        $count = $OrgProgram->details->count();
+                    @endphp
 
-<div class="info-card-item-value">
-    {{ $count }}
-    {{ $count == 1 ? 'تدريب' : 'تدريبات' }}
-</div>
+                    <div class="info-card-item-value">
+                        {{ $count }}
+                        {{ $count == 1 ? 'تدريب' : 'تدريبات' }}
+                    </div>
 
-                  
+
                     <div class="info-card-item-label">محتويات المسار</div>
                 </div>
                 <div class="info-card-item">
@@ -805,7 +824,7 @@
                         @if (isset($OrgProgram->country) && $OrgProgram->city)
                             {{ $OrgProgram->country->name }}, {{ $OrgProgram->city }}
                         @else
-                            غير محدد
+                            عن بعد
                         @endif
                     </div>
                     <div class="info-card-item-label">مكان تقديم المسار</div>
@@ -965,8 +984,8 @@
             @else
                 <p>لا توجد متطلبات تسجيل.</p>
             @endif
-            @if (isset($OrgProgram->registrationRequirements) )
-              @php
+            @if (isset($OrgProgram->registrationRequirements))
+                @php
                     $benefits = [];
                     if (isset($OrgProgram->registrationRequirements)) {
                         $ben = json_decode($OrgProgram->registrationRequirements->benefits, true);
@@ -976,9 +995,9 @@
                     }
                 @endphp
                 @if (count($benefits) > 0)
-                <h3 class="mt-4">ميزات المسار</h3>
-              
-            
+                    <h3 class="mt-4">ميزات المسار</h3>
+
+
                     @foreach ($benefits as $benefit)
                         <div class="learning-item">
                             <img src="{{ asset('images/icons/check-circle.svg') }}" alt="تحقق">
@@ -1035,7 +1054,8 @@
                             </div>
                             <div class="d-flex align-items-center">
 
-                              <a href="{{ route('org.training.show.program', $program->id) }}" class="me-2 text-decoration-underline training-details-btn">تفاصيل التدريب</a>
+                                <a href="{{ route('org.training.show.program', $program->id) }}"
+                                    class="me-2 text-decoration-underline training-details-btn">تفاصيل التدريب</a>
 
                                 <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1064,7 +1084,6 @@
                                                     </thead>
                                                     <tbody>
                                                         @foreach ($program->trainingSchedules as $session)
-                                                          
                                                             <tr style="border-bottom: 1px solid #dee2e6;">
                                                                 <td class="p-3 text-center">
                                                                     {{ \Carbon\Carbon::parse($session->session_date)->locale('ar')->dayName }}
@@ -1074,11 +1093,11 @@
                                                                 </td>
                                                                 <td class="p-3 text-center">
                                                                     {{ formatTimeArabic($session->session_start_time) }} -
-                                                                {{ formatTimeArabic($session->session_end_time) }}
+                                                                    {{ formatTimeArabic($session->session_end_time) }}
                                                                 </td>
                                                                 <td class="p-3 text-center">
-                                                                  
-{{ calculateDurationArabic($session->session_start_time, $session->session_end_time) }}
+
+                                                                    {{ calculateDurationArabic($session->session_start_time, $session->session_end_time) }}
 
                                                                 </td>
                                                             </tr>
@@ -1115,7 +1134,7 @@
             <div class="trainer-card mt-5">
                 <h4 class="info-title">مقدم المسار</h4>
                 <div class=" d-flex flex-column flex-md-row align-items-start gap-4">
-                    <a href="#"
+                    <a href="{{ route('show_organization_profile', ['id' => $OrgProgram->organization->user->id]) }}"
                         style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
                         <div class="trainer-image text-center">
                             <img src="{{ asset('images/icons/user.svg') }}"
@@ -1160,7 +1179,7 @@
         </div>
     </div>
 
-        <!-- Modal تأكيد الاشتراك -->
+    <!-- Modal تأكيد الاشتراك -->
     <div class="modal fade" id="confirmEnrollmentModal" tabindex="-1" aria-labelledby="confirmEnrollmentModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -1174,14 +1193,16 @@
                     <h5 class="modal-title fw-bold mb-3" id="confirmEnrollmentModalLabel">هل أنت متأكد من الاشتراك في هذا
                         المسار التدريبي</h5>
                     <p class="text-muted mb-4">
-                        عند تأكيد الاشتراك، سيتم إضافتك إلى قائمة المشاركين في المسار التدريبي "{{ $OrgProgram->title ?? '' }}".<br>
-                        قد يتطلب الأمر موافقة من المدرب أو خطوات إضافية.
+                        عند تأكيد الاشتراك، سيتم إضافتك إلى قائمة المشاركين في المسار التدريبي
+                        "{{ $OrgProgram->title ?? '' }}".<br>
+                        قد يتطلب الأمر موافقة من المؤسسة أو خطوات إضافية.
                     </p>
                 </div>
-                
+
                 <div class="modal-footer border-0 d-flex flex-column flex-sm-row gap-3 justify-content-center">
                     <form class="flex-fill" style="padding: 0px"
-                        action="{{ route('orgEnrollment.enroll', ['OrgProgram_id' => $OrgProgram->id]) }}" method="POST">
+                        action="{{ route('orgEnrollment.enroll', ['OrgProgram_id' => $OrgProgram->id]) }}"
+                        method="POST">
                         @csrf
                         <button type="submit" class="custom-btn flex-fill">نعم، أؤكد انضمامي</button>
                     </form>
@@ -1210,12 +1231,12 @@
             trainingItem.classList.toggle('active');
         }
         // منع انتشار الحدث عند النقر على زر "تفاصيل التدريب"
-document.querySelectorAll('.training-details-btn').forEach(btn => {
-    btn.addEventListener('click', function(event) {
-        event.stopPropagation(); // منع انتشار الحدث للعناصر الأب
-        // السماح للرابط بالعمل كالمعتاد (الانتقال للصفحة الأخرى)
-    });
-});
+        document.querySelectorAll('.training-details-btn').forEach(btn => {
+            btn.addEventListener('click', function(event) {
+                event.stopPropagation(); // منع انتشار الحدث للعناصر الأب
+                // السماح للرابط بالعمل كالمعتاد (الانتقال للصفحة الأخرى)
+            });
+        });
     </script>
 @endsection
 @section('scripts')

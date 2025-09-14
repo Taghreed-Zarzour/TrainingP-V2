@@ -229,9 +229,12 @@
                                 <option value="">-- اختر الميسر --</option>
                                 @foreach ($assistants as $assistant)
                                     <option value="{{ $assistant->id }}">
-                                        {{ $assistant->getTranslation('name', 'ar') ?? '—'}} {{ $assistant->assistant->getTranslation('last_name', 'ar')?? '' }}
+    {{ $assistant->getTranslation('name', 'ar') ?? '—' }}
+    @if($assistant->assistant)
+        {{ $assistant->assistant->getTranslation('last_name', 'ar') }}
+    @endif
+</option>
 
-                                    </option>
                                 @endforeach
                             </select>
                             <div id="assistantError" class="invalid-feedback d-none">يرجى اختيار ميسر</div>

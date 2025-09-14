@@ -207,28 +207,11 @@ public function index(Request $request)
         $deadlineValid = $applicationDeadline
             ? $currentDateTime->lessThanOrEqualTo(Carbon::parse($applicationDeadline)->endOfDay())
             : false;
-        // التحقق من وجود جلسات
-        $hasSessions = $program->details && $program->details->some(function ($detail) {
-            return $detail->trainingSchedules && $detail->trainingSchedules->count() > 0;
-        });
-        if ($completion === 100 && $deadlineValid) {
-            // إذا لا توجد جلسات، نضيف البرنامج مباشرة
-            if (!$hasSessions) {
-                $filteredOrgPrograms[] = $program;
-                continue;
-            }
-            // الحصول على أول جلسة
-            foreach ($program->details as $detail) {
-                $firstSession = $detail->trainingSchedules->sortBy('session_date')->first();
-                if ($firstSession) {
-                    $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                    if ($startTime->isFuture()) {
-                        $filteredOrgPrograms[] = $program;
-                        break;
-                    }
-                }
-            }
-        }
+      
+            if ($completion === 100 && $deadlineValid) {
+    $filteredOrgPrograms[] = $program;
+}
+
     }
     
     // تمرير البيانات إلى العرض

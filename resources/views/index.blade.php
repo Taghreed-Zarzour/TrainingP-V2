@@ -59,7 +59,7 @@
             </section>
 
             <!-- Decorative and Hero Section -->
-            <div class="design-wrapper d-none d-md-block">
+            <div class="design-wrapper d-none d-lg-block">
                 <!-- Text Prompt -->
                 <div class="position-absolute text-center animate-bounce-in animate-delay-3 d-none d-lg-block" 
                     style="z-index: 100; left: 35%; bottom: -65px; font-weight: 500;">

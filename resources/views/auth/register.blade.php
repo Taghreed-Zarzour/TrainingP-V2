@@ -27,7 +27,7 @@
     </label>
     <label class="role-option">
         <input type="radio" name="role" class="role-checkbox" value="2" onclick="setUserType(2)">
-        <span class="role-label">مساعد مدرب</span>
+        <span class="role-label">خبير دعم</span>
     </label>
     <label class="role-option">
         <input type="radio" name="role" class="role-checkbox" value="3" onclick="setUserType(3)">

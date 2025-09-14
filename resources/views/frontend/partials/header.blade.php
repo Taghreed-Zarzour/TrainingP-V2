@@ -39,7 +39,7 @@
                     ✕
                 </button>
 
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-2">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-4">
 
                   @guest
                     
@@ -77,7 +77,7 @@
 
                     
                     <li class="nav-item {{ request()->is('assistants') ? 'active' : '' }}">
-                        <a class="nav-link nav-font pb-0" href="{{ route('assistants.index') }}">المساعدون</a>
+                        <a class="nav-link nav-font pb-0" href="{{ route('assistants.index') }}">شركاء التدريب</a>
                     </li>
                     
 

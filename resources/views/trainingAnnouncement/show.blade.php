@@ -57,7 +57,8 @@
                         <img src="{{ asset('storage/' . $program->AdditionalSetting->profile_image) }}"
                             class="square-image" alt="صورة التدريب">
                     @else
-                        <img src="{{ asset('images/cources/training-default-img.svg') }}" class="square-image" alt="صورة التدريب">
+                        <img src="{{ asset('images/cources/training-default-img.svg') }}" class="square-image"
+                            alt="صورة التدريب">
                     @endif
                     <div class="price-section mt-3">
                         <div class="price mb-3">
@@ -76,24 +77,22 @@
                                 مجاني
                             @endif
                         </div>
-<div class="time-left">
-    <img class="pe-2" src="{{ asset('images/cources/calender-red.svg') }}" alt="سعر التسجيل">
-    {{ $remainingText }}
-</div>
+                        <div class="time-left">
+                            <img class="pe-2" src="{{ asset('images/cources/calender-red.svg') }}" alt="سعر التسجيل">
+                            {{ $remainingText }}
+                        </div>
 
                     </div>
                     <h5>تفاصيل التدريب</h5>
                     <div class="training-details">
                         <div>
-                                                      <div class="mb-3">
-                                  <img src="{{ asset('images/training-details/calendar.svg') }}" alt="">
-                                    تاريخ انتهاء التقديم: 
-                                    {{ $program?->AdditionalSetting?->application_deadline 
-    ? \Carbon\Carbon::parse($program->AdditionalSetting->application_deadline)
-        ->locale('ar')
-        ->translatedFormat('d F Y')
-    : 'غير معروف' }}
-                                </div>
+                            <div class="mb-3">
+                                <img src="{{ asset('images/training-details/calendar.svg') }}" alt="">
+                                تاريخ انتهاء التقديم:
+                                {{ $program?->AdditionalSetting?->application_deadline
+                                    ? \Carbon\Carbon::parse($program->AdditionalSetting->application_deadline)->locale('ar')->translatedFormat('d F Y')
+                                    : 'غير معروف' }}
+                            </div>
 
 
                             @if ($program->programLevel)
@@ -109,7 +108,7 @@
                             <div class="mb-3">
                                 <img class="pe-2" src="{{ asset('images/cources/clock2.svg') }}" alt="عدد الساعات">
 
-عدد الساعات: {{ $program->duration_text }}
+                                عدد الساعات: {{ $program->duration_text }}
 
                             </div>
                             @if ($program->AdditionalSetting?->application_submission_method)
@@ -124,7 +123,8 @@
                                 <div class="mb-3">
                                     <img class="pe-2" src="{{ asset('images/cources/members.svg') }}"
                                         alt="العدد الأقصى للمشاركين">
-                                    العدد الأقصى للمشاركين: {{ $program->AdditionalSetting->max_trainees == 0 ? 'لا يوجد عدد محدد' : $program->AdditionalSetting->max_trainees . 'مشارك' }}
+                                    العدد الأقصى للمشاركين:
+                                    {{ $program->AdditionalSetting->max_trainees == 0 ? 'لا يوجد عدد محدد' : $program->AdditionalSetting->max_trainees . 'مشارك' }}
                                 </div>
                             @endif
                             @if ($program->AdditionalSetting?->country)
@@ -138,73 +138,74 @@
                         </div>
                     </div>
                     <div class="row g-2">
-                      @auth
-    @if (auth()->user()->userType?->type === 'متدرب')
-        @if ($training_has_ended) <!-- تحقق إذا انتهى موعد التسجيل -->
-            <div class="col-12">
-                <div class="alert alert-danger text-center mb-0">
-                    انتهى موعد التسجيل في هذا التدريب
-                </div>
-            </div>
-        @elseif (!$has_enrolled)
-            <div class="col-12 col-md-7">
-                <button type="button" class="custom-btn w-100" data-bs-toggle="modal"
-                    data-bs-target="#confirmEnrollmentModal">
-                    انضم الآن ←
-                </button>
-            </div>
-        @else
-            @switch($enrollment?->status)
-                @case('pending')
-                    <div class="col-12">
-                        <div class="alert alert-warning text-center mb-0">
-                            تم إرسال طلبك مسبقًا، في انتظار الموافقة.
-                        </div>
-                    </div>
-                @break
+                        @auth
+                            @if (auth()->user()->userType?->type === 'متدرب')
+                                @if ($training_has_ended)
+                                    <!-- تحقق إذا انتهى موعد التسجيل -->
+                                    <div class="col-12">
+                                        <div class="alert alert-danger text-center mb-0">
+                                            انتهى موعد التسجيل في هذا التدريب
+                                        </div>
+                                    </div>
+                                @elseif (!$has_enrolled)
+                                    <div class="col-12 col-md-7">
+                                        <button type="button" class="custom-btn w-100" data-bs-toggle="modal"
+                                            data-bs-target="#confirmEnrollmentModal">
+                                            انضم الآن ←
+                                        </button>
+                                    </div>
+                                @else
+                                    @switch($enrollment?->status)
+                                        @case('pending')
+                                            <div class="col-12">
+                                                <div class="alert alert-warning text-center mb-0">
+                                                    تم إرسال طلبك مسبقًا، في انتظار الموافقة.
+                                                </div>
+                                            </div>
+                                        @break
 
-                @case('accepted')
-                    <div class="col-12">
-                        <div class="alert alert-success text-center mb-0">
-                            تم قبولك في التدريب، بالتوفيق!
-                        </div>
-                    </div>
-                @break
+                                        @case('accepted')
+                                            <div class="col-12">
+                                                <div class="alert alert-success text-center mb-0">
+                                                    تم قبولك في التدريب، بالتوفيق!
+                                                </div>
+                                            </div>
+                                        @break
 
-                @case('rejected')
-                    <div class="col-12">
-                        <div class="alert alert-danger text-center mb-0">
-                            تم رفض طلبك للانضمام.
-                            @if (!empty($enrollment?->rejection_reason))
-                                <br>
-                                <strong>السبب:</strong> {{ $enrollment->rejection_reason }}
+                                        @case('rejected')
+                                            <div class="col-12">
+                                                <div class="alert alert-danger text-center mb-0">
+                                                    تم رفض طلبك للانضمام.
+                                                    @if (!empty($enrollment?->rejection_reason))
+                                                        <br>
+                                                        <strong>السبب:</strong> {{ $enrollment->rejection_reason }}
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @break
+
+                                        @default
+                                            <div class="col-12">
+                                                <div class="alert alert-info text-center mb-0">
+                                                    حالة طلبك: {{ $enrollment?->status ?? 'غير محدد' }}
+                                                </div>
+                                            </div>
+                                    @endswitch
+                                @endif
+                            @else
+                                <div class="col-12 ">
+                                    <div class="alert alert-warning text-center mb-0">
+                                        الرجاء التسجيل بحساب متدرب للانضمام إلى التدريب
+                                    </div>
+                                </div>
                             @endif
-                        </div>
-                    </div>
-                @break
-
-                @default
-                    <div class="col-12">
-                        <div class="alert alert-info text-center mb-0">
-                            حالة طلبك: {{ $enrollment?->status ?? 'غير محدد' }}
-                        </div>
-                    </div>
-            @endswitch
-        @endif
-    @else
-        <div class="col-12 ">
-            <div class="alert alert-warning text-center mb-0">
-                الرجاء التسجيل بحساب متدرب للانضمام إلى التدريب
-            </div>
-        </div>
-    @endif
-@else
-    <div class="col-12">
-        <div class="alert alert-info text-center mb-0">
-            الرجاء تسجيل الدخول أولاً بحساب متدرب للانضمام إلى التدريب
-        </div>
-    </div>
-@endauth
+                        @else
+                            <div class="col-12">
+                                <div class="alert alert-info text-center mb-0">
+                                    الرجاء تسجيل الدخول أولاً بحساب متدرب للانضمام إلى التدريب
+                                </div>
+                            </div>
+                        @endauth
                         <div class="col-12 col-md-5">
                             <button type="button" class="custom-share-btn w-100" data-bs-toggle="modal"
                                 data-bs-target="#inviteFriendModal">دعوة صديق</button>
@@ -287,76 +288,89 @@
                     @endif
 
 
-<!-- الجلسات التدريبية -->
-<div class="container mt-5">
-    <div class="mt-4 session-schedule">
-        <h4 class="info-title">جدولة الجلسات</h4>
-        <div class="card">
-            <div class="card-body p-0">
-                <div class="table-responsive w-100">
-                    @if (!$program->sessions || $program->sessions->isEmpty())
-                      <div class="info-block py-4 px-2">
-                        <!-- عرض عدد الجلسات والساعات عند عدم وجود جلسات -->
-                        <div class="info-block-content">
-                                                      
-                            @if (isset($program->num_of_session))
-                                <div class="info-block-content-item">
-                                    <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
-                                    <div class="info-block-content-item-title">
-                                        عدد الجلسات {{ $program->num_of_session }} جلسة
+                    <!-- الجلسات التدريبية -->
+                    <div class="container mt-5">
+                        <div class="mt-4 session-schedule">
+                            <h4 class="info-title">جدولة الجلسات</h4>
+                            <div class="card">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive w-100">
+                                        @if (
+                                            (!$program->sessions || $program->sessions->isEmpty()) &&
+                                                (empty($program->num_of_session) || $program->num_of_session == 0) &&
+                                                (empty($program->num_of_hours) || $program->num_of_hours == 0))
+                                            <div class="info-block py-4 px-2 text-center">
+                                                <div class="info-block-content">
+                                                    <div class="info-block-content-item-title align-self-start text-muted">
+                                                        سيتم جدولة الجلسات لاحقا
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @elseif (!$program->sessions || $program->sessions->isEmpty())
+                                            <div class="info-block py-4 px-2">
+                                                <!-- عرض عدد الجلسات والساعات عند عدم وجود جلسات -->
+                                                <div class="info-block-content">
+                                                    @if (!empty($program->num_of_session))
+                                                        <div class="info-block-content-item">
+                                                            <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                                alt="">
+                                                            <div class="info-block-content-item-title">
+                                                                عدد الجلسات {{ $program->num_of_session }} جلسة
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    @if (!empty($program->num_of_hours))
+                                                        <div class="info-block-content-item">
+                                                            <img src="{{ asset('images/icons/check-circle.svg') }}"
+                                                                alt="">
+                                                            <div class="info-block-content-item-title">
+                                                                عدد الساعات
+                                                                {{ rtrim(rtrim(number_format($program->num_of_hours, 1), '0'), '.') }}
+                                                                ساعة
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @else
+                                            <!-- عرض جدول الجلسات عند وجود جلسات -->
+                                            <table class="table table-borderless m-0">
+                                                <thead>
+                                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                                        <th class="p-3 text-center">اليوم</th>
+                                                        <th class="p-3 text-center">التاريخ</th>
+                                                        <th class="p-3 text-center">وقت الجلسة</th>
+                                                        <th class="p-3 text-center">مدة الجلسة</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($program->sessions as $i => $session)
+                                                        <tr style="border-bottom: 1px solid #dee2e6;">
+                                                            <td class="p-3 text-center">
+                                                                {{ isset($session_day[$i]) ? \Carbon\Carbon::parse($session_day[$i])->locale('ar')->dayName : '' }}
+                                                            </td>
+                                                            <td class="p-3 text-center">
+                                                                {{ isset($date_display[$i]) ? \Carbon\Carbon::parse($date_display[$i])->locale('ar')->translatedFormat('d F Y') : '' }}
+                                                            </td>
+                                                            <td class="p-3 text-center">
+                                                                {{ formatTimeArabic($session->session_start_time) }} -
+                                                                {{ formatTimeArabic($session->session_end_time) }}
+                                                            </td>
+                                                            <td class="p-3 text-center">
+                                                                {{ calculateDurationArabic($session->session_start_time, $session->session_end_time) }}
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        @endif
+
                                     </div>
                                 </div>
-                            @endif
-                            
-                            @if (isset($program->num_of_hours))
-                                <div class="info-block-content-item">
-                                    <img src="{{ asset('images/icons/check-circle.svg') }}" alt="">
-                                    <div class="info-block-content-item-title">
-                                        عدد الساعات
-                                        {{ rtrim(rtrim(number_format($program->num_of_hours, 1), '0'), '.') }}
-                                        ساعة
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
                             </div>
-                    @else
-                        <!-- عرض جدول الجلسات عند وجود جلسات -->
-                        <table class="table table-borderless m-0">
-                            <thead>
-                                <tr style="border-bottom: 1px solid #dee2e6;">
-                                    <th class="p-3 text-center">اليوم</th>
-                                    <th class="p-3 text-center">التاريخ</th>
-                                    <th class="p-3 text-center">وقت الجلسة</th>
-                                    <th class="p-3 text-center">مدة الجلسة</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($program->sessions as $i => $session)
-                                    <tr style="border-bottom: 1px solid #dee2e6;">
-                                        <td class="p-3 text-center">
-                                            {{ isset($session_day[$i]) ? \Carbon\Carbon::parse($session_day[$i])->locale('ar')->dayName : '' }}
-                                        </td>
-                                        <td class="p-3 text-center">
-                                            {{ isset($date_display[$i]) ? \Carbon\Carbon::parse($date_display[$i])->locale('ar')->translatedFormat('d F Y') : '' }}
-                                        </td>
-                                        <td class="p-3 text-center">
-                                            {{ formatTimeArabic($session->session_start_time) }} -
-                                            {{ formatTimeArabic($session->session_end_time) }}
-                                        </td>
-                                        <td class="p-3 text-center">
-                                            {{ calculateDurationArabic($session->session_start_time, $session->session_end_time) }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                        </div>
+                    </div>
                     <!-- مقدم التدريب -->
                     <div class="info-box mt-5">
                         <h4 class="info-title">مقدم التدريب</h4>
@@ -447,40 +461,31 @@
                     </p>
                     <div class="social-share">
                         <div class="d-flex justify-content-start flex-wrap gap-3 mb-4">
-  <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" 
-     target="_blank" 
-     class="btn btn-social btn-facebook p-2" 
-     title="شارك على فيسبوك">
-    <img src="{{ asset('images/cources/facebook.svg') }}" alt="فيسبوك">
-  </a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
+                                target="_blank" class="btn btn-social btn-facebook p-2" title="شارك على فيسبوك">
+                                <img src="{{ asset('images/cources/facebook.svg') }}" alt="فيسبوك">
+                            </a>
 
-  <a href="https://twitter.com/intent/tweet?text={{ urlencode('تعالوا شاركوا هذا التدريب الرائع!') }}&url={{ urlencode(url()->current()) }}" 
-     target="_blank" 
-     class="btn btn-social btn-twitter p-2" 
-     title="شارك على تويتر">
-    <img src="{{ asset('images/cources/twitter.svg') }}" alt="تويتر">
-  </a>
+                            <a href="https://twitter.com/intent/tweet?text={{ urlencode('تعالوا شاركوا هذا التدريب الرائع!') }}&url={{ urlencode(url()->current()) }}"
+                                target="_blank" class="btn btn-social btn-twitter p-2" title="شارك على تويتر">
+                                <img src="{{ asset('images/cources/twitter.svg') }}" alt="تويتر">
+                            </a>
 
-  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}" 
-     target="_blank" 
-     class="btn btn-social btn-linkedin p-2" 
-     title="شارك على لينكدإن">
-    <img src="{{ asset('images/cources/linkedin.svg') }}" alt="لينكدإن">
-  </a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}"
+                                target="_blank" class="btn btn-social btn-linkedin p-2" title="شارك على لينكدإن">
+                                <img src="{{ asset('images/cources/linkedin.svg') }}" alt="لينكدإن">
+                            </a>
 
-  <a href="mailto:?subject={{ urlencode('دعوة للمشاركة في تدريب') }}&body={{ urlencode('شاركونا هذا التدريب الرائع: ' . url()->current()) }}" 
-     class="btn btn-social btn-email p-2" 
-     title="شارك عبر الإيميل">
-    <img src="{{ asset('images/cources/email.svg') }}" alt="إيميل">
-  </a>
+                            <a href="mailto:?subject={{ urlencode('دعوة للمشاركة في تدريب') }}&body={{ urlencode('شاركونا هذا التدريب الرائع: ' . url()->current()) }}"
+                                class="btn btn-social btn-email p-2" title="شارك عبر الإيميل">
+                                <img src="{{ asset('images/cources/email.svg') }}" alt="إيميل">
+                            </a>
 
-  <a href="https://wa.me/?text={{ urlencode('تعالوا شاركوا هذا التدريب الرائع: ' . url()->current()) }}" 
-     target="_blank" 
-     class="btn btn-social btn-whatsapp p-2" 
-     title="شارك على واتساب">
-    <img src="{{ asset('images/cources/SMS.svg') }}" alt="واتساب">
-  </a>
-</div>
+                            <a href="https://wa.me/?text={{ urlencode('تعالوا شاركوا هذا التدريب الرائع: ' . url()->current()) }}"
+                                target="_blank" class="btn btn-social btn-whatsapp p-2" title="شارك على واتساب">
+                                <img src="{{ asset('images/cources/SMS.svg') }}" alt="واتساب">
+                            </a>
+                        </div>
                     </div>
                     <div class="share-section mb-4">
                         <div class="row align-items-center g-2">

@@ -2946,8 +2946,8 @@ font-size: 1.3rem;
 @media (min-width: 1400px) {
     .custom-container {
         max-width: 100%;
-        padding-left: 50px;
-        padding-right: 50px;
+        padding-left: 70px;
+        padding-right: 90px;
     }
 }
 

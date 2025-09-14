@@ -49,24 +49,9 @@ class TrainingAnnouncementService
             continue;
         }
 
-        $sessions = collect($program->sessions);
-        $hasSessions = !$sessions->isEmpty();
 
-        // إذا لم توجد جلسات أو تم اختيار schedule_later
-        if (!$hasSessions || ($program->AdditionalSetting && $program->AdditionalSetting->schedule_later)) {
-            $announced[] = $program;
-            continue;
-        }
+      $announced[] = $program;
 
-        // إذا توجد جلسات، تحقق من أول جلسة
-        $firstSession = $sessions->sortBy('session_date')->first();
-        if ($firstSession) {
-            $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-            if ($startTime->isFuture()) {
-                $announced[] = $program;
-                continue;
-            }
-        }
     }
 
     return [

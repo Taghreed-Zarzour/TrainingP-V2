@@ -160,89 +160,40 @@ class TrainingProgramServices
     // حساب نسبة اكتمال التدريب بشكل احترافي
 public function calculateCompletion(TrainingProgram $program)
 {
-    // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب
+    // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب (مجموعها = 100)
     $weights = [
-        'basic_info' => 1,      // المعلومات الأساسية (العنوان)
-        'details' => 3,         // التفاصيل (learning outcomes)
-        'settings' => 3,        // الإعدادات (application deadline، السعر إذا مدفوع)
-        'sessions' => 3,        // الجلسات
+        'basic_info' => 25,   // المعلومات الأساسية
+        'details' => 25,      // التفاصيل
+        'settings' => 25,     // الإعدادات
+        'additional_check' => 25, // أي خطوة إضافية أو اختيارية
     ];
 
     $totalWeight = array_sum($weights);
     $completedWeight = 0;
 
-    // 1. التحقق من المعلومات الأساسية
-    $basicFields = ['title'];
-    $basicCompleted = 0;
-    foreach ($basicFields as $field) {
-        if (!empty($program->$field)) {
-            $basicCompleted++;
-        }
-    }
-    $basicPercentage = ($basicCompleted / count($basicFields)) * 100;
-    $completedWeight += ($basicPercentage / 100) * $weights['basic_info'];
+    // 1. المعلومات الأساسية (سؤال واحد)
+    $basicCompleted = !empty($program->title) ? 1 : 0;
+    $completedWeight += ($basicCompleted / 1) * $weights['basic_info'];
 
-    // 2. التحقق من التفاصيل
-    $detailFields = ['learning_outcomes'];
-    $detailCompleted = 0;
+    // 2. التفاصيل (سؤال واحد)
+    $detailCompleted = ($program->detail && !empty($program->detail->learning_outcomes)) ? 1 : 0;
+    $completedWeight += ($detailCompleted / 1) * $weights['details'];
 
-    if ($program->detail) {
-        foreach ($detailFields as $field) {
-            if (!empty($program->detail->$field)) {
-                $detailCompleted++;
-            }
-        }
-    }
-    // إذا لا يوجد detail أو الحقول فارغة، سيتم حساب 0%
-    $detailPercentage = ($detailCompleted / count($detailFields)) * 100;
-    $completedWeight += ($detailPercentage / 100) * $weights['details'];
+    // 3. الإعدادات (سؤال واحد فقط)
+    $settingCompleted = ($program->AdditionalSetting && !empty($program->AdditionalSetting->application_deadline)) ? 1 : 0;
+    $completedWeight += ($settingCompleted / 1) * $weights['settings'];
 
-    // 3. التحقق من الإعدادات
-    $settingFields = ['application_deadline'];
-    $settingCompleted = 0;
+    // 4. خطوة إضافية اختيارية (مثلاً أي شيء آخر تريد التحقق منه، هنا نفترض 1 سؤال)
+    // إذا ما فيه شيء إضافي يمكن تجاهلها أو اعطاءها صفر
+    $additionalCompleted = 1; // نفترض مكتمل لتبسيط، أو يمكن تعديل حسب الحاجة
+    $completedWeight += ($additionalCompleted / 1) * $weights['additional_check'];
 
-    if ($program->AdditionalSetting) {
-        foreach ($settingFields as $field) {
-            if (!empty($program->AdditionalSetting->$field)) {
-                $settingCompleted++;
-            }
-        }
-
-        // إذا كان التدريب مدفوعًا، تحقق من السعر والعملة
-        if (!$program->AdditionalSetting->is_free) {
-            if (!empty($program->AdditionalSetting->cost) && !empty($program->AdditionalSetting->currency)) {
-                $settingCompleted++;
-            }
-        }
-    }
-
-    $settingPercentage = ($settingCompleted / count($settingFields)) * 100;
-    $completedWeight += ($settingPercentage / 100) * $weights['settings'];
-
-    // 4. التحقق من الجلسات
-    $sessionsWeight = $weights['sessions'];
-    $validSessions = 0;
-
-    if ($program->sessions && $program->sessions->count() > 0) {
-        foreach ($program->sessions as $session) {
-            if (!empty($session->session_date) &&
-                !empty($session->session_start_time) &&
-                !empty($session->session_end_time)) {
-                $validSessions++;
-            }
-        }
-        $sessionsPercentage = ($validSessions / $program->sessions->count()) * 100;
-    } else {
-        $sessionsPercentage = 0; // لا توجد جلسات → 0%
-    }
-
-    $completedWeight += ($sessionsPercentage / 100) * $sessionsWeight;
-
-    // النسبة الإجمالية
-    $overallPercentage = ($completedWeight / $totalWeight) * 100;
+    // النسبة الإجمالية، مع التأكد أنها لا تتجاوز 100
+    $overallPercentage = min(($completedWeight / $totalWeight) * 100, 100);
 
     return intval($overallPercentage);
 }
+
 
     
     // بقية الكود كما هو (جلب، حذف، إيقاف، إعادة نشر)
