@@ -4,6 +4,8 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Messaging;
 
 class EnrollmentRejectedNotification extends Notification
 {
@@ -20,9 +22,21 @@ class EnrollmentRejectedNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database']; 
+        return ['database' , 'fcm']; 
     }
 
+    public function toFcm($notifiable)
+    {
+        return CloudMessage::withTarget('token', $notifiable->fcm_token) 
+            ->withNotification([
+                'title' => 'تم رفض تسجيلك في البرنامج ' . $this->programId,
+                'body' => [
+                    'program_id' => $this->programId,
+                    'participant_id' => $notifiable->id,
+                    'rejection_reason' => $this->reason,
+                ],
+            ]);
+    }
     public function toArray($notifiable)
     {
         return [

@@ -155,6 +155,11 @@ public function login(array $data)
         if (Auth::attempt(['email' => $data['email'], 'password' => $data['password']], $remember)) {
             $user = Auth::user();
 
+            if (isset($data['fcm_token'])) {
+                $user->fcm_token = $data['fcm_token']; // Store the FCM token
+                $user->save(); // Save the user
+            }
+            
             if (is_null($user->email_verified_at)) {
                 $routes = [
                     1 => 'complete-trainer-register',

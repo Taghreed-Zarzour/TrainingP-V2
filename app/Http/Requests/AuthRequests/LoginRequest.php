@@ -25,16 +25,20 @@ class LoginRequest extends FormRequest
             'email' => ['required','email','exists:users,email'],
             'password' => ['required'],
             'remember' => 'nullable|boolean',
+            'fcm_token' => 'required|string',
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'email.required' => 'البريد الإلكتروني مطلوب.',
-            'email.exists' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+            'email.email' => 'يجب أن يكون البريد الإلكتروني صالحًا.',
+            'email.exists' => 'هذا البريد الإلكتروني غير موجود.',
             'password.required' => 'كلمة المرور مطلوبة.',
-            'remember.boolean' => 'القيمة المحددة لتذكرني غير صحيحة.',
+            'remember.boolean' => 'يجب أن تكون قيمة التذكر صحيحة أو خاطئة.',
+            'fcm_token.required' => 'رمز FCM مطلوب.',
+            'fcm_token.string' => 'يجب أن يكون رمز FCM نصًا.',
         ];
     }
 }
