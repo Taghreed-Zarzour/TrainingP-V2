@@ -5,6 +5,8 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Messaging;
 
 class RegistrationCompleted extends Notification
 {
@@ -19,9 +21,17 @@ class RegistrationCompleted extends Notification
 
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database' , 'fcm'];
     }
 
+    public function toFcm($notifiable)
+    {
+        return CloudMessage::withTarget('token', $notifiable->fcm_token) 
+            ->withNotification([
+                'title' =>"تم اكتمال تسجيل حسابك",
+                'body' =>$this->message
+                ]);
+    }
     public function toArray($notifiable)
     {
         return [

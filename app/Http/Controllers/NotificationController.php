@@ -1,10 +1,29 @@
 <?php
 namespace App\Http\Controllers;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 class NotificationController extends Controller
 {
+    protected $firebaseService;
+
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
+
+    // public function sendFirebaseNotification(Request $request)
+    // {
+    //     $token = $request->input('token'); 
+    //     $title = 'Your Notification Title';
+    //     $body = 'Your notification body here';
+
+    //     $this->firebaseService->sendNotification($token, $title, $body);
+
+    //     return response()->json(['message' => 'Notification sent successfully']);
+    // }
+    
     protected $cacheDuration = 60; // دقيقة
     
     public function index()
@@ -51,16 +70,16 @@ class NotificationController extends Controller
     }
     
     // إضافة دالة جديدة لحفظ FCM Token
-    public function saveFcmToken(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string'
-        ]);
+    // public function saveFcmToken(Request $request)
+    // {
+    //     $request->validate([
+    //         'token' => 'required|string'
+    //     ]);
         
-        $user = Auth::user();
-        $user->fcm_token = $request->token;
-        $user->save();
+    //     $user = Auth::user();
+    //     $user->fcm_token = $request->token;
+    //     $user->save();
         
-        return response()->json(['success' => true]);
-    }
+    //     return response()->json(['success' => true]);
+    // }
 }

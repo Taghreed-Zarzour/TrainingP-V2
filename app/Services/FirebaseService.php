@@ -7,46 +7,22 @@ use Illuminate\Support\Facades\Log;
 class FirebaseService
 {
     protected $messaging;
-    
+
     public function __construct()
     {
-        // ضع ملف الاعتماد في storage/app/firebase-service-account.json
-        $serviceAccount = storage_path('app/firebase-service-account.json');
-        $factory = (new Factory)->withServiceAccount($serviceAccount);
-        $this->messaging = $factory->createMessaging();
+        $this->messaging = (new Factory)
+            ->withServiceAccount(base_path('firebase-config.json')) // Adjust this path
+            ->createMessaging();
     }
-    
-    public function sendNotification($deviceToken, $title, $body, $data = [])
+
+    public function sendNotification($token, $title, $body)
     {
-        try {
-            $notification = FirebaseNotification::create($title, $body);
-            
-            $message = CloudMessage::withTarget('token', $deviceToken)
-                ->withNotification($notification)
-                ->withData($data);
-            
-            $this->messaging->send($message);
-            
-            Log::info('Firebase notification sent', [
-                'token' => substr($deviceToken, 0, 10) . '...',
+        $message = CloudMessage::withTarget('token', $token)
+            ->withNotification([
                 'title' => $title,
-                'body' => $body
+                'body' => $body,
             ]);
-            
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Firebase notification error: ' . $e->getMessage());
-            return false;
-        }
-    }
-    
-    public function sendToUser($userId, $title, $body, $data = [])
-    {
-        $user = \App\Models\User::find($userId);
-        if (!$user || !$user->fcm_token) {
-            return false;
-        }
-        
-        return $this->sendNotification($user->fcm_token, $title, $body, $data);
+
+        $this->messaging->send($message);
     }
 }

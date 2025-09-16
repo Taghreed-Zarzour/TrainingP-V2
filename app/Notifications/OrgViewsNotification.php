@@ -4,6 +4,8 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Messaging;
 
 class OrgViewsNotification extends Notification
 {
@@ -18,9 +20,17 @@ class OrgViewsNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database']; // Add other channels as needed
+        return ['database' , 'fcm']; // Add other channels as needed
     }
 
+    public function toFcm($notifiable)
+    {
+        return CloudMessage::withTarget('token', $notifiable->fcm_token) 
+            ->withNotification([
+                'title' =>  'لقد تم مشاهدة برنامجك ' . $this->views . ' مرة.',
+                'body' => $this->views ,
+            ]);
+    }
     public function toArray($notifiable)
     {
         return [
