@@ -70,12 +70,16 @@
                 </div>
 
                 <!-- Remember Me -->
-                <div class="form-group mt-4">
+                {{-- <div class="form-group mt-4">
                     <label for="remember_me" class="form-check-label">
                         <input id="remember_me" type="checkbox" name="remember" value="1" class="form-check-input">
                         تذكرني
                     </label>
-                </div>
+                </div> --}}
+                <input type="hidden" name="remember" value="1">
+
+                <input type="hidden" name="fcm_token" id="fcm_token">
+
 
                     @if (Route::has('password.request'))
                         <a class="forgot-password w-100 mb-2" href="{{ route('password.request') }}">
@@ -114,5 +118,67 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/eye-password.js') }}"></script>
-</body>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC1DOHyKG2922iRHqaT5t6ZrBAdzZ2hQr0",
+    authDomain: "trainingp0.firebaseapp.com",
+    projectId: "trainingp0",
+    storageBucket: "trainingp0.firebasestorage.app",
+    messagingSenderId: "57053343136",
+    appId: "1:57053343136:web:fedf6b3b1689c9700bc8c5",
+    measurementId: "G-FF7SM0VLEJ"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const messaging = firebase.messaging();
+
+  // تسجيل Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then(function(registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+        messaging.useServiceWorker(registration);
+        getFcmToken(); // استدعاء بعد تسجيل SW
+      })
+      .catch(function(err) {
+        console.error('Service Worker registration failed:', err);
+        document.getElementById("fcm_token").value = "sw_error";
+      });
+  } else {
+    console.warn('Service Worker not supported');
+    document.getElementById("fcm_token").value = "no_sw";
+  }
+
+  // دالة للحصول على FCM Token
+  async function getFcmToken() {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        const currentToken = await messaging.getToken({
+          vapidKey: "BPePTrqbThSvx4WtC_t3iYJcWAUK9iF7XX4Ps5z9TOUyDbAyWSyaUtxpwBnp9kb3fDnviJIT0cC_3GcetZZyl1w"
+        });
+
+        if (currentToken) {
+          console.log("FCM Token:", currentToken);
+          document.getElementById("fcm_token").value = currentToken;
+        } else {
+          console.warn("لا يوجد Token حالي");
+          document.getElementById("fcm_token").value = "no_token";
+        }
+      } else {
+        console.warn("المستخدم لم يعطي إذن للإشعارات");
+        document.getElementById("fcm_token").value = "not_granted";
+      }
+    } catch (err) {
+      console.error("خطأ في الحصول على FCM Token:", err);
+      document.getElementById("fcm_token").value = "error";
+    }
+  }
+</script>
+
+  </body>
 </html>

@@ -1,28 +1,18 @@
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js');
 
-// إعداد Firebase
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+firebase.initializeApp({
+    apiKey: "AIzaSyC1DOHyKG2922iRHqaT5t6ZrBAdzZ2hQr0",
+    authDomain: "trainingp0.firebaseapp.com",
+    projectId: "trainingp0",
+    storageBucket: "trainingp0.firebasestorage.app",
+    messagingSenderId: "57053343136",
+    appId: "1:57053343136:web:fedf6b3b1689c9700bc8c5",
+    measurementId: "G-FF7SM0VLEJ"
+});
 
-firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// معالجة الإشعارات في الخلفية
 messaging.onBackgroundMessage(function(payload) {
-    console.log('Received background message ', payload);
-    
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/favicon.ico'
-    };
-    
-    return self.registration.showNotification(notificationTitle, notificationOptions);
+    console.log('[FCM SW] Message received in background:', payload);
 });
