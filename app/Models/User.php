@@ -29,10 +29,10 @@ namespace App\Models;
             'phone_code',
             'phone_number',
             'photo',
-            'profile_message_shown',,
-            'fcm_token'
+            'profile_message_shown',
+            'fcm_token',
         ];
-    
+
 
         public function userType()
         {

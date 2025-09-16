@@ -7,6 +7,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingFilesController;
 use App\Http\Controllers\OrgTrainings\OrgTrainingManagerController;
+use App\Http\Controllers\OrgTrainings\TrainingDetailController;
 use App\Http\Controllers\OrgTrainings\UpdateTrainingController;
 use App\Http\Controllers\Trainings\TrainingsController;
 use App\Http\Controllers\User\Organization\OrganizationProfileController;
@@ -289,6 +290,10 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
   Route::delete('organization-training-manager/destroy/{id}', [OrgTrainingManagerController::class, 'destroy'])->name('orgTrainingsManager.destroy');
   Route::delete('organization-training-manager/destroy-training/{id}', [OrgTrainingManagerController::class, 'deleteOrgTraining'])->name('orgTraining.destroy');
 
+  Route::put('/training-detail/{id}', [TrainingDetailController::class, 'updateInfo'])->name('training-detail.update');
+  Route::put('/training-detail/{id}/clear', [TrainingDetailController::class, 'deleteInfo'])->name('training-detail.clear');
+
+
   Route::delete('organization-training-manager/destroy-session/{id}', [OrgTrainingManagerController::class, 'deleteOrgSession'])->name('orgSessions.destroy');
   Route::put('organization-training-manager/update-session/{id}', [OrgTrainingManagerController::class, 'updateOrgSession'])->name('orgSessions.update');
   Route::delete('organization-training-manager/delete-image/{id}', [OrgTrainingManagerController::class, 'deleteOrgImage'])->name('orgImage.delete');
@@ -376,14 +381,14 @@ Route::get('/test-notification', function () {
             'هذا إشعار اختباري',
             'test'
         );
-        
+
         if ($notification) {
             \Log::info('Test notification created successfully', [
                 'notification_id' => $notification->id,
                 'user_id' => auth()->id(),
                 'data' => $notification->data
             ]);
-            
+
             return 'تم إرسال الإشعار بنجاح. ID: ' . $notification->id;
         } else {
             \Log::error('Failed to create test notification');
@@ -399,21 +404,21 @@ Route::get('/test-views-notification', function () {
     try {
         $organization = \App\Models\User::find(auth()->id());
         $views = rand(30, 60);
-        
+
         $notification = \App\Helpers\NotificationHelper::sendNotification(
             $organization->id,
             'لقد تم مشاهدة برنامجك ' . $views . ' مرة.',
             'views',
             ['views' => $views, 'program_id' => 1]
         );
-        
+
         if ($notification) {
             \Log::info('Views notification created successfully', [
                 'notification_id' => $notification->id,
                 'user_id' => $organization->id,
                 'data' => $notification->data
             ]);
-            
+
             return 'تم إرسال إشعار المشاهدات بنجاح. ID: ' . $notification->id;
         } else {
             \Log::error('Failed to create views notification');
