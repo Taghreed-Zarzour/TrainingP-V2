@@ -1,4 +1,3 @@
-<!-- resources/views/orgTrainings/tabs/assistants.blade.php -->
 <div class="tr-trainees-container">
     <div class="tr-sessions-header">
         <h1 class="tr-sessions-title">مساعدو المدرب</h1>
@@ -7,7 +6,7 @@
             إضافة مساعد
         </button>
     </div>
-    
+
     <div class="tr-trainees-card">
         @if($assistants->isEmpty())
             <div class="text-center py-4">
@@ -46,7 +45,7 @@
                             <td>{{ $assistant->phone_number }}</td>
                             <td><button class="tr-details-btn">عرض التفاصيل</button></td>
                             <td class="text-center">
-                                <form action="{{ route('training.assistant.destroy', ['program_id' => $OrgProgramDetail->trainingProgram->id, 'assistant_id' => $assistant->id]) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('orgAssistant.destroy', ['orgTraining_id' => $OrgProgramDetail->trainingProgram->id, 'assistant_id' => $assistant->id]) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-link p-0" onclick="return confirm('هل أنت متأكد من الحذف؟')">
@@ -76,7 +75,7 @@
                     
                     <h5 class="modal-title mb-4">اختر مساعدًا لإضافته</h5>
                     
-                    @if($assistants->isEmpty())
+                    @if($availableAssistants->isEmpty())
                         <div class="alert alert-warning text-center">
                             <i class="fas fa-exclamation-triangle mb-2"></i>
                             لا يوجد مساعدين متاحين حاليًا للإضافة.
@@ -90,7 +89,7 @@
                                 <option value="">-- اختر المساعد --</option>
                                 @foreach ($availableAssistants as $assistant)
                                     <option value="{{ $assistant->id }}">
-                                        {{-- {{ $assistant->user->getTranslation('name', 'ar') }} {{ $assistant->getTranslation('last_name', 'ar') }} --}}
+                                        {{ $assistant->getTranslation('name', 'ar') }} {{ $assistant->assistant->getTranslation('last_name', 'ar') }}
                                     </option>
                                 @endforeach
                             </select>
@@ -112,51 +111,3 @@
         </div>
     </div>
 </div>
-
-<!-- سكريبت التعامل مع التحقق والرسائل -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('addAssistantForm');
-    const select = form.querySelector('select[name="assistant_id"]');
-    const assistantError = document.getElementById('assistantError');
-    
-    form.addEventListener('submit', function (e) {
-        e.preventDefault(); // امنع الإرسال أولًا للتحقق
-        
-        // Reset error messages
-        select.classList.remove('is-invalid');
-        assistantError.classList.add('d-none');
-        
-        const selectedId = select.value;
-        const alreadyAddedIds = @json($assistants->pluck('id') ?? []);
-        let hasError = false;
-        
-        // تحقق من الاختيار
-        if (!selectedId) {
-            select.classList.add('is-invalid');
-            assistantError.textContent = 'يرجى اختيار مساعد لإضافته.';
-            assistantError.classList.remove('d-none');
-            hasError = true;
-        }
-        
-        // تحقق من التكرار
-        if (alreadyAddedIds.includes(parseInt(selectedId))) {
-            Swal.fire({
-                icon: 'error',
-                title: 'خطأ',
-                text: 'هذا المساعد مضاف مسبقًا لهذا التدريب.',
-                confirmButtonText: 'موافق'
-            });
-            hasError = true;
-        }
-        
-        // لا ترسل إذا في خطأ
-        if (hasError) return;
-        
-        // تعيين الرابط الصحيح ثم إرسال النموذج يدويًا
-        const programId = "{{ $OrgProgramDetail->trainingProgram->id }}";
-        form.action = `/assistant/${selectedId}/add/${programId}`;
-        form.submit();
-    });
-});
-</script>

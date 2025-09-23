@@ -292,7 +292,9 @@ Route::middleware(['auth:web', 'CheckEmailVerified'])->group(function () {
 
   Route::put('/training-detail/{id}', [TrainingDetailController::class, 'updateInfo'])->name('training-detail.update');
   Route::put('/training-detail/{id}/clear', [TrainingDetailController::class, 'deleteInfo'])->name('training-detail.clear');
-
+// المسارات الجديدة
+Route::post('/training-detail/{id}/update-field', [TrainingDetailController::class, 'updateField'])->name('training-detail.update-field');
+Route::post('/training-detail/{id}/delete-field', [TrainingDetailController::class, 'deleteField'])->name('training-detail.delete-field');
 
   Route::delete('organization-training-manager/destroy-session/{id}', [OrgTrainingManagerController::class, 'deleteOrgSession'])->name('orgSessions.destroy');
   Route::put('organization-training-manager/update-session/{id}', [OrgTrainingManagerController::class, 'updateOrgSession'])->name('orgSessions.update');
