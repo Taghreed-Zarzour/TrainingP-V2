@@ -32,15 +32,7 @@
                                         عرض التفاصيل
                                     </button>
                                 </td>
-                                <td class="text-center">
-                                    <form action="{{ route('orgEnrollment.deleteTrainee', ['trainee_id' => $trainee->id, 'program_id' => $OrgProgramDetail->trainingProgram->id]) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('هل أنت متأكد من الحذف؟')">
-                                            <img src="{{ asset('images/cources/trash.svg') }}">
-                                        </button>
-                                    </form>
-                                </td>
+                                
                             </tr>
                         @endforeach
                     </tbody>

@@ -38,7 +38,6 @@
                                     @else
                                         <img src="{{ asset('images/icons/user.svg') }}" alt="مساعد" class="tr-trainee-avatar">
                                     @endif
-                                    <span>{{ $assistant->getTranslation('name', 'ar') }} {{ $assistant->assistant->getTranslation('last_name', 'ar') }}</span>
                                 </div>
                             </td>
                             <td>{{ $assistant->email }}</td>
@@ -70,7 +69,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <div class="modal-body">
-                <form id="addAssistantForm" method="POST" class="p-0">
+                <form id="addAssistantForm" action="{{ route('training-assistant.create' , $OrgProgramDetail->id) }}" method="POST" class="p-0">
                     @csrf
                     
                     <h5 class="modal-title mb-4">اختر مساعدًا لإضافته</h5>

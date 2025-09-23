@@ -53,9 +53,10 @@
                             </div>
                         </div>
                         <!-- نموذج تعديل الصورة -->
-                        <form action="{{ route('orgImage.update', $OrgProgramDetail->id) }}" method="POST" enctype="multipart/form-data" id="edit-image-form" style="display: none;">
+                        <form action="{{ route('training-detail.update', $OrgProgramDetail->id) }}" method="POST" enctype="multipart/form-data" id="edit-image-form" style="display: none;">
                             @csrf
-                            <input type="file" name="profile_image" id="edit-image-input" accept="image/*" onchange="document.getElementById('edit-image-form').submit();">
+                            <input type="hidden" name="_method" value="PUT">
+                            <input type="file" name="image" id="edit-image-input" accept="image/*" onchange="document.getElementById('edit-image-form').submit();">
                         </form>
                     </div>
 

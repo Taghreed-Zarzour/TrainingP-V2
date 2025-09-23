@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\OrgTrainings;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\OrganizationRequests\addAssisstantRequest;
 use App\Http\Requests\OrganizationRequests\updateDetialInfo;
+use App\Models\OrgAssistantManagement;
 use App\Models\OrgTrainingDetail;
 use App\Models\Language;
 use App\Models\TrainingClassification;
@@ -13,38 +15,57 @@ use Illuminate\Support\Facades\Storage;
 class TrainingDetailController extends Controller
 {
     public function updateInfo(updateDetialInfo $request, $id)
-    {
-        $programDetail = OrgTrainingDetail::findOrFail($id);
+{
+    $programDetail = OrgTrainingDetail::findOrFail($id);
+    $data = [];
 
-        $data = $request->validated();
+    if ($request->hasFile('image')) {
+        $originalName = $request->file('image')->getClientOriginalName();
+        $path = 'trainingDetail/image/' . $originalName;
 
-        if ($request->hasFile('image')) {
-            $originalName = $request->file('image')->getClientOriginalName();
-            $path = 'trainingDetail/image/' . $originalName;
+        $request->file('image')->storeAs('trainingDetail/image', $originalName, 'public');
 
-            $request->file('image')->storeAs('trainingDetail/image', $originalName, 'public');
-
-            if ($programDetail->image) {
-                Storage::disk('public')->delete($programDetail->image);
-            }
-
-            $data['image'] = $path;
+        if ($programDetail->image) {
+            Storage::disk('public')->delete($programDetail->image);
         }
 
-        // معالجة الحقول المتعددة مثل أهداف التعلم والتصنيفات
-        if ($request->has('learning_outcomes')) {
-            $data['learning_outcomes'] = json_encode($request->learning_outcomes);
-        }
-
-        if ($request->has('classification')) {
-            $data['classification'] = json_encode($request->classification);
-        }
-
-        $programDetail->fill($data);
-        $programDetail->save();
-
-        return redirect()->back()->with('success', 'تم تحديث بيانات التدريب بنجاح');
+        $data['image'] = $path;
     }
+
+
+    if ($request->has('program_description')) {
+        $data['program_description'] = $request->program_description;
+    }
+
+    if ($request->has('learning_outcomes')) {
+        $data['learning_outcomes'] = json_encode($request->learning_outcomes);
+    }
+
+    if ($request->has('program_type')) {
+        $data['program_type'] = $request->program_type;
+    }
+
+    if ($request->has('language_id')) {
+        $data['language_id'] = $request->language_id;
+    }
+
+    if ($request->has('classification')) {
+        $data['classification'] = json_encode($request->classification);
+    }
+
+    if ($request->has('program_presentation_method')) {
+        $data['program_presentation_method'] = $request->program_presentation_method;
+    }
+
+    if ($request->has('assistant_id')) {
+        $data['assistant_id'] = $request->assistant_id;
+    }
+    $programDetail->fill($data);
+
+    $programDetail->save();
+
+    return redirect()->back()->with('success', 'تم تحديث بيانات التدريب بنجاح');
+}
 
     public function deleteInfo(Request $request, $id)
     {
@@ -93,72 +114,27 @@ class TrainingDetailController extends Controller
 
         return redirect()->back()->with('success', 'تم حذف البيانات المحددة بنجاح');
     }
-
-    // دالة جديدة لتحديث حقول محددة
-    public function updateField(Request $request, $id)
-    {
+    public function viewAssistant(Request $request , $id){
         $programDetail = OrgTrainingDetail::findOrFail($id);
-        
-        $fieldName = $request->input('field_name');
-        $fieldValue = $request->input('field_value');
-        
-        // التحقق من أن الحقل مسموح بتحديثه
-        $allowedFields = [
-            'program_title', 'program_description', 'learning_outcomes', 
-            'program_type', 'language_id', 'classification', 
-            'program_presentation_method'
-        ];
-        
-        if (!in_array($fieldName, $allowedFields)) {
-            return response()->json(['error' => 'غير مسموح بتحديث هذا الحقل'], 403);
-        }
-        
-        // معالجة القيم الخاصة
-        if ($fieldName === 'learning_outcomes' || $fieldName === 'classification') {
-            $fieldValue = json_encode($fieldValue);
-        }
-        
-        $programDetail->$fieldName = $fieldValue;
-        $programDetail->save();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تحديث الحقل بنجاح',
-            'field_name' => $fieldName,
-            'field_value' => $fieldValue
-        ]);
+        $orgTrainingProgramId = $programDetail->org_training_program_id;
+        $orgAssistants = OrgAssistantManagement::where('org_training_program_id',$orgTrainingProgramId)
+        ->get();
+        return redirect()->back()->with('orgAssistants', $orgAssistants);
     }
-    
-    // دالة جديدة لحذف حقول محددة
-    public function deleteField(Request $request, $id)
-    {
+
+    public function addAssistant(addAssisstantRequest $request, $id){
         $programDetail = OrgTrainingDetail::findOrFail($id);
-        
-        $fieldName = $request->input('field_name');
-        
-        // التحقق من أن الحقل مسموح بحذفه
-        $allowedFields = [
-            'program_title', 'program_description', 'learning_outcomes', 
-            'program_type', 'language_id', 'classification', 
-            'program_presentation_method', 'image', 'assistant_id'
-        ];
-        
-        if (!in_array($fieldName, $allowedFields)) {
-            return response()->json(['error' => 'غير مسموح بحذف هذا الحقل'], 403);
-        }
-        
-        // حذف الصورة من التخزين إذا كان الحقل هو image
-        if ($fieldName === 'image' && $programDetail->image) {
-            Storage::disk('public')->delete($programDetail->image);
-        }
-        
-        $programDetail->$fieldName = null;
-        $programDetail->save();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'تم حذف الحقل بنجاح',
-            'field_name' => $fieldName
+        $validatedData = $request->validated();
+        $programDetail->fill([
+            'assistant_id' => $validatedData['assistant_id']
         ]);
+        $programDetail->save();
+        return redirect()->back()->with('success', 'تم أضافة مساعد جديد بنجاح');
+    }
+    public function deleteAssistant(Request $request , $id){
+        $programDetail = OrgTrainingDetail::findOrFail($id);
+        $programDetail->assistant_id = null;
+        $programDetail->save();
+        return redirect()->back()->with('success', 'تم حذف مساعد بنجاح');
     }
 }

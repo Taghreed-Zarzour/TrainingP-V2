@@ -271,7 +271,7 @@ public function showProgramDetail($id)
             $sessionStatuses[$session->id] = $status;
 
             $attendeeCount = OrgSessionAttendance::where('session_id', $session->id)
-            .where('attended', 1)
+            ->where('attended', 1)
             ->count();
 
           $sessionAttendanceCounts[$session->id] = $attendeeCount;
