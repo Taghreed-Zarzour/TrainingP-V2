@@ -1,0 +1,137 @@
+:root {
+  /* === Color Variables === */
+  --color-primary: #003090;
+  --color-primary-dark: #0A1938;
+  --color-secondary: #005FDC;
+  --color-accent: #e74c3c;
+  --color-warning: #FFC62A;
+  --color-danger: #F55157;
+  --color-success: #00AF6C;
+  --color-info: #5196F3;
+
+  --color-text-dark: #333333;
+  --color-text-medium: #666666;
+  --color-text-light: #6c757d;
+  --color-heading: #333;
+
+  --color-bg-light: #f8f9fa;
+  --color-bg-white: #ffffff;
+
+  --color-button-primary: var(--color-primary);
+  --color-button-secondary: #005FDC;
+  --color-highlight: var(--color-primary);
+
+  --primary-color: #0D6EFD;
+  --secondary-color: #6C757D;
+  --font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  direction: rtl;
+}
+
+.intro-bg-container {
+  background-color: #fff;
+  min-height: 100vh;
+}
+
+.cots-style-img{
+  position: absolute;
+  top: -15px;
+  left: -25px;
+}
+.bg-wrapper{
+  position: relative;
+    width: 250px;
+    height: 175px;
+}
+/* Circles */
+.register-ex-screen-header .circle {
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  left: 12%;
+  top: -20px;
+  background-color: #EEEEEE;
+}
+
+.circle-lg {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 150px;
+  height: 150px;}
+
+.circle-md {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 36%;
+  left: 50%;
+}
+
+.circle-sm {
+  position: absolute;
+  top: 30%;
+  left: 35%;
+  width: 30px;
+  height: 30px;
+}
+.intro-slogan {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.intro-highlighted-text {
+  color: var(--primary-color);
+}
+
+.intro-description {
+  font-size: 1.1rem;
+  color: var(--secondary-color);
+  line-height: 1.6;
+}
+
+.intro-btn-custom {
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid var(--primary-color);
+  background: transparent;
+  color: var(--primary-color);
+}
+
+.intro-btn-custom:hover {
+  /* background: var(--primary-color); */
+  color: white;
+}
+
+.intro-btn-custom-2 {
+  background: var(--primary-color);
+  color: white;
+}
+
+.intro-btn-custom-2:hover {
+  background: transparent;
+  /* color: var(--color-secondary); */
+}
+
+@media (max-width: 768px) {
+  .intro-slogan {
+    font-size: 2rem;
+  }
+  
+  .intro-content-section {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .intro-logo-img {
+    margin: 0 auto 2rem;
+  }
+}

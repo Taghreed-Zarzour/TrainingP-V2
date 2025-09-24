@@ -1,0 +1,275 @@
+/* Navbar Styles */
+.navbar {
+    padding: 0.75rem 0;
+    background-color: transparent !important;
+}
+
+.navbar-brand img {
+    height: 40px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.05);
+}
+
+/* Nav Links */
+.nav-item {
+    position: relative;
+    margin: 0 0.5rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.nav-link {
+    color: var(--color-text-dark);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--color-button-primary);
+}
+
+.nav-link.active {
+    color: var(--color-button-primary) !important;
+    padding-bottom: 2px !important;
+}
+
+/* Underline for Active State Only */
+.underline-img {
+    bottom: -5px;
+    left: 0;
+    width: 80%;
+    display: block;
+}
+
+.active + .underline-img {
+    display: block !important;
+}
+
+/* Dropdown Styles */
+.dropdown-menu {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    padding: 0.5rem 0;
+    min-width: 150px;
+    transform: translateY(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.dropdown:hover .dropdown-menu {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: var(--color-bg-light);
+    color: var(--color-button-primary);
+    transform: translateX(-5px);
+}
+
+/* Arrow Animation */
+.arrow-down-img {
+    transition: transform 0.3s ease;
+    margin-right: 5px;
+}
+
+.nav-item:hover .arrow-down-img {
+    transform: rotate(180deg);
+}
+
+/* Auth Buttons */
+.login-btn {
+    background-color: transparent;
+    text-decoration: underline;
+    color: var(--color-text-dark);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.login-btn:hover {
+    color: var(--color-button-primary);
+    transform: translateY(-2px);
+}
+
+.register-btn {
+    background-color: var(--color-button-primary);
+    color: white;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.register-btn:hover {
+    background-color: var(--color-button-secondary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 48, 144, 0.1);
+}
+
+/* Organizations Link */
+.arrow-img {
+    transition: transform 0.3s ease;
+}
+
+a:hover .arrow-img {
+    transform: translate(5px, -5px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 991.98px) {
+    .navbar {
+        padding: 0.5rem 0;
+    }
+    
+    .navbar-toggler {
+        border: none;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .navbar-toggler:focus {
+        box-shadow: none;
+    }
+    
+    .navbar-collapse {
+        margin-top: 1rem;
+    }
+    
+    .navbar-nav {
+        padding: 1rem 0;
+        width: 100%;
+    }
+    
+    .nav-item {
+        margin: 0.5rem 0;
+        display: block;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+    }
+    .nav-item>img {
+       width: 100px;
+    }
+    
+    .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        width: 100%;
+        text-align: right;
+    }
+    
+    .underline-img {
+        display: none !important;
+    }
+    
+    /* Mobile dropdown styles */
+    .dropdown-menu {
+        position: static !important;
+        transform: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        box-shadow: none;
+        border: none;
+        background-color: rgba(0, 0, 0, 0.05);
+        margin-top: 0.5rem;
+        border-radius: 8px;
+    }
+    
+    .dropdown-item {
+        padding: 0.75rem 1.5rem;
+        text-align: right;
+    }
+    
+    /* Mobile auth buttons container */
+    .d-flex.align-items-center {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 1rem !important;
+        width: 100%;
+        margin-top: 1rem;
+        padding: 1rem 0;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .login-btn, .register-btn {
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+    
+    /* Organizations link mobile */
+    .d-flex.align-items-center a[href*="organizations"] {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+    
+    /* Arrow animations disabled on mobile */
+    .nav-item:hover .arrow-down-img {
+        transform: none;
+    }
+    
+    a:hover .arrow-img {
+        transform: none;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 575.98px) {
+    .navbar {
+        padding: 0.25rem 0;
+    }
+    
+    .nav-link {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .login-btn, .register-btn {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.75rem;
+    }
+}
+
+/* RTL Support */
+[dir="rtl"] .dropdown-menu-end {
+    left: 0;
+    right: auto;
+}
+
+.active {
+    color: var(--color-button-primary) !important;
+    padding-bottom: 2px !important;
+}
+
+.active,.underline-img {
+    display: block !important;
+}
+
+.underline-img {
+    display: none;
+}
+
