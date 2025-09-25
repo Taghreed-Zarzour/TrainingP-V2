@@ -192,6 +192,7 @@ $assistants = User::where('user_type_id', 2)
       ));
     }
 
+
 public function showProgramDetail($id)
 {
     $OrgProgramDetail = OrgTrainingDetail::with(
@@ -302,6 +303,7 @@ public function showProgramDetail($id)
     })->get();
 
     return view('orgTrainings.training.training-manager', compact(
+
         'OrgProgramDetail',
         'work_sectors',
         'orgTrainingClassification',
@@ -314,11 +316,14 @@ public function showProgramDetail($id)
         'sessionAttendanceCounts',
         'overallAttendancePercentage',
         'attachments',
+
         'languages',
         'classifications',
         'availableAssistants'
     ));
 }
+
+
 
     public function destroy($id)
     {

@@ -15,6 +15,7 @@ class OrgTrainingDetail extends Model
         'schedule_later',
         'num_of_session',
         'num_of_hours',
+
         'program_description',
         'learning_outcomes',
         'program_type',
@@ -23,6 +24,7 @@ class OrgTrainingDetail extends Model
         'program_presentation_method',
         'image',
         'assistant_id'
+
     ];
 
     public function trainingProgram()

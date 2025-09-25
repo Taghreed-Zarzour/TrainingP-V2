@@ -3,77 +3,48 @@
 namespace App\Http\Controllers\OrgTrainings;
 
 use App\Http\Controllers\Controller;
+
 use App\Http\Requests\OrganizationRequests\addAssisstantRequest;
 use App\Http\Requests\OrganizationRequests\updateDetialInfo;
 use App\Models\OrgAssistantManagement;
 use App\Models\OrgTrainingDetail;
 use App\Models\Language;
 use App\Models\TrainingClassification;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class TrainingDetailController extends Controller
 {
     public function updateInfo(updateDetialInfo $request, $id)
-{
-    $programDetail = OrgTrainingDetail::findOrFail($id);
-    $data = [];
+    {
+        $programDetail = OrgTrainingDetail::findOrFail($id);
 
-    if ($request->hasFile('image')) {
-        $originalName = $request->file('image')->getClientOriginalName();
-        $path = 'trainingDetail/image/' . $originalName;
+        $data = $request->validated();
 
-        $request->file('image')->storeAs('trainingDetail/image', $originalName, 'public');
+        if ($request->hasFile('image')) {
+            $originalName = $request->file('image')->getClientOriginalName();
+            $path = 'trainingDetail/image/' . $originalName;
 
-        if ($programDetail->image) {
-            Storage::disk('public')->delete($programDetail->image);
+            $request->file('image')->storeAs('trainingDetail/image', $originalName, 'public');
+
+            if ($programDetail->image) {
+                Storage::disk('public')->delete($programDetail->image);
+            }
+
+            $data['image'] = $path;
         }
 
-        $data['image'] = $path;
+        $programDetail->fill($data);
+        $programDetail->save();
+
+        return redirect()->back()->with('success', 'تم تحديث بيانات التدريب بنجاح');
     }
-
-
-    if ($request->has('program_description')) {
-        $data['program_description'] = $request->program_description;
-    }
-
-    if ($request->has('learning_outcomes')) {
-        $data['learning_outcomes'] = json_encode($request->learning_outcomes);
-    }
-
-    if ($request->has('program_type')) {
-        $data['program_type'] = $request->program_type;
-    }
-
-    if ($request->has('language_id')) {
-        $data['language_id'] = $request->language_id;
-    }
-
-    if ($request->has('classification')) {
-        $data['classification'] = json_encode($request->classification);
-    }
-
-    if ($request->has('program_presentation_method')) {
-        $data['program_presentation_method'] = $request->program_presentation_method;
-    }
-
-    if ($request->has('assistant_id')) {
-        $data['assistant_id'] = $request->assistant_id;
-    }
-    $programDetail->fill($data);
-
-    $programDetail->save();
-
-    return redirect()->back()->with('success', 'تم تحديث بيانات التدريب بنجاح');
-}
 
     public function deleteInfo(Request $request, $id)
     {
         $programDetail = OrgTrainingDetail::findOrFail($id);
 
-        if ($request->has('program_title')) {
-            $programDetail->program_title = null;
-        }
 
         if ($request->has('program_description')) {
             $programDetail->program_description = null;
@@ -138,3 +109,8 @@ class TrainingDetailController extends Controller
         return redirect()->back()->with('success', 'تم حذف مساعد بنجاح');
     }
 }
+
+        return redirect()->back()->with('success', 'Selected fields deleted successfully');
+    }
+}
+

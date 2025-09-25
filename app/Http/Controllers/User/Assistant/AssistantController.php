@@ -12,6 +12,7 @@ use App\Models\Language;
 use App\Models\ProvidedService;
 use App\Models\User;
 use App\Services\AssistantService;
+use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,6 +26,16 @@ class AssistantController extends Controller
     }
 
     public function index(Request $request){
+
+        // Test NotificationHelper.sendToCurrentUser
+        if (Auth::check()) {
+            NotificationHelper::sendNotification(
+                6,
+                'مرحباً! تم الوصول إلى صفحة المساعدين بنجاح',
+                'success'
+            );
+        }
+        
         $assistants = Assistant::with('user')->get();
         $services = ProvidedService::pluck('name', 'id');
         $experience_areas =ExperienceArea::pluck('name','id');
