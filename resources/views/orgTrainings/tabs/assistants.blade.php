@@ -79,6 +79,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+            justify-content: center;
     }
     .custom-btn:hover {
         background-color: #002b80;

@@ -15,8 +15,7 @@
           <div class="content">
             <div class="title">
               <p>
-                اعثر على أفضل المدربين والمستشارين بكل سهولة في منصتك المهنية مع
-                <span
+اعثر على أفضل المدربين… وأدِر برامجك التدريبية باحترافية مع                <span
                   class="text-underlined text-top right"
                   style="color: var(--color-primary)"
                 >
@@ -25,14 +24,11 @@
               </p>
             </div>
             <div class="desc">
-              منصة TrainingP تتيح للمؤسسات الوصول السريع إلى شبكة واسعة من
-              المدربين المحترفين، مع إمكانية نشر المناقصات واحتياجات المدربين
-              والميسرين وحتى إعلانات التدريبات - كل ذلك في مكان واحد وبدون عناء
-              البحث المتفرق.
-            </div>
+
+مع Training P، لا تحتاج لإجراءات معقدة أو أدوات متفرقة. منصتنا تتيح لك إنشاء تدريبات منفصلة أو مسارات تدريبية متكاملة، مع أتمتة كاملة لعملية التسجيل والحضور، وصفحات تعريف احترافية تسهّل على المشاركين معرفة كل التفاصيل. كل ذلك في واجهة استخدام سلسة وبسيطة مصممة لتجعل التدريب أكثر فعالية وأقل عبئًا.            </div>
             <div class="action">
               <a href="{{ route('register-org') }}" class="pbtn pbtn-main">
-                سجّل مؤسستك الآن وابدأ برصيد 100$
+                سجل كمؤسسة مجانًا، وابدأ الآن
               </a>
             </div>
           </div>
@@ -51,10 +47,9 @@
           <div class="pfeature-item">
             <div class="pfeature-item-col1">01</div>
             <div class="pfeature-item-col2">
-              <div class="title">نشر الفرص في منصات عامة؟</div>
+              <div class="title">أتمتة كاملة للتسجيل</div>
               <div class="desc">
-                أعلن احتياجك واضمن وصوله إلى شبكة واسعة متخصصة من المدربين
-                والمستشارين والمرشدين.
+استقبل طلبات المشاركة تلقائيًا دون الحاجة لاستمارات منفصلة أو متابعة يدوية.
               </div>
             </div>
             <div class="pfeature-item-line-horizontal"></div>
@@ -63,10 +58,9 @@
           <div class="pfeature-item">
             <div class="pfeature-item-col1">02</div>
             <div class="pfeature-item-col2">
-              <div class="title">كثرة المتقدمين دون ملفات احترافية؟</div>
+              <div class="title">تسجيل حضور المتدربين بسهولة</div>
               <div class="desc">
-                ملفات المدربين في TrainingP تعرض الخبرات التدريبية والاستشارية
-                والعملية والشهادات باحتراف وتميُّز.
+تابع حضور المشاركين بدقة عبر المنصة دون الحاجة للورقيات أو الجداول المبعثرة.
               </div>
             </div>
             <div class="pfeature-item-line-horizontal"></div>
@@ -74,21 +68,19 @@
           <div class="pfeature-item">
             <div class="pfeature-item-col1">03</div>
             <div class="pfeature-item-col2">
-              <div class="title">صعوبة الوصول إلى خبرات متخصصة؟</div>
+              <div class="title">صفحات تعريف احترافية للبرامج التدريبية
+</div>
               <div class="desc">
-                تصفّح المدربين والمستشارين حسب الموضوعات الدقيقة والتخصصات
-                النادرة بسهولة.
-              </div>
+لكل تدريب أو مسار تدريبي صفحة خاصة تضم جميع المعلومات التي يحتاجها المشاركون قبل الانضمام.              </div>
             </div>
             <div class="pfeature-item-line-vertical center"></div>
           </div>
           <div class="pfeature-item">
             <div class="pfeature-item-col1">04</div>
             <div class="pfeature-item-col2">
-              <div class="title">لا وقت للانتظار؟</div>
+              <div class="title">واجهة استخدام سلسة</div>
               <div class="desc">
-                ابحث فورًا في بنك المدربين واختر من بين أفضل الكفاءات دون إعلان
-                مسبق.
+بنية مصممة بتجربة مستخدم بسيطة وسريعة، تضمن لك وفريقك سهولة في إدارة البرامج التدريبية.
               </div>
             </div>
             <div class="pfeature-item-line-vertical top"></div>
@@ -96,10 +88,9 @@
           <div class="pfeature-item">
             <div class="pfeature-item-col1">05</div>
             <div class="pfeature-item-col2">
-              <div class="title">وعود منمقة ومعلومات مضللة؟</div>
+              <div class="title">معرفة الاحتياجات التدريبية مسبقًا</div>
               <div class="desc">
-                تقدّم TrainingP ملفات موثقة ومؤشرات واضحة لخبرات المدرب، تساعدكم
-                على التحقق قبل اتخاذ القرار.
+عبر لوحة معلومات تفاعلية، يمكنك التعرف على مجالات الاهتمام والتطوير المهني لدى المتدربين في المنصة.
               </div>
             </div>
           </div>
@@ -108,13 +99,12 @@
       <div class="pfeatured small">
         <div class="pfeatured-content">
           <div class="title">
-            في منصتكم TrainingP، نوفر لكم الوقت، ونرفع جودة الاختيار، ونسهّل
-            الوصول إلى الكفاءات التي يصعب العثور عليها
+ودّع العمل اليدوي والفوضى، وابدأ إدارة تدريبية مؤتمتة واحترافية.
           </div>
         </div>
       </div>
       <section class="companies-features-section">
-        <div class="title">
+        <div class="title mt-5">
           <p>
             ماذا تقدم TrainingP
             <span class="text-underlined" style="color: var(--color-primary)">
@@ -125,28 +115,23 @@
         <div class="grid">
           <div class="company-feature-item">
             <img src="../images/company-features/1.svg" />
-            <div class="desc">بروفايلات مدربين احترافية مع تفاصيل كاملة</div>
+            <div class="desc">إنشاء وإدارة تدريبات منفصلة أو مسارات تدريبية متكاملة.</div>
           </div>
           <div class="company-feature-item">
             <img src="../images/company-features/2.svg" />
-            <div class="desc">بحث متقدم بأكثر من 20 معيار</div>
+            <div class="desc">أتمتة التسجيل والمتابعة دون جهد إداري إضافي.</div>
           </div>
           <div class="company-feature-item">
             <img src="../images/company-features/3.svg" />
             <div class="desc" style="text-align: right; line-height: 30px">
-              <p>إمكانية نشر:</p>
-              <ul>
-                <li>وظائف مدربين وميسرين</li>
-                <li>مناقصات تدريبية</li>
-                <li>إعلانات تدريبات مفتوحة للمتدربين</li>
-              </ul>
+              <p>صفحات تعريف جاهزة تعكس احترافية برامجك التدريبية.</p>
+              
             </div>
           </div>
           <div class="company-feature-item">
             <img src="../images/company-features/4.svg" />
             <div class="desc">
-              رصيد مجاني بقيمة 50$ لاستخدامه في الاشتراك ونشر الإعلانات
-            </div>
+قاعدة بيانات لأفضل المدربين المحترفين في المنطقة العربية.            </div>
           </div>
         </div>
       </section>
@@ -162,20 +147,19 @@
         <div class="grid">
           <div class="start-item">
             <img src="../images/how-to-start/1.svg" />
-            <div class="title">سجّل مؤسستك مجانًا خلال دقيقتين</div>
+            <div class="title">سجّل مؤسستك مجانًا خلال دقيقتين.</div>
             <div class="index">01</div>
           </div>
           <div class="start-item">
             <img src="../images/how-to-start/2.svg" />
             <div class="title">
-              ابدأ بنشر الوظائف والمناقصات التدريبية أو ابدأ البحث عن المدربين
-            </div>
+أنشئ تدريبًا أو مسارًا تدريبيًا وحدد تفاصيله.</div>
             <div class="index">02</div>
           </div>
           <div class="start-item">
             <img src="../images/how-to-start/3.svg" />
             <div class="title">
-              تواصل مع الكفاءات المناسبة مباشرة عبر وسائل الاتصال.
+دع المنصة تهتم بالتسجيل والمتابعة بينما تركز أنت على جودة التدريب.
             </div>
             <div class="index">03</div>
           </div>
@@ -306,11 +290,11 @@
                                     سجّل مؤسستك اليوم
                                 </div>
                                 <div class="title">
-                                    وابدأ رحلتك نحو نجاح تدريبي أسرع وأكثر
-                  احترافية.
+                                    وحوّل فوضى التدريبات إلى تجربة سلسة ومؤتمتة بالكامل.
+
                                 </div>
                                 <a href="{{ route('register-org') }}" class="pbtn pbtn-light top-white">
-                                    تسجيل المؤسسة
+                                    ابدأ الآن مجانًا
                                 </a>
                             </div>
                         </div>

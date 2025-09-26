@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('org_training_details', function (Blueprint $table) {
             $table->longText('program_description')->nullable();
 
-            $table->longText('learning_outcomes');
+            $table->longText('learning_outcomes')->nullable();;
 
             $table->string('program_type')->nullable();
 

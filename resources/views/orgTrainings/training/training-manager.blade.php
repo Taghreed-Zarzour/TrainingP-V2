@@ -155,11 +155,11 @@
                             الجلسات التدريبية
                         </a>
                     </li>
-                    <li class="nav-item" role="presentation">
+                    {{-- <li class="nav-item" role="presentation">
                         <a class="nav-link" id="registrants-tab" data-bs-toggle="tab" href="#registrants" role="tab" aria-controls="registrants" aria-selected="false">
                             المسجلون
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" id="trainees-tab" data-bs-toggle="tab" href="#trainees" role="tab" aria-controls="trainees" aria-selected="false">
                             المتدربون
@@ -170,11 +170,11 @@
                             معلومات التدريب
                         </a>
                     </li>
-                    <li class="nav-item" role="presentation">
+                    {{-- <li class="nav-item" role="presentation">
                         <a class="nav-link" id="attachments-tab" data-bs-toggle="tab" href="#attachments" role="tab" aria-controls="attachments" aria-selected="false">
                             المرفقات
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" id="assistants-tab" data-bs-toggle="tab" href="#assistants" role="tab" aria-controls="assistants" aria-selected="false">
                             مساعدو المدرب
@@ -190,9 +190,9 @@
                         @include('orgTrainings.training.tabs.sessions')
                     </div>
 
-                    <div class="tab-pane fade" id="registrants" role="tabpanel" aria-labelledby="registrants-tab">
+                    {{-- <div class="tab-pane fade" id="registrants" role="tabpanel" aria-labelledby="registrants-tab">
                         @include('orgTrainings.training.tabs.registrants')
-                    </div>
+                    </div> --}}
 
                     <div class="tab-pane fade  px-5" id="trainees" role="tabpanel" aria-labelledby="trainees-tab">
                         @include('orgTrainings.training.tabs.trainees')
@@ -202,9 +202,9 @@
                         @include('orgTrainings.training.tabs.info')
                     </div>
 
-                    <div class="tab-pane fade  px-5" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
+                    {{-- <div class="tab-pane fade  px-5" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
                         @include('orgTrainings.training.tabs.attachments')
-                    </div>
+                    </div> --}}
 
                     <div class="tab-pane fade  px-5" id="assistants" role="tabpanel" aria-labelledby="assistants-tab">
                         @include('orgTrainings.training.tabs.assistants')
@@ -259,10 +259,10 @@
         const tabNames = {
             '#stats': 'إحصائيات',
             '#sessions': 'الجلسات التدريبية',
-            '#registrants': 'المسجلون',
+            // '#registrants': 'المسجلون',
             '#trainees': 'المتدربون',
             '#info': 'معلومات التدريب',
-            '#attachments': 'المرفقات',
+            // '#attachments': 'المرفقات',
             '#assistants': 'مساعدو المدرب'
         };
 

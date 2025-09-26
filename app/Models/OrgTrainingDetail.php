@@ -15,7 +15,7 @@ class OrgTrainingDetail extends Model
         'schedule_later',
         'num_of_session',
         'num_of_hours',
-
+//new columns
         'program_description',
         'learning_outcomes',
         'program_type',

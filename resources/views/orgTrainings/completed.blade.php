@@ -18,8 +18,8 @@
                         أصبح مسارك التدريبي الآن جاهزًا للعرض على المنصة ويمكن للمستخدمين التسجيل وفق الإعدادات التي حددتها
                         يمكنك
                         متابعة حالة التسجيلات، إدارة الجلسات، والتفاعل مع المتدربين من خلال صفحة المسار التدريبي.</p>
-{{-- <a href="{{ route('training.details', ['id' => $training->id]) }}#info" --}}
-                    <a href="#"
+{{-- <a href="{{ route('orgTrainingsManager.show', ['id' => $training->id]) }}#info" --}}
+                    <a href="{{ route('orgTrainingsManager.show', ['id' => $training->id]) }}#info"
                         class="pbtn pbtn-main piconed">
                         <span>انتقل لصفحة المسار التدريبي </span>
                         <img src="{{ asset('images/arrow-left.svg') }}" alt="">

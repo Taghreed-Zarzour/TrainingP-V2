@@ -500,6 +500,8 @@
                             <div class="desc w-100">
                                 <span class="text-muted mb-3">حمّل سيرتك الذاتية بشكل سهل وسريع</span>
                             </div>
+
+                              <div class="edit-button-container">
                             <button class="btn download-btn px-5"
                                 onclick="document.getElementById('cv-upload').click()">
 <svg width="25" height="24" viewBox="0 0 25 24" fill="none"
@@ -520,6 +522,7 @@
                                 <input type="file" name="uploadPdf" id="cv-upload"
                                     onchange="document.getElementById('cvUploadForm').submit();">
                             </form>
+                              </div>
                         </div>
                     </div>
                 </div>
