@@ -80,6 +80,15 @@
                 <input type="hidden" name="remember" value="1">
 
                 <input type="hidden" name="fcm_token" id="fcm_token">
+                
+                <!-- Notification Permission Status -->
+                <div id="notification-status" class="alert alert-info d-none" style="font-size: 14px;">
+                    <i class="fas fa-bell-slash me-2"></i>
+                    <span id="notification-message">يتم تحضير الإشعارات...</span>
+                    <button type="button" id="retry-notification" class="btn btn-sm btn-outline-primary ms-2" style="display: none;">
+                        <i class="fas fa-redo me-1"></i>إعادة المحاولة
+                    </button>
+                </div>
 
 
                 @if (Route::has('password.request'))
@@ -136,6 +145,90 @@
         firebase.initializeApp(firebaseConfig);
         const messaging = firebase.messaging();
 
+        // متغيرات للتحكم في حالة الإشعارات
+        let notificationStatus = document.getElementById('notification-status');
+        let notificationMessage = document.getElementById('notification-message');
+        let retryButton = document.getElementById('retry-notification');
+        let fcmTokenInput = document.getElementById('fcm_token');
+
+        // دالة لتحديث واجهة حالة الإشعارات
+        function updateNotificationStatus(message, showRetry = false, alertClass = 'alert-info') {
+            notificationStatus.className = `alert ${alertClass} d-block`;
+            notificationMessage.textContent = message;
+            retryButton.style.display = showRetry ? 'inline-block' : 'none';
+        }
+
+        // دالة للحصول على FCM Token
+        async function getFcmToken() {
+            try {
+                updateNotificationStatus('يتم طلب إذن الإشعارات...', false, 'alert-info');
+                
+                const permission = await Notification.requestPermission();
+                
+                if (permission === 'granted') {
+                    updateNotificationStatus('يتم إنشاء رمز الإشعارات...', false, 'alert-info');
+                    
+                    const currentToken = await messaging.getToken({
+                        vapidKey: "BIkY7EMkwxf3xyvhgran_-tb46xovLHz7qVZSpQSHOR4QAhkFiottsww2TycGChUqgd7aG4J-uf2rrAbusmDqp0"
+                    });
+
+                    if (currentToken) {
+                        console.log("FCM Token:", currentToken);
+                        fcmTokenInput.value = currentToken;
+                        updateNotificationStatus('تم تفعيل الإشعارات بنجاح!', false, 'alert-success');
+                        setTimeout(() => {
+                            notificationStatus.classList.add('d-none');
+                        }, 3000);
+                    } else {
+                        console.warn("لا يوجد Token حالي");
+                        fcmTokenInput.value = "no_token";
+                        updateNotificationStatus('فشل في إنشاء رمز الإشعارات', true, 'alert-warning');
+                    }
+                } else if (permission === 'denied') {
+                    console.warn("المستخدم رفض إذن الإشعارات");
+                    fcmTokenInput.value = "not_granted";
+                    updateNotificationStatus('تم رفض إذن الإشعارات. يمكنك إعادة المحاولة لاحقاً', true, 'alert-warning');
+                } else {
+                    console.warn("المستخدم لم يقرر بعد بشأن إذن الإشعارات");
+                    fcmTokenInput.value = "not_granted";
+                    updateNotificationStatus('يرجى السماح بالإشعارات للمتابعة', true, 'alert-info');
+                }
+            } catch (err) {
+                console.error("خطأ في الحصول على FCM Token:", err);
+                fcmTokenInput.value = "error";
+                updateNotificationStatus('حدث خطأ في تحضير الإشعارات', true, 'alert-danger');
+            }
+        }
+
+        // مراقبة تغيير إذن الإشعارات
+        function monitorNotificationPermission() {
+            // فحص إذن الإشعارات الحالي
+            if (Notification.permission === 'granted') {
+                getFcmToken();
+            } else if (Notification.permission === 'denied') {
+                updateNotificationStatus('تم رفض إذن الإشعارات. يمكنك إعادة المحاولة لاحقاً', true, 'alert-warning');
+            } else {
+                updateNotificationStatus('يرجى السماح بالإشعارات للمتابعة', true, 'alert-info');
+            }
+
+            // مراقبة تغيير إذن الإشعارات
+            navigator.permissions && navigator.permissions.query({name: 'notifications'}).then(function(permissionStatus) {
+                permissionStatus.onchange = function() {
+                    console.log('Notification permission changed to:', permissionStatus.state);
+                    if (permissionStatus.state === 'granted') {
+                        getFcmToken();
+                    } else if (permissionStatus.state === 'denied') {
+                        updateNotificationStatus('تم رفض إذن الإشعارات. يمكنك إعادة المحاولة لاحقاً', true, 'alert-warning');
+                    }
+                };
+            });
+        }
+
+        // إضافة مستمع لزر إعادة المحاولة
+        retryButton.addEventListener('click', function() {
+            getFcmToken();
+        });
+
         // تسجيل Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/firebase-messaging-sw.js')
@@ -147,41 +240,17 @@
                 })
                 .then(function(registration) {
                     console.log('Service Worker is ready');
-                    getFcmToken(); // استدعاء بعد أن يصبح SW نشطاً
+                    monitorNotificationPermission(); // استدعاء مراقبة الإذن
                 })
                 .catch(function(err) {
                     console.error('Service Worker registration failed:', err);
-                    document.getElementById("fcm_token").value = "sw_error";
+                    fcmTokenInput.value = "sw_error";
+                    updateNotificationStatus('فشل في تحميل خدمة الإشعارات', true, 'alert-danger');
                 });
         } else {
             console.warn('Service Worker not supported');
-            document.getElementById("fcm_token").value = "no_sw";
-        }
-
-        // دالة للحصول على FCM Token
-        async function getFcmToken() {
-            try {
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    const currentToken = await messaging.getToken({
-                        vapidKey: "BIkY7EMkwxf3xyvhgran_-tb46xovLHz7qVZSpQSHOR4QAhkFiottsww2TycGChUqgd7aG4J-uf2rrAbusmDqp0"
-                    });
-
-                    if (currentToken) {
-                        console.log("FCM Token:", currentToken);
-                        document.getElementById("fcm_token").value = currentToken;
-                    } else {
-                        console.warn("لا يوجد Token حالي");
-                        document.getElementById("fcm_token").value = "no_token";
-                    }
-                } else {
-                    console.warn("المستخدم لم يعطي إذن للإشعارات");
-                    document.getElementById("fcm_token").value = "not_granted";
-                }
-            } catch (err) {
-                console.error("خطأ في الحصول على FCM Token:", err);
-                document.getElementById("fcm_token").value = "error";
-            }
+            fcmTokenInput.value = "no_sw";
+            updateNotificationStatus('المتصفح لا يدعم الإشعارات', false, 'alert-warning');
         }
     </script>
 
