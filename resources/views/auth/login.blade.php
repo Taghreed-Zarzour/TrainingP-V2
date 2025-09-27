@@ -86,7 +86,7 @@
                     <i class="fas fa-bell-slash me-2"></i>
                     <span id="notification-message">يتم تحضير الإشعارات...</span>
                     <button type="button" id="retry-notification" class="btn btn-sm btn-outline-primary ms-2" style="display: none;">
-                        <i class="fas fa-redo me-1"></i>إعادة المحاولة
+                        <i class="fas fa-redo me-1"></i> فعل الاشعارات
                     </button>
                 </div>
 
@@ -187,7 +187,7 @@
                 } else if (permission === 'denied') {
                     console.warn("المستخدم رفض إذن الإشعارات");
                     fcmTokenInput.value = "not_granted";
-                    updateNotificationStatus('تم رفض إذن الإشعارات. يمكنك إعادة المحاولة لاحقاً', true, 'alert-warning');
+                    updateNotificationStatus('تم رفض إذن الإشعارات.', true, 'alert-warning');
                 } else {
                     console.warn("المستخدم لم يقرر بعد بشأن إذن الإشعارات");
                     fcmTokenInput.value = "not_granted";
@@ -206,7 +206,7 @@
             if (Notification.permission === 'granted') {
                 getFcmToken();
             } else if (Notification.permission === 'denied') {
-                updateNotificationStatus('تم رفض إذن الإشعارات. يمكنك إعادة المحاولة لاحقاً', true, 'alert-warning');
+                updateNotificationStatus('تم رفض إذن الإشعارات.', true, 'alert-warning');
             } else {
                 updateNotificationStatus('يرجى السماح بالإشعارات للمتابعة', true, 'alert-info');
             }
