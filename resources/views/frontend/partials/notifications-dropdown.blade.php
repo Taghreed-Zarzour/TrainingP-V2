@@ -23,7 +23,11 @@
         <li class="notifications-header d-flex justify-content-between align-items-center">
             <span>الإشعارات</span>
             @if($unreadCount > 0)
-                <a href="#" class="mark-all-read" data-url="{{ route('notifications.markAllRead') }}">تعريف الكل كمقروء</a>
+                <form action="{{ route('notifications.markAllRead') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="mark-all-read">تعريف الكل كمقروء</button>
+                </form>
+                <!-- <a href="#" class="mark-all-read" data-url="{{ route('notifications.markAllRead') }}">تعريف الكل كمقروء</a> -->
             @endif
         </li>
         
@@ -226,6 +230,7 @@ $(document).ready(function() {
     font-size: 12px;
     color: #003090;
     text-decoration: none;
+    background: none;
 }
 
 .notifications-container {

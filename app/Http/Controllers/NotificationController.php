@@ -55,7 +55,7 @@ class NotificationController extends Controller
         $cacheKey = 'user_notifications_' . $userId;
         Cache::forget($cacheKey);
         
-        return response()->json(['success' => true]);
+        return redirect()->route('notifications.index');
     }
     
     public function markAllAsRead()
@@ -66,7 +66,7 @@ class NotificationController extends Controller
         $cacheKey = 'user_notifications_' . $userId;
         Cache::forget($cacheKey);
         
-        return response()->json(['success' => true]);
+        return redirect()->back();
     }
     
     // إضافة دالة جديدة لحفظ FCM Token
