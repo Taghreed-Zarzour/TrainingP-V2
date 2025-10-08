@@ -22,6 +22,8 @@ enum JobPositionEnum: string
     case مسؤول = 'مسؤول';
     case ميسر = 'ميسر';
     case مساعد = 'مساعد';
+    case غيرـمقيد = 'غير مقيد';
+    case الكل = 'الكل';
 
     public static function values(): array
     {
