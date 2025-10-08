@@ -19,33 +19,44 @@ class OrgTrainingFilesController extends Controller
 
     foreach ($files as $uploadedFile) {
         $originalName = $uploadedFile->getClientOriginalName();
-        $storagePath = 'training/files/' . $originalName;
+        
+        // Generate a unique filename to avoid conflicts
+        $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName);
+        $storagePath = 'training/files/' . $filename;
 
-        // Check if the file already exists in the storage
-        if (Storage::disk('public')->exists($storagePath)) {
-            return back()->with('error', 'الملف "' . $originalName . '" موجود مسبقًا في التخزين.');
-        }
-
-        // Check if the file exists in the database
-        $existingFile = OrgTrainingDetailFile::where('training_files', $storagePath)
-            ->where('org_training_program_id', $program_id)
+        // Check if the file already exists in the database for this program
+        $existingFile = OrgTrainingDetailFile::where('org_training_program_id', $program_id)
+            ->where('training_files', 'like', '%' . $originalName . '%')
             ->first();
 
         if ($existingFile) {
-            // Update the existing record
-            $existingFile->training_files = $storagePath;
-            $existingFile->save();
-
-            return back()->with('success', 'تم تحديث الملف "' . $originalName . '" بنجاح.');
+            return back()->with('error', 'الملف "' . $originalName . '" موجود مسبقًا لهذا البرنامج التدريبي.');
         }
 
         // Store the new file
-        $path = $uploadedFile->storeAs('training/files', $originalName, 'public');
+        $path = $uploadedFile->storeAs('training/files', $filename, 'public');
 
-        OrgTrainingDetailFile::create([
-            'org_training_program_id' => $program_id,
-            'training_files' => $path,
-        ]);
+        // Prepare file data as JSON (required by database constraint)
+        $fileData = [
+            'original_name' => $originalName,
+            'stored_path' => $path,
+            'filename' => $filename,
+            'size' => $uploadedFile->getSize(),
+            'mime_type' => $uploadedFile->getMimeType(),
+            'uploaded_at' => now()->toISOString()
+        ];
+
+        // Create the database record
+        try {
+            OrgTrainingDetailFile::create([
+                'org_training_program_id' => $program_id,
+                'training_files' => json_encode($fileData),
+            ]);
+        } catch (\Exception $e) {
+            // If database insert fails, delete the uploaded file
+            Storage::disk('public')->delete($path);
+            return back()->with('error', 'حدث خطأ أثناء حفظ الملف: ' . $e->getMessage());
+        }
     }
 
     return back()->with('success', 'تم رفع الملفات بنجاح.');
@@ -54,17 +65,26 @@ class OrgTrainingFilesController extends Controller
 
   public function deleteOrgTrainingFile($id)
 {
-    $file = OrgTrainingDetailFile::findOrFail($id);
+    try {
+        $file = OrgTrainingDetailFile::findOrFail($id);
 
-    Storage::disk('public')->delete($file->training_files);
+        // Parse the JSON data to get file information
+        $fileData = json_decode($file->training_files, true);
+        
+        if ($fileData && isset($fileData['stored_path'])) {
+            // Delete the physical file from storage
+            if (Storage::disk('public')->exists($fileData['stored_path'])) {
+                Storage::disk('public')->delete($fileData['stored_path']);
+            }
+        }
 
-    $file->delete($file->training_files);
+        // Delete the database record
+        $file->delete();
 
-    if (!isset($file)) {
-        return back()->withErrors('الملف المطلوب غير موجود');
+        return back()->with('success', 'تم حذف الملف بنجاح');
+    } catch (\Exception $e) {
+        return back()->withErrors('حدث خطأ أثناء حذف الملف: ' . $e->getMessage());
     }
-
-    return back()->with('success', 'تم حذف الملف بنجاح');
 }
 
 

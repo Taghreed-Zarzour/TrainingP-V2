@@ -15,10 +15,27 @@ class OrgTrainingDetailFile extends Model
         'org_training_program_id',
         'training_files',
     ];
-    
+
+    protected $casts = [
+        'training_files' => 'array',
+    ];
 
     public function trainingProgram()
     {
         return $this->belongsTo(OrgTrainingProgram::class, 'org_training_program_id');
+    }
+
+    // Accessor to get the file path for easy access
+    public function getFilePathAttribute()
+    {
+        $fileData = $this->training_files;
+        return $fileData['stored_path'] ?? null;
+    }
+
+    // Accessor to get the original filename
+    public function getOriginalNameAttribute()
+    {
+        $fileData = $this->training_files;
+        return $fileData['original_name'] ?? null;
     }
 }

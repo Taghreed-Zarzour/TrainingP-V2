@@ -43,11 +43,11 @@ class TrainingAnnouncementService
         }
 
         // تحقق من انتهاء التقديم
-        $deadline = $program->AdditionalSetting->application_deadline ?? null;
-        $deadlineValid = $deadline ? $now->lessThanOrEqualTo(Carbon::parse($deadline)->endOfDay()) : false;
-        if (!$deadlineValid) {
-            continue;
-        }
+        // $deadline = $program->AdditionalSetting->application_deadline ?? null;
+        // $deadlineValid = $deadline ? $now->lessThanOrEqualTo(Carbon::parse($deadline)->endOfDay()) : false;
+        // if (!$deadlineValid) {
+        //     continue;
+        // }
 
 
       $announced[] = $program;

@@ -16,7 +16,7 @@ namespace App\Models;
         /** @use HasFactory<\Database\Factories\UserFactory> */
         use HasFactory, Notifiable , HasApiTokens, HasTranslations, CanResetPasswordTrait;
 
-        public array $translatable = ['name'];
+        public array $translatable = ['name','last_name'];
         protected $rememberTokenName = 'remember_token';
         protected $fillable = [
             'name',

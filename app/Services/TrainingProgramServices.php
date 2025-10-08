@@ -12,7 +12,8 @@ class TrainingProgramServices
         // جلب التدريبات النشطة (online) والمتوقفة (stopped)
         $activePrograms = TrainingProgram::with(['detail', 'AdditionalSetting', 'sessions', 'trainees'])
             ->where('user_id', $userId)
-            ->where('status', 'online') 
+            ->where('status', 'online')
+            ->orWhere('status', 'offline')
             ->get();
             
         $stoppedPrograms = TrainingProgram::with(['detail', 'AdditionalSetting', 'sessions', 'trainees'])

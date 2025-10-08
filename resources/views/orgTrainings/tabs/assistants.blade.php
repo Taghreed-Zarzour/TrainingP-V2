@@ -179,7 +179,7 @@
                                     @else
                                         <img src="{{ asset('images/icons/user.svg') }}" alt="ميسر" class="tr-trainee-avatar">
                                     @endif 
-                                    <span>{{ $assistant->getTranslation('name', 'ar') }} {{ $assistant->assistant->getTranslation('last_name', 'ar') }}</span>
+                                    <span>{{ $assistant->getTranslation('name', 'ar') }} {{ $assistant->assistant ? ' ' . $assistant->assistant->getTranslation('last_name', 'ar') : '' }}</span>
                                 </div>
                             </td>
                             <td>{{ $assistant->email }}</td>

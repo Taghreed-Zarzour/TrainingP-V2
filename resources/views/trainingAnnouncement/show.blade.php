@@ -412,7 +412,26 @@
                                 </a>
                             </div>
                             <p class="trainer-bio mt-3">{{ $trainer->bio ?? 'لا يوجد نبذة متاحة' }}</p>
-
+                            @if (count($trainerUsers) > 0)
+                                <h5 class="section-title mt-5">مدربو التدريب</h5>
+                                <div class="facilitators-container d-flex flex-column flex-md-row gap-4">
+                                    @foreach ($trainerUsers as $trainer)
+                                        <div class="facilitator-card d-flex align-items-center gap-3">
+                                            @if ($trainer->photo)
+                                                <img src="{{ asset('storage/' . $trainer->photo) }}"
+                                                    alt="{{ $trainer->getTranslation('name', 'ar') }}"
+                                                    class="rounded-circle" width="60" height="60">
+                                            @else
+                                                <img src="{{ asset('images/icons/user.svg') }}"
+                                                    alt="{{ $trainer->getTranslation('name', 'ar') }}"
+                                                    class="rounded-circle" width="60" height="60">
+                                            @endif
+                                            <span class="facilitator-name">{{ $trainer->getTranslation('name', 'ar') }}
+                                                {{ $trainer->trainer?->getTranslation('last_name', 'ar') }} </span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                             @if (count($assistantUsers) > 0)
                                 <h5 class="section-title mt-5">ميسرو التدريب</h5>
                                 <div class="facilitators-container d-flex flex-column flex-md-row gap-4">

@@ -9,54 +9,54 @@
 
     <div class="tr-trainees-card">
         @if($assistants->isEmpty())
-            <div class="text-center py-4">
-                <h5>لا يوجد مساعدين مضافين لهذا التدريب</h5>
-                <p class="mb-0">يمكنك إضافة مساعدين من خلال زر إضافة مساعد</p>
-            </div>
+        <div class="text-center py-4">
+            <h5>لا يوجد مساعدين مضافين لهذا التدريب</h5>
+            <p class="mb-0">يمكنك إضافة مساعدين من خلال زر إضافة مساعد</p>
+        </div>
         @else
-            <div class="tr-trainees-table-container">
-                <table class="tr-trainees-table">
-                    <thead>
-                        <tr>
-                            <th>رقم تسلسلي</th>
-                            <th>اسم المساعد</th>
-                            <th>البريد الإلكتروني</th>
-                            <th>رقم الهاتف</th>
-                            <th>التفاصيل</th>
-                            <th>تفاعل</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php $i = 1; @endphp
-                        @foreach($assistants as $assistant)
-                        <tr>
-                            <td>{{ $i++ }}</td>
-                            <td>
-                                <div class="tr-trainee-name">
-                                    @if ($assistant->photo)
-                                        <img src="{{ asset('storage/' . $assistant->photo) }}" alt="صورة المساعد" class="tr-trainee-avatar">
-                                    @else
-                                        <img src="{{ asset('images/icons/user.svg') }}" alt="مساعد" class="tr-trainee-avatar">
-                                    @endif
-                                </div>
-                            </td>
-                            <td>{{ $assistant->email }}</td>
-                            <td>{{ $assistant->phone_number }}</td>
-                            <td><button class="tr-details-btn">عرض التفاصيل</button></td>
-                            <td class="text-center">
-                                <form action="{{ route('orgAssistant.destroy', ['orgTraining_id' => $OrgProgramDetail->trainingProgram->id, 'assistant_id' => $assistant->id]) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-link p-0" onclick="return confirm('هل أنت متأكد من الحذف؟')">
-                                        <img src="{{ asset('images/cources/trash.svg') }}">
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+        <div class="tr-trainees-table-container">
+            <table class="tr-trainees-table">
+                <thead>
+                    <tr>
+                        <th>رقم تسلسلي</th>
+                        <th>اسم المساعد</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>رقم الهاتف</th>
+                        <th>التفاصيل</th>
+                        <th>تفاعل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $i = 1; @endphp
+                    @foreach($assistants as $assistant)
+                    <tr>
+                        <td>{{ $i++ }}</td>
+                        <td>
+                            <div class="tr-trainee-name">
+                                @if ($assistant->photo)
+                                <img src="{{ asset('storage/' . $assistant->photo) }}" alt="صورة المساعد" class="tr-trainee-avatar">
+                                @else
+                                <img src="{{ asset('images/icons/user.svg') }}" alt="مساعد" class="tr-trainee-avatar">
+                                @endif
+                            </div>
+                        </td>
+                        <td>{{ $assistant->email }}</td>
+                        <td>{{ $assistant->phone_number }}</td>
+                        <td><button class="tr-details-btn">عرض التفاصيل</button></td>
+                        <td class="text-center">
+                            <form action="{{ route('orgAssistant.destroy', ['orgTraining_id' => $OrgProgramDetail->trainingProgram->id, 'assistant_id' => $assistant->id]) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-link p-0" onclick="return confirm('هل أنت متأكد من الحذف؟')">
+                                    <img src="{{ asset('images/cources/trash.svg') }}">
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
         @endif
     </div>
 </div>
@@ -71,38 +71,38 @@
             <div class="modal-body">
                 <form id="addAssistantForm" action="{{ route('training-assistant.create' , $OrgProgramDetail->id) }}" method="POST" class="p-0">
                     @csrf
-                    
+
                     <h5 class="modal-title mb-4">اختر مساعدًا لإضافته</h5>
-                    
+
                     @if($availableAssistants->isEmpty())
-                        <div class="alert alert-warning text-center">
-                            <i class="fas fa-exclamation-triangle mb-2"></i>
-                            لا يوجد مساعدين متاحين حاليًا للإضافة.
-                        </div>
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle mb-2"></i>
+                        لا يوجد مساعدين متاحين حاليًا للإضافة.
+                    </div>
                     @else
-                        <div class="input-group mb-4">
-                            <div class="d-flex flex-column-reverse">
-                                <label class="w-100">المساعد <span class="required">*</span></label>
-                            </div>
-                            <select name="assistant_id" class="form-select w-100" required>
-                                <option value="">-- اختر المساعد --</option>
-                                @foreach ($availableAssistants as $assistant)
-                                    <option value="{{ $assistant->id }}">
-                                        {{ $assistant->getTranslation('name', 'ar') }} {{ $assistant->assistant->getTranslation('last_name', 'ar') }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <div id="assistantError" class="invalid-feedback d-none">يرجى اختيار مساعد</div>
+                    <div class="input-group mb-4">
+                        <div class="d-flex flex-column-reverse">
+                            <label class="w-100">المساعد <span class="required">*</span></label>
                         </div>
+                        <select name="assistant_id" class="form-select w-100" required>
+                            <option value="">-- اختر المساعد --</option>
+                            @foreach ($availableAssistants as $assistant)
+                            <option value="{{ $assistant->id }}">
+                                {{ $assistant->getTranslation('name', 'ar') }}{{ $assistant->assistant ? ' ' . $assistant->assistant->getTranslation('last_name', 'ar') : '' }}
+                            </option>
+                            @endforeach
+                        </select>
+                        <div id="assistantError" class="invalid-feedback d-none">يرجى اختيار مساعد</div>
+                    </div>
                     @endif
-                    
+
                     <div class="modal-footer border-0 px-0">
                         <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">إلغاء</button>
                         @if(!$availableAssistants->isEmpty())
-                            <button type="submit" class="custom-btn">
-                                إضافة المساعد
-                                <img src="{{ asset('images/cources/arrow-left.svg') }}">
-                            </button>
+                        <button type="submit" class="custom-btn">
+                            إضافة المساعد
+                            <img src="{{ asset('images/cources/arrow-left.svg') }}">
+                        </button>
                         @endif
                     </div>
                 </form>

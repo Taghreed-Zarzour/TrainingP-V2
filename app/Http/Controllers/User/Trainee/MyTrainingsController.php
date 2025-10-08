@@ -24,6 +24,8 @@ class MyTrainingsController extends Controller
         $trainee_id = Auth::id();
         $enrollments = Enrollment::where('trainee_id', $trainee_id)->get();
 
+        dd($enrollments);
+
         foreach ($enrollments as $enrollment) {
             // ====== الحالة 1: التدريبات المعلقة (stopped) ======
             if ($enrollment->training_programs_id) {

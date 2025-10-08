@@ -628,7 +628,12 @@
                                                             : asset('images/icons/user.svg');
                                                 @endphp
                                                 @if ($trainer)
-                                                    <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
+                                                    @php
+                                                        $routeName = $trainer->user_type_id == 4 
+                                                            ? 'show_organization_profile' 
+                                                            : 'show_trainer_profile';
+                                                    @endphp
+                                                    <a href="{{ route($routeName, ['id' => $trainer->id]) }}"
                                                         style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
                                                         <img class="trainer-img" src="{{ $trainerPhoto }}"
                                                             alt="صورة المدرب" />
@@ -791,7 +796,12 @@
                                                             : asset('images/icons/user.svg');
                                                 @endphp
                                                 @if ($trainer)
-                                                    <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
+                                                    @php
+                                                        $routeName = $trainer->user_type_id == 4 
+                                                            ? 'show_organization_profile' 
+                                                            : 'show_trainer_profile';
+                                                    @endphp
+                                                    <a href="{{ route($routeName, ['id' => $trainer->id]) }}"
                                                         style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
                                                         <img class="trainer-img" src="{{ $trainerPhoto }}"
                                                             alt="صورة المدرب" />
@@ -1388,7 +1398,12 @@
                                                         : asset('images/icons/user.svg');
                                                 @endphp
                                                 @if ($trainer)
-                                                    <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
+                                                    @php
+                                                        $routeName = $trainer->user_type_id == 4 
+                                                            ? 'show_organization_profile' 
+                                                            : 'show_trainer_profile';
+                                                    @endphp
+                                                    <a href="{{ route($routeName, ['id' => $trainer->id]) }}"
                                                         style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
                                                         <img class="trainer-img" src="{{ $trainerPhoto }}"
                                                             alt="صورة المدرب" />
@@ -1500,7 +1515,12 @@
                                                         : asset('images/icons/user.svg');
                                                 @endphp
                                                 @if ($trainer)
-                                                    <a href="{{ route('show_trainer_profile', ['id' => $trainer->id]) }}"
+                                                    @php
+                                                        $routeName = $trainer->user_type_id == 4 
+                                                            ? 'show_organization_profile' 
+                                                            : 'show_trainer_profile';
+                                                    @endphp
+                                                    <a href="{{ route($routeName, ['id' => $trainer->id]) }}"
                                                         style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;">
                                                         <img class="trainer-img" src="{{ $trainerPhoto }}"
                                                             alt="صورة المدرب" />

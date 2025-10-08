@@ -2,6 +2,8 @@
 namespace App\Http\Requests\TrainingCreate;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\schedulingTrainingSessions;
+use App\Models\TrainingProgram;
+use Carbon\Carbon;
 
 class StoreAdditionalSettingsRequest extends FormRequest
 {
@@ -83,15 +85,50 @@ class StoreAdditionalSettingsRequest extends FormRequest
           'application_deadline' => [
                 'required',
                 'date',
-                'after_or_equal:today',
                 function ($attribute, $value, $fail) {
+                    // الحصول على معرف التدريب من المسار
+                    $trainingId = $this->route('trainingId');
+                    
+                    // التحقق من حالة التدريب (هل هو معلن أم لا)
+                    $isAnnounced = false;
+                    if ($trainingId) {
+                        $program = TrainingProgram::with(['detail', 'AdditionalSetting', 'sessions'])
+                            ->find($trainingId);
+                            
+                        if ($program) {
+                            // حساب نسبة الإكمال
+                            $completionPercentage = $this->calculateTrainingCompletion($program);
+                            
+                            // التحقق إذا كان التدريب معلن
+                            if ($completionPercentage === 100) {
+                                $hasSessions = $program->sessions && $program->sessions->count() > 0;
+                                
+                                // إذا لم تكن هناك جلسات أو تم اختيار تحديد الجلسات لاحقاً، فهو معلن
+                                if (!$hasSessions || ($program->AdditionalSetting && $program->AdditionalSetting->schedule_later)) {
+                                    $isAnnounced = true;
+                                } else {
+                                    // إذا كانت هناك جلسات، تحقق من تاريخ أول جلسة
+                                    $firstSession = $program->sessions->sortBy('session_date')->first();
+                                    if ($firstSession) {
+                                        $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                                        if ($startTime->isFuture()) {
+                                            $isAnnounced = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // إذا لم يكن التدريب معلن، تحقق من أن التاريخ ليس قبل اليوم
+                    if (!$isAnnounced && strtotime($value) < strtotime(date('Y-m-d'))) {
+                        $fail('لا يمكن أن يكون آخر موعد للتقديم قبل اليوم.');
+                    }
+                    
                     // التحقق من أن التاريخ ليس بعد سنة من الآن
                     if (now()->diffInDays($value) > 365) {
                         $fail('لا يمكن أن يكون آخر موعد للتقديم بعد سنة من الآن.');
                     }
-                    
-                    // الحصول على معرف التدريب من المسار
-                    $trainingId = $this->route('trainingId');
                     
                     if ($trainingId) {
                         // البحث عن أول جلسة مرتبطة بالتدريب
@@ -249,5 +286,44 @@ class StoreAdditionalSettingsRequest extends FormRequest
                 }
             }
         });
+    }
+    
+    /**
+     * حساب نسبة اكتمال التدريب
+     */
+    private function calculateTrainingCompletion(TrainingProgram $program)
+    {
+        // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب (مجموعها = 100)
+        $weights = [
+            'basic_info' => 25,   // المعلومات الأساسية
+            'details' => 25,      // التفاصيل
+            'settings' => 25,     // الإعدادات
+            'additional_check' => 25, // أي خطوة إضافية أو اختيارية
+        ];
+
+        $totalWeight = array_sum($weights);
+        $completedWeight = 0;
+
+        // 1. المعلومات الأساسية (سؤال واحد)
+        $basicCompleted = !empty($program->title) ? 1 : 0;
+        $completedWeight += ($basicCompleted / 1) * $weights['basic_info'];
+
+        // 2. التفاصيل (سؤال واحد)
+        $detailCompleted = ($program->detail && !empty($program->detail->learning_outcomes)) ? 1 : 0;
+        $completedWeight += ($detailCompleted / 1) * $weights['details'];
+
+        // 3. الإعدادات (سؤال واحد فقط)
+        $settingCompleted = ($program->AdditionalSetting && !empty($program->AdditionalSetting->application_deadline)) ? 1 : 0;
+        $completedWeight += ($settingCompleted / 1) * $weights['settings'];
+
+        // 4. خطوة إضافية اختيارية (مثلاً أي شيء آخر تريد التحقق منه، هنا نفترض 1 سؤال)
+        // إذا ما فيه شيء إضافي يمكن تجاهلها أو اعطاءها صفر
+        $additionalCompleted = 1; // نفترض مكتمل لتبسيط، أو يمكن تعديل حسب الحاجة
+        $completedWeight += ($additionalCompleted / 1) * $weights['additional_check'];
+
+        // النسبة الإجمالية، مع التأكد أنها لا تتجاوز 100
+        $overallPercentage = min(($completedWeight / $totalWeight) * 100, 100);
+
+        return intval($overallPercentage);
     }
 }

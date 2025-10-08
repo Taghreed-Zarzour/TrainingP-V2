@@ -32,19 +32,19 @@ class TrainerProfileController extends Controller
     $this->trainerService = $trainerService;
   }
 
-    public function showProfile($userIdentifier = null)
-{
-     // الحالة 1: إذا كان الرابط يحتوي على ID فقط (مثال: /show-profile/123)
+  public function showProfile($userIdentifier = null)
+  {
+    // الحالة 1: إذا كان الرابط يحتوي على ID فقط (مثال: /show-profile/123)
     if (is_numeric($userIdentifier)) {
-        $userId = $userIdentifier;
+      $userId = $userIdentifier;
     }
     // الحالة 2: إذا كان الرابط يحتوي على Slug (مثال: /show-profile/john-doe-123)
     elseif (strpos($userIdentifier, '-') !== false) {
-        $userId = (int) substr($userIdentifier, strrpos($userIdentifier, '-') + 1);
+      $userId = (int) substr($userIdentifier, strrpos($userIdentifier, '-') + 1);
     }
     // الحالة 3: إذا لم يتم تمرير أي معرف، استخدم ID المستخدم الحالي
     else {
-        $userId = Auth::id();
+      $userId = Auth::id();
     }
 
     $user = User::with('country',)->findOrFail($userId);
@@ -68,111 +68,114 @@ class TrainerProfileController extends Controller
 
     $selected_country = Country::where('phonecode', ltrim($user->phone_code, '+'))->first();
 
-    $ratings= $trainer->ratings;
+    $ratings = $trainer->ratings;
 
     // اجمالي تقييم كل متدرب للمدرب
     $averageRatings = [];
     foreach ($ratings as $rating) {
-        $trainee_id = $rating->trainee_id;
-        if (!isset($averageRatings[$trainee_id])) {
-            $average = TrainerRating::where('trainer_id', $trainer->id)
-                ->where('trainee_id', $trainee_id)
-                ->avg(DB::raw('(clarity + interaction + organization)/3'));
-            $averageRatings[$trainee_id] = $average;
-        }
+      $trainee_id = $rating->trainee_id;
+      if (!isset($averageRatings[$trainee_id])) {
+        $average = TrainerRating::where('trainer_id', $trainer->id)
+          ->where('trainee_id', $trainee_id)
+          ->avg(DB::raw('(clarity + interaction + organization)/3'));
+        $averageRatings[$trainee_id] = $average;
+      }
     }
 
     // اجمالي تقييمات المدرب
     $totalSum = TrainerRating::where('trainer_id', $trainer->id)
-    ->sum(DB::raw('clarity + interaction + organization'));
+      ->sum(DB::raw('clarity + interaction + organization'));
     $totalCount = TrainerRating::where('trainer_id', $trainer->id)->count();
     $averageTrainerRating = $totalCount > 0 ? ($totalSum / (3 * $totalCount)) : 0;
 
     // تدريبات خاصة بالمدرب
     $tariningPrograms = $trainer->trainingPrograms;
-    $tariningPrograms->load('trainer','sessions');
+    $tariningPrograms->load('trainer', 'sessions');
 
 
-  return view('user.trainer.show_profile',
-  compact(
-    'user',
-    'trainer',
-    'trainer_providedServices',
-    'trainer_workSectors',
-    'trainer_workFields',
-    'countries',
-    'work_sectors',
-    'provided_services',
-    'work_fields',
-    'trainer_internationalExperiences',
-    'selected_country',
-    'profileCompletion',
-    'ratings',
-    'averageRatings',
-    'averageTrainerRating',
-    'tariningPrograms',
-));
-}
+    return view(
+      'user.trainer.show_profile',
+      compact(
+        'user',
+        'trainer',
+        'trainer_providedServices',
+        'trainer_workSectors',
+        'trainer_workFields',
+        'countries',
+        'work_sectors',
+        'provided_services',
+        'work_fields',
+        'trainer_internationalExperiences',
+        'selected_country',
+        'profileCompletion',
+        'ratings',
+        'averageRatings',
+        'averageTrainerRating',
+        'tariningPrograms',
+      )
+    );
+  }
 
-protected function getProfileCompletion($trainerId)
+  protected function getProfileCompletion($trainerId)
   {
-      $user = User::find($trainerId);
-      $trainer = Trainer::find($trainerId);
-      $trainerCv = UserCv::where('user_id',$trainerId)->first();
-      $previousTraining = PreviousTraining::where('trainer_id',$trainerId)->first();
-      if (!$user || !$trainer) {
-          return 0; // Or throw an exception
-      }
+    $user = User::find($trainerId);
+    $trainer = Trainer::find($trainerId);
+    $trainerCv = UserCv::where('user_id', $trainerId)->first();
+    $previousTraining = PreviousTraining::where('trainer_id', $trainerId)->first();
+    if (!$user || !$trainer) {
+      return 0; // Or throw an exception
+    }
 
-      // List of important user fields
-      $fieldsToCheck = [
-          $user->getTranslation('name', 'ar'),
-          $user->getTranslation('name', 'en'),
-          $user->bio,
-          $user->phone_number,
-          $user->phone_code,
-          $user->city,
-          $user->country_id,
-          $user->photo,
-      ];
+    // List of important user fields
+    $fieldsToCheck = [
+      $user->getTranslation('name', 'ar'),
+      $user->getTranslation('name', 'en'),
+      $user->bio,
+      $user->phone_number,
+      $user->phone_code,
+      $user->city,
+      $user->country_id,
+      $user->photo,
+    ];
 
-      // Trainer fields
-      $fieldsToCheck = array_merge($fieldsToCheck, [
-          $trainer->getTranslation('last_name', 'ar'),
-          $trainer->getTranslation('last_name', 'en'),
-          $trainer->sex,
-          $trainer->headline,
-          $trainer->nationality,
-          $trainer->hourly_wage,
-          $trainer->currency,
-          $trainer->linkedin_url,
-          $trainer->website,
-          $trainer->important_topics,
-          $trainer->work_fields,
-          $trainer->provided_services,
-          $trainer->work_sectors,
-          $trainer->international_exp,
-      ]);
-      $fieldsToCheck = array_merge($fieldsToCheck, [
-        $trainerCv->cv_file ?? null,
-      ]);
-      $fieldsToCheck = array_merge($fieldsToCheck, [
-        $previousTraining->video_link ?? null,
-        $previousTraining->training_title ?? null,
-        $previousTraining->description ?? null,
-      ]);
+    // Trainer fields
+    $fieldsToCheck = array_merge($fieldsToCheck, [
+      $trainer->getTranslation('last_name', 'ar'),
+      $trainer->getTranslation('last_name', 'en'),
+      $trainer->sex,
+      $trainer->headline,
+      $trainer->nationality,
+      $trainer->hourly_wage,
+      $trainer->currency,
+      $trainer->linkedin_url,
+      $trainer->website,
+      $trainer->important_topics,
+      $trainer->work_fields,
+      $trainer->provided_services,
+      $trainer->work_sectors,
+      $trainer->international_exp,
+    ]);
+    $fieldsToCheck = array_merge($fieldsToCheck, [
+      $trainerCv->cv_file ?? null,
+    ]);
+    $fieldsToCheck = array_merge($fieldsToCheck, [
+      $previousTraining->video_link ?? null,
+      $previousTraining->training_title ?? null,
+      $previousTraining->description ?? null,
+    ]);
 
-      $total = count($fieldsToCheck);
-      $filled = collect($fieldsToCheck)->filter(function ($value) {
-        return !is_null($value) && $value !== '' && $value !== [] && $value !== 0;
-      })->count();
+    $total = count($fieldsToCheck);
+    $filled = collect($fieldsToCheck)->filter(function ($value) {
+      return !is_null($value) && $value !== '' && $value !== [] && $value !== 0;
+    })->count();
 
 
-      return intval(($filled / $total) * 100);
+    return intval(($filled / $total) * 100);
   }
 
 
-public function updatePersonalInfo(updatePersonalInfo $request){
+  public function updatePersonalInfo(updatePersonalInfo $request)
+  {
 
     $data = $request->validated();
 
@@ -183,10 +186,11 @@ public function updatePersonalInfo(updatePersonalInfo $request){
     } else {
       return back()->withErrors(['error' => $response['msg']]);
     }
-}
+  }
 
 
-public function updateExperiance(updateExperiance $request){
+  public function updateExperiance(updateExperiance $request)
+  {
 
     $data = $request->validated();
 
@@ -197,10 +201,11 @@ public function updateExperiance(updateExperiance $request){
     } else {
       return back()->withErrors(['error' => $response['msg']]);
     }
-}
+  }
 
 
-public function updateContactinfo(updateContactInfo $request){
+  public function updateContactinfo(updateContactInfo $request)
+  {
 
     $data = $request->validated();
 
@@ -211,6 +216,5 @@ public function updateContactinfo(updateContactInfo $request){
     } else {
       return back()->withErrors(['error' => $response['msg']]);
     }
-}
-
+  }
 }

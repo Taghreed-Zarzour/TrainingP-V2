@@ -44,17 +44,17 @@ class TrainingProgramController extends Controller
     $this->trainingProgramService = $trainingProgramService;
   }
 
-public function index()
-{
+  public function index()
+  {
     $categorized = $this->trainingProgramService->categorizePrograms();
     return view('trainings.index', [
-        'drafts' => $categorized['draft'] ?? [],
-        'announced' => $categorized['announced'] ?? [],
-        'ongoing' => $categorized['ongoing'] ?? [],
-        'completed' => $categorized['completed'] ?? [],
-        'stoppedPrograms' => $categorized['stopped'] ?? [],
+      'drafts' => $categorized['draft'] ?? [],
+      'announced' => $categorized['announced'] ?? [],
+      'ongoing' => $categorized['ongoing'] ?? [],
+      'completed' => $categorized['completed'] ?? [],
+      'stoppedPrograms' => $categorized['stopped'] ?? [],
     ]);
-}
+  }
 
   public function show(Request $request, $id)
   {
@@ -69,15 +69,15 @@ public function index()
 
     // المشاهدات
     $program->increment('views');
-$programUser = User::find($program->user_id);
-if ($program->views % 30 === 0) {
-    NotificationHelper::sendNotification(
+    $programUser = User::find($program->user_id);
+    if ($program->views % 30 === 0) {
+      NotificationHelper::sendNotification(
         $programUser->id,
         'لقد تم مشاهدة برنامجك ' . $program->views . ' مرة.',
         'views',
         ['views' => $program->views, 'program_id' => $program->id]
-    );
-}
+      );
+    }
     $programTypes = ProgramType::pluck('name', 'id');
     $languages = Language::pluck('name', 'id');
     $classifications = TrainingClassification::pluck('name', 'id');
@@ -88,15 +88,26 @@ if ($program->views % 30 === 0) {
     $trainerId = TrainingProgram::where('id', $id)->value('user_id');
     $trainer = User::find($trainerId);
 
+    $trainerUsers = collect();
+    if ($program->id) {
+      $assistantManagement = TrainingAssistantManagement::where('training_program_id', $program->id)->first();
+      if ($assistantManagement) {
+        // الحصول على المدربين
+        $trainerIds = $assistantManagement->getAllTrainers();
+        if (!empty($trainerIds)) {
+          $trainerUsers = User::whereIn('id', $trainerIds)->get();
+        }
+      }
+    }
+
     // المسجلون
     $participantIds = Enrollment::where('training_programs_id', $id)->pluck('trainee_id');
-    if($search){
-            $participants = Trainee::whereIn('id', $participantIds)
-            ->where('last_name->ar','like',"%{$search}%")
-            ->orWhereHas('user', fn($q) => $q->where('first_name->ar','like',"%{$search}%"))->get();
-    }
-    else{
-        $participants = Trainee::whereIn('id', $participantIds)->get();
+    if ($search) {
+      $participants = Trainee::whereIn('id', $participantIds)
+        ->where('last_name->ar', 'like', "%{$search}%")
+        ->orWhereHas('user', fn($q) => $q->where('first_name->ar', 'like', "%{$search}%"))->get();
+    } else {
+      $participants = Trainee::whereIn('id', $participantIds)->get();
     }
 
 
@@ -120,10 +131,10 @@ if ($program->views % 30 === 0) {
         ->whereIn('session_id', $totalSessions)
         ->count();
 
-$sessionCount = count($totalSessions);
-$percentage = $sessionCount > 0
-    ? round(($attendedSessions / $sessionCount) * 100, 2)
-    : 0;
+      $sessionCount = count($totalSessions);
+      $percentage = $sessionCount > 0
+        ? round(($attendedSessions / $sessionCount) * 100, 2)
+        : 0;
       $attendanceStats[$trainee->id] = $percentage;
     }
 
@@ -194,6 +205,7 @@ $percentage = $sessionCount > 0
       'sessionStatuses',
       'sessionAttendanceCounts',
       'overallAttendancePercentage',
+      'trainerUsers',
     ));
   }
 
@@ -219,5 +231,4 @@ $percentage = $sessionCount > 0
 
     return view('trainings.stopped', compact('stoppedPrograms'));
   }
-
 }

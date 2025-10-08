@@ -94,7 +94,7 @@
                                 <option value="">-- اختر المساعد --</option>
                                 @foreach ($availableAssistants as $assistant)
                                     <option value="{{ $assistant->id }}">
-                                        {{ $assistant->user->getTranslation('name', 'ar') }} {{ $assistant->getTranslation('last_name', 'ar') }}
+                                        {{ $assistant->user->getTranslation('name', 'ar') }} {{ $assistant->user->getTranslation('last_name', 'ar') }}
                                     </option>
                                 @endforeach
                             </select>

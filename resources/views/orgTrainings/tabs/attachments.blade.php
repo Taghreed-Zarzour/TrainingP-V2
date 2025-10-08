@@ -180,22 +180,62 @@
             <h5>الملفات المرفوعة:</h5>
             <ul class="list-group mt-3">
                 @foreach($attachments as $file)
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="fas fa-file-alt me-2"></i>
-                        <a href="{{ asset('storage/' . $file->training_files) }}" target="_blank" class="text-decoration-none">
-                            {{ basename($file->training_files) }}
-                        </a>
-                    </div>
-                    <form method="POST" action="{{ route('orgTraining.file.delete', $file->id ) }}">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="border-0 bg-transparent p-0" onclick="return confirm('هل أنت متأكد من حذف هذا الملف؟')">
-                              <img src="{{ asset('images/cources/delete_x.svg') }}" alt="حذف"
-                                                    title="حذف" style="width: 32px;">
-                        </button>
-                    </form>
-                </li>
+                    @php
+                        // Handle both old string format and new JSON format
+                        $fileData = $file->training_files;
+                        if (is_string($fileData)) {
+                            // Try to decode JSON, if it fails, treat as old format
+                            $decoded = json_decode($fileData, true);
+                            if (json_last_error() === JSON_ERROR_NONE) {
+                                $fileData = $decoded;
+                            } else {
+                                // Old format - convert to new structure
+                                $fileData = [
+                                    'original_name' => basename($fileData),
+                                    'stored_path' => $fileData,
+                                    'filename' => basename($fileData),
+                                    'size' => null,
+                                    'mime_type' => null,
+                                    'uploaded_at' => null
+                                ];
+                            }
+                        }
+                        
+                        $filePath = $fileData['stored_path'] ?? '';
+                        $originalName = $fileData['original_name'] ?? basename($filePath);
+                        $fileSize = $fileData['size'] ?? null;
+                        $mimeType = $fileData['mime_type'] ?? null;
+                        $uploadedAt = $fileData['uploaded_at'] ?? null;
+                    @endphp
+                    
+                    @if($filePath)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file-alt me-2"></i>
+                            <div>
+                                <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="text-decoration-none">
+                                    {{ $originalName }}
+                                </a>
+                                @if($fileSize)
+                                    <small class="text-muted d-block">
+                                        {{ number_format($fileSize / 1024, 2) }} KB
+                                        @if($uploadedAt)
+                                            - {{ \Carbon\Carbon::parse($uploadedAt)->format('Y-m-d H:i') }}
+                                        @endif
+                                    </small>
+                                @endif
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ route('orgTraining.file.delete', $file->id ) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="border-0 bg-transparent p-0" onclick="return confirm('هل أنت متأكد من حذف هذا الملف؟')">
+                                  <img src="{{ asset('images/cources/delete_x.svg') }}" alt="حذف"
+                                                        title="حذف" style="width: 32px;">
+                            </button>
+                        </form>
+                    </li>
+                    @endif
                 @endforeach
             </ul>
         </div>

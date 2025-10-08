@@ -226,7 +226,7 @@ public function showProgramDetail($id)
     }])->get();
 
     //Assistants
-    $assistantIds = OrgAssistantManagement::where('org_training_program_id',$org_training_programs_id)->pluck('id');
+    $assistantIds = OrgAssistantManagement::where('org_training_program_id',$org_training_programs_id)->pluck('assistant_id');
     $assistants = User::whereIn('id', $assistantIds)->with('assistant')->get();
     
     //نسبة الحضور
