@@ -48,6 +48,7 @@
                     <form id="publish-training-3-form" method="POST" action="{{ route('training.store.team', $training->id) }}">
                         @csrf
                         
+                        
                         @if (!(auth()->user()->userType?->type === 'مؤسسة'))
                         <div class="input-group">
                             <label>المدرب الرئيسي</label>
