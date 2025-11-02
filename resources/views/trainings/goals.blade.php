@@ -157,6 +157,22 @@
                                             )) ? 'selected' : '' }}>
                                             لا يعمل
                                         </option>
+                                        <option value="not_specified"
+                                            {{ in_array('not_specified', old('work_status',
+                                                is_array($trainingDetail->work_status)
+                                                    ? $trainingDetail->work_status
+                                                    : json_decode($trainingDetail->work_status ?? '[]', true)
+                                            )) ? 'selected' : '' }}>
+                                            غير مقيد
+                                        </option>
+                                        <option value="all"
+                                            {{ in_array('all', old('work_status',
+                                                is_array($trainingDetail->work_status)
+                                                    ? $trainingDetail->work_status
+                                                    : json_decode($trainingDetail->work_status ?? '[]', true)
+                                            )) ? 'selected' : '' }}>
+                                            الكل
+                                        </option>
                                     </select>
                                 </div>
                                 @error('work_status')

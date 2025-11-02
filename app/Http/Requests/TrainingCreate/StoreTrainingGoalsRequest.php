@@ -43,7 +43,7 @@ class StoreTrainingGoalsRequest extends FormRequest
             'country_id.*' => 'exists:countries,id',
             
             'work_status'   => 'nullable|array',
-            'work_status.*'=> 'nullable|string|in:working,not_working', // لأنه عندك قيم نصية مش boolean
+            'work_status.*'=> 'nullable|string|in:working,not_working,not_specified,all', // لأنه عندك قيم نصية مش boolean
             
 
 
