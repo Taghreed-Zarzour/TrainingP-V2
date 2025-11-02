@@ -77,7 +77,7 @@
                             <div class="col-md-6">
                                 <div class="info-item">
                                     <img src="/images/cources/type-program.svg" class="info-icon" alt="نوع البرنامج">
-                                    <span>نوع البرنامج: {{ $program->programType->name }}</span>
+                                    <span>نوع البرنامج: {{ $program->programType ? $program->programType->name : 'غير محدد' }}</span>
                                 </div>
                                 <div class="info-item">
                                     <img src="/images/cources/level.svg" class="info-icon" alt="مستوى التدريب">
