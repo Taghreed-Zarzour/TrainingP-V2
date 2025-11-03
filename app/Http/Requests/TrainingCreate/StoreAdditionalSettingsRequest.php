@@ -117,6 +117,20 @@ class StoreAdditionalSettingsRequest extends FormRequest
                                     }
                                 }
                             }
+                            
+                            // التحقق إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى
+                            if ($isAnnounced && $program->AdditionalSetting) {
+                                $currentDeadline = $program->AdditionalSetting->application_deadline;
+                                if ($currentDeadline) {
+                                    $deadlineDate = Carbon::parse($currentDeadline)->endOfDay();
+                                    $now = Carbon::now();
+                                    
+                                    // إذا انتهى موعد التقديم، منع التعديل
+                                    if ($now->greaterThan($deadlineDate)) {
+                                        $fail('لا يمكن تعديل الإعدادات لأن موعد التقديم على هذا التدريب قد انتهى.');
+                                    }
+                                }
+                            }
                         }
                     }
                     
