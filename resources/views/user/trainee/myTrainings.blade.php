@@ -1257,7 +1257,9 @@
                                         <div class="col-md-8 align-content-center">
                                             <div class="card-body-trainee">
                                                 <!-- العنوان -->
-                                                <h5 class="card-title-trainee">{{ $training->title }}</h5>
+                                                <a href="{{ route('show_trainings_announcements', $training->id) }}">
+                                                <h5 class="card-title-trainee text-decoration-none text-dark">{{ $training->title }}</h5>
+                                                </a>
 
                                                 <!-- صورة المدرب واسمه -->
                                                 <div class="trainer-info">
