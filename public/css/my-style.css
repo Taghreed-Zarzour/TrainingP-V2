@@ -2906,6 +2906,7 @@ font-size: 1.3rem;
     color: #dc3545;
     font-size: 0.8rem;
     gap: 5px;
+    display: block;
 }
 
 .error-message i {
