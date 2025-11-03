@@ -42,13 +42,14 @@ class TrainingAnnouncementService
             continue;
         }
 
-        // تحقق من انتهاء التقديم
-        // $deadline = $program->AdditionalSetting->application_deadline ?? null;
-        // $deadlineValid = $deadline ? $now->lessThanOrEqualTo(Carbon::parse($deadline)->endOfDay()) : false;
-        // if (!$deadlineValid) {
-        //     continue;
-        // }
-
+        // تحقق من انتهاء التقديم - استبعاد التدريبات التي انتهى موعد التقديم فيها
+        $deadline = $program->AdditionalSetting->application_deadline ?? null;
+        if ($deadline) {
+            $deadlineValid = $now->lessThanOrEqualTo(Carbon::parse($deadline)->endOfDay());
+            if (!$deadlineValid) {
+                continue; // استبعاد التدريب إذا انتهى موعد التقديم
+            }
+        }
 
       $announced[] = $program;
 

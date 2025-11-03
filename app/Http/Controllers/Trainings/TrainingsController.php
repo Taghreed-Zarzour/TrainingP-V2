@@ -205,15 +205,22 @@ class TrainingsController extends Controller
         foreach ($allOrgPrograms as $program) {
             // حساب نسبة الإكمال
             $completion = $this->orgTrainingManagerService->calculateCompletion($program);
-            // جلب تاريخ انتهاء التقديم
-            $applicationDeadline = $program->registrationRequirements->application_deadline ?? null;
-            $deadlineValid = $applicationDeadline
-                ? $currentDateTime->lessThanOrEqualTo(Carbon::parse($applicationDeadline)->endOfDay())
-                : false;
-
-            if ($completion === 100 && $deadlineValid) {
-                $filteredOrgPrograms[] = $program;
+            
+            // تحقق من نسبة الإكمال
+            if ($completion !== 100) {
+                continue;
             }
+            
+            // جلب تاريخ انتهاء التقديم - استبعاد التدريبات التي انتهى موعد التقديم فيها
+            $applicationDeadline = $program->registrationRequirements->application_deadline ?? null;
+            if ($applicationDeadline) {
+                $deadlineValid = $currentDateTime->lessThanOrEqualTo(Carbon::parse($applicationDeadline)->endOfDay());
+                if (!$deadlineValid) {
+                    continue; // استبعاد التدريب إذا انتهى موعد التقديم
+                }
+            }
+            
+            $filteredOrgPrograms[] = $program;
         }
 
         // تمرير البيانات إلى العرض
