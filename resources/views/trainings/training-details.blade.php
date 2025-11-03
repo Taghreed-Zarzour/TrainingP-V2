@@ -79,10 +79,12 @@
                                     <img src="/images/cources/type-program.svg" class="info-icon" alt="نوع البرنامج">
                                     <span>نوع البرنامج: {{ $program->programType ? $program->programType->name : 'غير محدد' }}</span>
                                 </div>
+                                @if ($program->trainingLevel)
                                 <div class="info-item">
                                     <img src="/images/cources/level.svg" class="info-icon" alt="مستوى التدريب">
-                                    <span>مستوى التدريب: {{ $program->programLevel }}</span>
+                                    <span>مستوى التدريب: {{ $program->trainingLevel->name }}</span>
                                 </div>
+                                @endif
                                 <div class="info-item">
                                     <img src="/images/cources/clock2.svg" class="info-icon" alt="عدد الجلسات">
                                     <span>عدد الجلسات: {{ count($program->sessions) }} جلسات</span>
@@ -118,10 +120,12 @@
                                     <img src="/images/cources/language-primary.svg" class="info-icon" alt="لغة التدريب">
                                     <span>لغة التدريب: {{ $program->language->name }}</span>
                                 </div>
+                                @if ($program->trainingClassification)
                                 <div class="info-item">
                                     <img src="/images/cources/calssification.svg" class="info-icon" alt="تصنيف التدريب">
-                                    <span>تصنيف التدريب: {{ $program->programClassification }}</span>
+                                    <span>تصنيف التدريب: {{ $program->trainingClassification->name }}</span>
                                 </div>
+                                @endif
                                 <div class="info-item">
                                     <img src="/images/cources/type.svg" class="info-icon" alt="طريقة التقديم">
                                     <span>طريقة تقديم التدريب: {{ $program->program_presentation_method_id }}</span>
