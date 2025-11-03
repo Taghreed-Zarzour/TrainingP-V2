@@ -388,9 +388,46 @@ class Trainings_CURD_Controller extends Controller
 
     public function storeSettings(StoreAdditionalSettingsRequest $request, $trainingId)
     {
+        // التحقق من إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى (قبل البدء بالتحقق من صحة البيانات)
+        $training = TrainingProgram::findOrFail($trainingId);
+
+        $isAnnounced = false;
+        $training->completion_percentage = $this->trainingProgramServices->calculateCompletion($training);
+        if ($training->completion_percentage === 100) {
+            $hasSessions = $training->sessions()->exists();
+            
+            // إذا لم تكن هناك جلسات أو تم اختيار تحديد الجلسات لاحقاً، فهي معلنة
+            if (!$hasSessions || ($training->AdditionalSetting && $training->AdditionalSetting->schedule_later)) {
+                $isAnnounced = true;
+            } else {
+                // إذا كانت هناك جلسات، تحقق من تاريخ أول جلسة
+                $firstSession = $training->sessions()->orderBy('session_date')->first();
+                if ($firstSession) {
+                    $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                    if ($startTime->isFuture()) {
+                        $isAnnounced = true;
+                    }
+                }
+            }
+        }
+
+        // إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى، منع التعديل
+        if ($isAnnounced) {
+            $existingSettings = $training->AdditionalSetting;
+            if ($existingSettings && $existingSettings->application_deadline) {
+                $deadlineDate = Carbon::parse($existingSettings->application_deadline)->endOfDay();
+                $now = Carbon::now();
+                
+                if ($now->greaterThan($deadlineDate)) {
+                    return redirect()->back()
+                        ->withErrors(['application_deadline' => 'لا يمكن تعديل الإعدادات لأن موعد التقديم على هذا التدريب قد انتهى.'])
+                        ->withInput();
+                }
+            }
+        }
+
         DB::beginTransaction();
         try {
-            $training = TrainingProgram::findOrFail($trainingId);
 
             $settings = $training->AdditionalSetting()->firstOrCreate([
                 'training_program_id' => $trainingId,

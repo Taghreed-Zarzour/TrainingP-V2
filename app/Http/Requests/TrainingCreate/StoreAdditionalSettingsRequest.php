@@ -89,53 +89,8 @@ class StoreAdditionalSettingsRequest extends FormRequest
                     // الحصول على معرف التدريب من المسار
                     $trainingId = $this->route('trainingId');
                     
-                    // التحقق من حالة التدريب (هل هو معلن أم لا)
-                    $isAnnounced = false;
-                    if ($trainingId) {
-                        $program = TrainingProgram::with(['detail', 'AdditionalSetting', 'sessions'])
-                            ->find($trainingId);
-                            
-                        if ($program) {
-                            // حساب نسبة الإكمال
-                            $completionPercentage = $this->calculateTrainingCompletion($program);
-                            
-                            // التحقق إذا كان التدريب معلن
-                            if ($completionPercentage === 100) {
-                                $hasSessions = $program->sessions && $program->sessions->count() > 0;
-                                
-                                // إذا لم تكن هناك جلسات أو تم اختيار تحديد الجلسات لاحقاً، فهو معلن
-                                if (!$hasSessions || ($program->AdditionalSetting && $program->AdditionalSetting->schedule_later)) {
-                                    $isAnnounced = true;
-                                } else {
-                                    // إذا كانت هناك جلسات، تحقق من تاريخ أول جلسة
-                                    $firstSession = $program->sessions->sortBy('session_date')->first();
-                                    if ($firstSession) {
-                                        $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                                        if ($startTime->isFuture()) {
-                                            $isAnnounced = true;
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            // // التحقق إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى
-                            // if ($isAnnounced && $program->AdditionalSetting) {
-                            //     $currentDeadline = $program->AdditionalSetting->application_deadline;
-                            //     if ($currentDeadline) {
-                            //         $deadlineDate = Carbon::parse($currentDeadline)->endOfDay();
-                            //         $now = Carbon::now();
-                                    
-                            //         // إذا انتهى موعد التقديم، منع التعديل
-                            //         if ($now->greaterThan($deadlineDate)) {
-                            //             $fail('لا يمكن تعديل الإعدادات لأن موعد التقديم على هذا التدريب قد انتهى.');
-                            //         }
-                            //     }
-                            // }
-                        }
-                    }
-                    
-                    // إذا لم يكن التدريب معلن، تحقق من أن التاريخ ليس قبل اليوم
-                    if (!$isAnnounced && strtotime($value) < strtotime(date('Y-m-d'))) {
+                    // التحقق من أن التاريخ ليس قبل اليوم
+                    if (strtotime($value) < strtotime(date('Y-m-d'))) {
                         $fail('لا يمكن أن يكون آخر موعد للتقديم قبل اليوم.');
                     }
                     
@@ -300,44 +255,5 @@ class StoreAdditionalSettingsRequest extends FormRequest
                 }
             }
         });
-    }
-    
-    /**
-     * حساب نسبة اكتمال التدريب
-     */
-    private function calculateTrainingCompletion(TrainingProgram $program)
-    {
-        // تعريف أوزان لكل خطوة من خطوات إنشاء التدريب (مجموعها = 100)
-        $weights = [
-            'basic_info' => 25,   // المعلومات الأساسية
-            'details' => 25,      // التفاصيل
-            'settings' => 25,     // الإعدادات
-            'additional_check' => 25, // أي خطوة إضافية أو اختيارية
-        ];
-
-        $totalWeight = array_sum($weights);
-        $completedWeight = 0;
-
-        // 1. المعلومات الأساسية (سؤال واحد)
-        $basicCompleted = !empty($program->title) ? 1 : 0;
-        $completedWeight += ($basicCompleted / 1) * $weights['basic_info'];
-
-        // 2. التفاصيل (سؤال واحد)
-        $detailCompleted = ($program->detail && !empty($program->detail->learning_outcomes)) ? 1 : 0;
-        $completedWeight += ($detailCompleted / 1) * $weights['details'];
-
-        // 3. الإعدادات (سؤال واحد فقط)
-        $settingCompleted = ($program->AdditionalSetting && !empty($program->AdditionalSetting->application_deadline)) ? 1 : 0;
-        $completedWeight += ($settingCompleted / 1) * $weights['settings'];
-
-        // 4. خطوة إضافية اختيارية (مثلاً أي شيء آخر تريد التحقق منه، هنا نفترض 1 سؤال)
-        // إذا ما فيه شيء إضافي يمكن تجاهلها أو اعطاءها صفر
-        $additionalCompleted = 1; // نفترض مكتمل لتبسيط، أو يمكن تعديل حسب الحاجة
-        $completedWeight += ($additionalCompleted / 1) * $weights['additional_check'];
-
-        // النسبة الإجمالية، مع التأكد أنها لا تتجاوز 100
-        $overallPercentage = min(($completedWeight / $totalWeight) * 100, 100);
-
-        return intval($overallPercentage);
     }
 }
