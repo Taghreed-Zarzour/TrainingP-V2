@@ -260,7 +260,7 @@ class Trainings_CURD_Controller extends Controller
     {
         $training = TrainingProgram::findOrFail($trainingId);
         // تحويل قيمة schedules_later إلى قيمة يمكن استخدامها في النموذج
-        $schedulesLater = $training->schedules_later ? 1 : 0;
+        $schedulesLater = 0 ;
 
         return view('trainings.schedule', [
             'training' => $training,
@@ -279,28 +279,23 @@ class Trainings_CURD_Controller extends Controller
             // تحديث قيمة schedules_later
             $training->schedules_later = $request->boolean('schedules_later');
 
-            // تحديث عدد الساعات والجلسات إذا تم تحديد الجلسات لاحقًا
-            if ($training->schedules_later) {
-                $training->num_of_session = $request->num_of_session;
-                $training->num_of_hours = $request->num_of_hours;
-            }
+            // تحديث عدد الساعات دائماً (بدون شرط schedules_later)
+            $training->num_of_hours = $request->num_of_hours;
 
             $training->save();
 
-            // حذف الجدول القديم دائماً (إلا إذا تم اختيار تحديد لاحق)
-            if (!$training->schedules_later) {
-                $training->sessions()->delete();
+            // حذف الجدول القديم دائماً
+            $training->sessions()->delete();
 
-                // إضافة الجدول الجديد إذا كانت هناك جلسات
-                if ($request->filled('schedules')) {
-                    foreach ($request->schedules as $schedule) {
-                        schedulingTrainingSessions::create([
-                            'training_program_id' => $training->id,
-                            'session_date' => $schedule['session_date'],
-                            'session_start_time' => $schedule['session_start_time'],
-                            'session_end_time' => $schedule['session_end_time'],
-                        ]);
-                    }
+            // إضافة الجدول الجديد إذا كانت هناك جلسات (بدون شرط schedules_later)
+            if ($request->filled('schedules')) {
+                foreach ($request->schedules as $schedule) {
+                    schedulingTrainingSessions::create([
+                        'training_program_id' => $training->id,
+                        'session_date' => $schedule['session_date'],
+                        'session_start_time' => $schedule['session_start_time'],
+                        'session_end_time' => $schedule['session_end_time'],
+                    ]);
                 }
             }
 

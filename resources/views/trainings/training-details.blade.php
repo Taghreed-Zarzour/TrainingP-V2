@@ -86,6 +86,10 @@
                                 </div>
                                 @endif
                                 <div class="info-item">
+                                    <img src="/images/cources/clock2.svg" class="info-icon" alt="عدد الساعات">
+                                    <span>عدد الساعات: {{ $program->num_of_hours }} ساعة</span>
+                                </div>
+                                <div class="info-item">
                                     <img src="/images/cources/clock2.svg" class="info-icon" alt="عدد الجلسات">
                                     <span>عدد الجلسات: {{ count($program->sessions) }} جلسات</span>
                                 </div>
