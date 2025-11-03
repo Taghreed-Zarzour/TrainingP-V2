@@ -105,7 +105,12 @@
                                     <img src="/images/cources/calender-primary.svg" class="info-icon"
                                         alt="تاريخ الانتهاء">
                                     <span>تاريخ انتهاء التقديم:
-                                        {{ \Carbon\Carbon::parse($program->AdditionalSetting->application_deadline)->locale('ar')->translatedFormat('j/F/Y') ?? 'غير محدد' }}</span>
+                                        @if ($program->AdditionalSetting)
+                                        {{ \Carbon\Carbon::parse($program->AdditionalSetting->application_deadline)->locale('ar')->translatedFormat('j/F/Y') }}
+                                        @else
+                                        غير محدد
+                                        @endif
+                                    </span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -124,7 +129,12 @@
                                 <div class="info-item">
                                     <img src="/images/cources/Register.svg" class="info-icon" alt="طريقة التسجيل">
                                     <span>طريقة التسجيل:
-                                        {{ $program->AdditionalSetting->application_submission_method->label() }}</span>
+                                        @if ($program->AdditionalSetting)
+                                        {{ $program->AdditionalSetting->application_submission_method->label() }}
+                                        @else
+                                        غير محدد
+                                        @endif
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -136,7 +146,7 @@
                             <strong class="price">
 
                                 @php
-                                $cost = $program->AdditionalSetting->cost ?? 0;
+                                $cost = $program->AdditionalSetting ? $program->AdditionalSetting->cost : 0;
                                 @endphp
 
                                 @if ($cost > 0)
@@ -145,7 +155,7 @@
                                 @else
                                 {{ number_format($cost, 2, '.', ',') }}
                                 @endif
-                                {{ $program->AdditionalSetting->currency ?? '' }}
+                                {{ $program->AdditionalSetting ? $program->AdditionalSetting->currency : '' }}
                                 @else
                                 مجاني
                                 @endif
