@@ -90,7 +90,11 @@
                                 <div class="info-item">
                                     <img src="/images/cources/members.svg" class="info-icon" alt="العدد الأقصى">
                                     <span>العدد الأقصى للمشاركين:
-                                        {{ $program->AdditionalSetting && $program->AdditionalSetting->max_trainees == 0 ? 'لا يوجد عدد محدد' : $program->AdditionalSetting->max_trainees . 'مشارك' }}
+                                        @if ($program->AdditionalSetting)
+                                        {{ $program->AdditionalSetting->max_trainees == 0 ? 'لا يوجد عدد محدد' : $program->AdditionalSetting->max_trainees . 'مشارك' }}
+                                        @else
+                                        غير محدد
+                                        @endif
                                     </span>
                                 </div>
                                 <div class="info-item">
