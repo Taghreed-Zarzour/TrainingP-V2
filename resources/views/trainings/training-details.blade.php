@@ -90,7 +90,7 @@
                                 <div class="info-item">
                                     <img src="/images/cources/members.svg" class="info-icon" alt="العدد الأقصى">
                                     <span>العدد الأقصى للمشاركين:
-                                        {{ $program->AdditionalSetting->max_trainees == 0 ? 'لا يوجد عدد محدد' : $program->AdditionalSetting->max_trainees . 'مشارك' }}
+                                        {{ $program->AdditionalSetting && $program->AdditionalSetting->max_trainees == 0 ? 'لا يوجد عدد محدد' : $program->AdditionalSetting->max_trainees . 'مشارك' }}
                                     </span>
                                 </div>
                                 <div class="info-item">
