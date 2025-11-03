@@ -92,24 +92,14 @@
                     </div>
                     <div class="session-fields-container">
                         @php
-                        // إذا لم يتم تحديد "تحديد الجلسات لاحقاً"، فأضف جلسة واحدة على الأقل
-                        if (!$schedules_later) {
+                        // جلب الجلسات الموجودة أو البيانات القديمة
                         $safeSchedules = $training->sessions ?? collect(); // ضمان أن sessions ليست null
                         $schedules = old(
-                        'schedules',
-                        $safeSchedules->count() > 0
-                        ? $safeSchedules->toArray()
-                        : [
-                        [
-                        'session_date' => '',
-                        'session_start_time' => '',
-                        'session_end_time' => '',
-                        ],
-                        ],
+                            'schedules',
+                            $safeSchedules->count() > 0
+                                ? $safeSchedules->toArray()
+                                : []
                         );
-                        } else {
-                        $schedules = [];
-                        }
                         @endphp
 
                         @foreach ($schedules as $index => $schedule)
