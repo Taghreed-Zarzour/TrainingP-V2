@@ -260,7 +260,7 @@ class Trainings_CURD_Controller extends Controller
     {
         $training = TrainingProgram::findOrFail($trainingId);
         // تحويل قيمة schedules_later إلى قيمة يمكن استخدامها في النموذج
-        $schedulesLater = 0 ;
+        $schedulesLater = 0;
 
         return view('trainings.schedule', [
             'training' => $training,
@@ -332,6 +332,19 @@ class Trainings_CURD_Controller extends Controller
                         $isAnnounced = true;
                     }
                 }
+            }
+        }
+
+        $currentDeadline = $training->AdditionalSetting->application_deadline;
+        if ($training->AdditionalSetting->application_deadline) {
+            $deadlineDate = Carbon::parse($currentDeadline)->endOfDay();
+            $now = Carbon::now();
+
+            // إذا انتهى موعد التقديم، منع التعديل
+            if (!$now->greaterThan($deadlineDate)) {
+                $isAnnounced = false;
+            } else {
+                $isAnnounced = true;
             }
         }
 
