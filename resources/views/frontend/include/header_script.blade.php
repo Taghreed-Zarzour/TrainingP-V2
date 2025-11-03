@@ -19,9 +19,12 @@
 
 
     <!-- Styles -->
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-<link rel="stylesheet" href="{{ asset('css/my-style.css') }}">
+    @php
+        $cacheVersion = config('app.cache_version', '1.0.0');
+    @endphp
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ $cacheVersion }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ $cacheVersion }}">
+    <link rel="stylesheet" href="{{ asset('css/my-style.css') }}?v={{ $cacheVersion }}">
 
     @stack('styles')
 

@@ -123,4 +123,17 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Version
+    |--------------------------------------------------------------------------
+    |
+    | This value is used to version static assets (CSS, JS, images) to
+    | force browsers to reload cached resources. Update this version
+    | whenever you want to invalidate the browser cache.
+    |
+    */
+
+    'cache_version' => env('APP_CACHE_VERSION', '1.0.0'),
+
 ];
