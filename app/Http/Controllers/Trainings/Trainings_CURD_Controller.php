@@ -313,41 +313,41 @@ class Trainings_CURD_Controller extends Controller
     public function showSettingsForm($trainingId)
     {
         $training = TrainingProgram::findOrFail($trainingId);
+        if ($training) {
+            // التحقق من إذا كان التدريب معلن أم لا
+            $isAnnounced = false;
+            $training->completion_percentage = $this->trainingProgramServices->calculateCompletion($training);
+            if ($training->completion_percentage === 100) {
+                $hasSessions = $training->sessions()->exists();
 
-        // التحقق من إذا كان التدريب معلن أم لا
-        $isAnnounced = false;
-        $training->completion_percentage = $this->trainingProgramServices->calculateCompletion($training);
-        if ($training->completion_percentage === 100) {
-            $hasSessions = $training->sessions()->exists();
-
-            // إذا لم تكن هناك جلسات أو تم اختيار تحديد الجلسات لاحقاً، فهي معلنة
-            if (!$hasSessions || ($training->AdditionalSetting && $training->AdditionalSetting->schedule_later)) {
-                $isAnnounced = true;
-            } else {
-                // إذا كانت هناك جلسات، تحقق من تاريخ أول جلسة
-                $firstSession = $training->sessions()->orderBy('session_date')->first();
-                if ($firstSession) {
-                    $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                    if ($startTime->isFuture()) {
-                        $isAnnounced = true;
+                // إذا لم تكن هناك جلسات أو تم اختيار تحديد الجلسات لاحقاً، فهي معلنة
+                if (!$hasSessions || ($training->AdditionalSetting && $training->AdditionalSetting->schedule_later)) {
+                    $isAnnounced = true;
+                } else {
+                    // إذا كانت هناك جلسات، تحقق من تاريخ أول جلسة
+                    $firstSession = $training->sessions()->orderBy('session_date')->first();
+                    if ($firstSession) {
+                        $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                        if ($startTime->isFuture()) {
+                            $isAnnounced = true;
+                        }
                     }
                 }
             }
-        }
 
-        $currentDeadline = $training->AdditionalSetting->application_deadline;
-        if ($training->AdditionalSetting->application_deadline) {
-            $deadlineDate = Carbon::parse($currentDeadline)->endOfDay();
-            $now = Carbon::now();
+            $currentDeadline =  $training->AdditionalSetting ? $training->AdditionalSetting->application_deadline : null;
+            if ($currentDeadline) {
+                $deadlineDate = Carbon::parse($currentDeadline)->endOfDay();
+                $now = Carbon::now();
 
-            // إذا انتهى موعد التقديم، منع التعديل
-            if (!$now->greaterThan($deadlineDate)) {
-                $isAnnounced = false;
-            } else {
-                $isAnnounced = true;
+                // إذا انتهى موعد التقديم، منع التعديل
+                if (!$now->greaterThan($deadlineDate)) {
+                    $isAnnounced = false;
+                } else {
+                    $isAnnounced = true;
+                }
             }
         }
-
         // dd($isAnnounced);
 
         // استخدام firstOrNew بدلاً من firstOrCreate
@@ -390,38 +390,39 @@ class Trainings_CURD_Controller extends Controller
     {
         // التحقق من إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى (قبل البدء بالتحقق من صحة البيانات)
         $training = TrainingProgram::findOrFail($trainingId);
+        if ($training) {
+            $isAnnounced = false;
+            $training->completion_percentage = $this->trainingProgramServices->calculateCompletion($training);
+            if ($training->completion_percentage === 100) {
+                $hasSessions = $training->sessions()->exists();
 
-        $isAnnounced = false;
-        $training->completion_percentage = $this->trainingProgramServices->calculateCompletion($training);
-        if ($training->completion_percentage === 100) {
-            $hasSessions = $training->sessions()->exists();
-            
-            // إذا لم تكن هناك جلسات أو تم اختيار تحديد الجلسات لاحقاً، فهي معلنة
-            if (!$hasSessions || ($training->AdditionalSetting && $training->AdditionalSetting->schedule_later)) {
-                $isAnnounced = true;
-            } else {
-                // إذا كانت هناك جلسات، تحقق من تاريخ أول جلسة
-                $firstSession = $training->sessions()->orderBy('session_date')->first();
-                if ($firstSession) {
-                    $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
-                    if ($startTime->isFuture()) {
-                        $isAnnounced = true;
+                // إذا لم تكن هناك جلسات أو تم اختيار تحديد الجلسات لاحقاً، فهي معلنة
+                if (!$hasSessions || ($training->AdditionalSetting && $training->AdditionalSetting->schedule_later)) {
+                    $isAnnounced = true;
+                } else {
+                    // إذا كانت هناك جلسات، تحقق من تاريخ أول جلسة
+                    $firstSession = $training->sessions()->orderBy('session_date')->first();
+                    if ($firstSession) {
+                        $startTime = Carbon::parse($firstSession->session_date . ' ' . $firstSession->session_start_time);
+                        if ($startTime->isFuture()) {
+                            $isAnnounced = true;
+                        }
                     }
                 }
             }
-        }
 
-        // إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى، منع التعديل
-        if ($isAnnounced) {
-            $existingSettings = $training->AdditionalSetting;
-            if ($existingSettings && $existingSettings->application_deadline) {
-                $deadlineDate = Carbon::parse($existingSettings->application_deadline)->endOfDay();
-                $now = Carbon::now();
-                
-                if ($now->greaterThan($deadlineDate)) {
-                    return redirect()->back()
-                        ->withErrors(['application_deadline' => 'لا يمكن تعديل الإعدادات لأن موعد التقديم على هذا التدريب قد انتهى.'])
-                        ->withInput();
+            // إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى، منع التعديل
+            if ($isAnnounced) {
+                $existingSettings = $training->AdditionalSetting;
+                if ($existingSettings && $existingSettings->application_deadline) {
+                    $deadlineDate = Carbon::parse($existingSettings->application_deadline)->endOfDay();
+                    $now = Carbon::now();
+
+                    if ($now->greaterThan($deadlineDate)) {
+                        return redirect()->back()
+                            ->withErrors(['application_deadline' => 'لا يمكن تعديل الإعدادات لأن موعد التقديم على هذا التدريب قد انتهى.'])
+                            ->withInput();
+                    }
                 }
             }
         }
