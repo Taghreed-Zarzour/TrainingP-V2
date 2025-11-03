@@ -212,15 +212,16 @@
                             <div class="sub-label">
                                 حدد تاريخ انتهاء التقديم على التدريب
                             </div>
-                            <!-- @if(isset($isAnnounced) && $isAnnounced )
+                            @if(isset($isAnnounced) && $isAnnounced )
                                 <div class="alert alert-warning" style="background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 14px;">
                                     <strong>تنبيه:</strong> لا يمكن تعديل تاريخ انتهاء التقديم لأن التدريب معلن بالفعل.
                                 </div>
-                            @endif -->
+                            @endif
                             <input type="date" name="application_deadline"
                                 value="{{ old('application_deadline', $settings->application_deadline ? $settings->application_deadline->format('Y-m-d') : '') }}"
                                 placeholder="مثال 12/06/2026"
-                                class="@error('application_deadline') error-border @enderror" />
+                                class="@error('application_deadline') error-border @enderror"
+                                {{ isset($isAnnounced) && $isAnnounced ? 'disabled' : '' }} />
                             @error('application_deadline')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
