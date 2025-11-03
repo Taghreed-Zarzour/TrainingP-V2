@@ -618,7 +618,9 @@
                                                 class="badge-position">{{ $training->TrainingClassification->name ?? 'تدريب' }}</span>
                                         </div>
                                         <div class="card-body-trainee pt-1">
-                                            <h5 class="card-title-trainee">{{ $training->title }}</h5>
+                                            <a href="{{ route('show_trainings_announcements', $training->id) }}">
+                                            <h5 class="card-title-trainee text-decoration-none text-dark">{{ $training->title }}</h5>
+                                            </a>
                                             <div class="trainer-info mt-3 mb-3">
                                                 @php
                                                     $trainer = $training->trainer;
@@ -786,7 +788,9 @@
                                             </span>
                                         </div>
                                         <div class="card-body-trainee pt-1">
-                                            <h5 class="card-title-trainee">{{ $orgTraining->title }}</h5>
+                                            <a href="{{ route('org.training.show', $orgTraining->id) }}">
+                                            <h5 class="card-title-trainee text-decoration-none text-dark">{{ $orgTraining->title }}</h5>
+                                            </a>
                                             <div class="trainer-info mt-3 mb-3">
                                                 @php
                                                     $trainer = $orgTraining->organization->user ?? null;
@@ -936,7 +940,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-8 d-flex flex-column justify-content-center py-3">
-                                                    <h5 class="card-title-trainee">{{ $training->title }}</h5>
+                                                    <a href="{{ route('show_trainings_announcements', $training->id) }}">
+                                                    <h5 class="card-title-trainee text-decoration-none text-dark">{{ $training->title }}</h5>
+                                                    </a>
                                                     <div class="trainer-name d-flex align-items-center">
                                                         @if ($training->trainer->photo)
                                                             <img src="{{ asset('storage/' . $training->trainer->photo) }}"
@@ -1108,7 +1114,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-8 d-flex flex-column justify-content-center py-3">
-                                                    <h5 class="card-title-trainee">{{ $orgTraining->title }}</h5>
+                                                    <a href="{{ route('org.training.show', $orgTraining->id) }}">
+                                                    <h5 class="card-title-trainee text-decoration-none text-dark">{{ $orgTraining->title }}</h5>
+                                                    </a>
                                                     <div class="trainer-name d-flex align-items-center">
                                                         @if ($orgTraining->organization->user->photo)
                                                             <img src="{{ asset('storage/' . $orgTraining->organization->user->photo) }}"
@@ -1321,7 +1329,9 @@
                                         <div class="col-md-8 align-content-center">
                                             <div class="card-body-trainee">
                                                 <!-- العنوان -->
-                                                <h5 class="card-title-trainee">{{ $orgTraining->title }}</h5>
+                                                <a href="{{ route('org.training.show', $orgTraining->id) }}">
+                                                <h5 class="card-title-trainee text-decoration-none text-dark">{{ $orgTraining->title }}</h5>
+                                                </a>
 
                                                 <!-- صورة المدرب واسمه -->
                                                 <div class="trainer-info">
@@ -1391,7 +1401,9 @@
                                             <span class="badge-position">{{ $training->TrainingClassification->name ?? 'تدريب' }}</span>
                                         </div>
                                         <div class="card-body-trainee pt-1">
-                                            <h5 class="card-title-trainee">{{ $training->title }}</h5>
+                                            <a href="{{ route('show_trainings_announcements', $training->id) }}">
+                                            <h5 class="card-title-trainee text-decoration-none text-dark">{{ $training->title }}</h5>
+                                            </a>
                                             <div class="trainer-info mt-3 mb-3">
                                                 @php
                                                     $trainer = $training->trainer;
@@ -1508,7 +1520,9 @@
                                             </span>
                                         </div>
                                         <div class="card-body-trainee pt-1">
-                                            <h5 class="card-title-trainee">{{ $orgTraining->title }}</h5>
+                                            <a href="{{ route('org.training.show', $orgTraining->id) }}">
+                                            <h5 class="card-title-trainee text-decoration-none text-dark">{{ $orgTraining->title }}</h5>
+                                            </a>
                                             <div class="trainer-info mt-3 mb-3">
                                                 @php
                                                     $trainer = $orgTraining->organization->user ?? null;
