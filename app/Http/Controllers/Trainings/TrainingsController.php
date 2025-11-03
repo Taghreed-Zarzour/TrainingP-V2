@@ -336,6 +336,8 @@ class TrainingsController extends Controller
         $program->total_duration_hours = round($minutes / 60, 2);
         // بعد حساب total_duration_hours
         $program->duration_text = $this->formatDuration($program);
+
+        dd($assistantUsers);
         return view('trainingAnnouncement.show', compact(
             'program',
             'trainer',
