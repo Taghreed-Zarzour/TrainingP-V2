@@ -22,6 +22,31 @@ class StoreAdditionalSettingsRequest extends FormRequest
      */
     public function rules(): array
     {
+        $trainingId = $this->route('trainingId');
+        $applicationDeadlineRequired = 'required';
+        
+        // التحقق إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى
+        if ($trainingId) {
+            $program = TrainingProgram::with(['AdditionalSetting', 'sessions'])->find($trainingId);
+            if ($program) {
+                $isAnnounced = false;
+                // استخدام نفس منطق التحقق من الإعلان (نحتاج إلى حساب completion_percentage)
+                // لكن لتجنب الاعتماد على service، سنتحقق بطريقة أبسط
+                $hasSettings = $program->AdditionalSetting;
+                $existingDeadline = $hasSettings ? $hasSettings->application_deadline : null;
+                
+                if ($existingDeadline) {
+                    $deadlineDate = Carbon::parse($existingDeadline)->endOfDay();
+                    $now = Carbon::now();
+                    
+                    // إذا كان التاريخ في الماضي، جعل الحقل اختياري
+                    if ($now->greaterThan($deadlineDate)) {
+                        $applicationDeadlineRequired = 'nullable';
+                    }
+                }
+            }
+        }
+        
         return [
           'welcome_message' => [
             'nullable',
@@ -83,9 +108,14 @@ class StoreAdditionalSettingsRequest extends FormRequest
                   
             ],
           'application_deadline' => [
-                'required',
+                $applicationDeadlineRequired,
                 'date',
                 function ($attribute, $value, $fail) {
+                    // إذا كانت القيمة فارغة وكان الحقل اختياري، تجاوز التحقق
+                    if (is_null($value) || empty($value)) {
+                        return;
+                    }
+                    
                     // الحصول على معرف التدريب من المسار
                     $trainingId = $this->route('trainingId');
                     
@@ -229,6 +259,26 @@ class StoreAdditionalSettingsRequest extends FormRequest
         $this->merge([
             'registration_link' => null,
         ]);
+    }
+    
+    // إذا كان تاريخ انتهاء التقديم فارغاً وكان هناك تاريخ قديم قد مضى، استخدم القيمة القديمة
+    $trainingId = $this->route('trainingId');
+    if ($trainingId && (empty($this->input('application_deadline')) || is_null($this->input('application_deadline')))) {
+        $program = TrainingProgram::with(['AdditionalSetting'])->find($trainingId);
+        if ($program && $program->AdditionalSetting && $program->AdditionalSetting->application_deadline) {
+            $existingDeadline = $program->AdditionalSetting->application_deadline;
+            $deadlineDate = Carbon::parse($existingDeadline)->endOfDay();
+            $now = Carbon::now();
+            
+            // إذا انتهى موعد التقديم، استخدم القيمة القديمة
+            if ($now->greaterThan($deadlineDate)) {
+                $oldDeadline = $existingDeadline instanceof \DateTime
+                    ? $existingDeadline->format('Y-m-d')
+                    : Carbon::parse($existingDeadline)->format('Y-m-d');
+                
+                $this->merge(['application_deadline' => $oldDeadline]);
+            }
+        }
     }
 }
    public function withValidator($validator)
