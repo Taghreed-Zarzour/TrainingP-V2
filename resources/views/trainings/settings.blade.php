@@ -212,7 +212,7 @@
                             <div class="sub-label">
                                 حدد تاريخ انتهاء التقديم على التدريب
                             </div>
-                            @if(isset($isAnnounced) && $isAnnounced )
+                            @if(isset($isAnnounced) && $isAnnounced && $settings->application_deadline && now()->greaterThan(Carbon::parse($settings->application_deadline)->endOfDay()))
                                 <div class="alert alert-warning" style="background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 14px;">
                                     <strong>تنبيه:</strong> لا يمكن تعديل تاريخ انتهاء التقديم لأن التدريب معلن بالفعل.
                                 </div>
