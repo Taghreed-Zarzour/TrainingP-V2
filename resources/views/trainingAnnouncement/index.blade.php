@@ -24,7 +24,7 @@
     <!-- ✅ السطر الثاني: البحث + زر الفلترة -->
     <div class="container-fluid py-4 bg-white">
         <div class="row justify-content-center">
-            <div class="col-12 col-lg-11">
+            <div class="col-12">
                 <div
                     class="d-flex align-items-center justify-content-between px-3 py-2 shadow-sm bg-white custom-search-bar w-100">
                     <form method="GET" action="{{ route('trainings_announcements') }}"

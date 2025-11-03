@@ -205,12 +205,12 @@ class TrainingsController extends Controller
         foreach ($allOrgPrograms as $program) {
             // حساب نسبة الإكمال
             $completion = $this->orgTrainingManagerService->calculateCompletion($program);
-            
+
             // تحقق من نسبة الإكمال
             if ($completion !== 100) {
                 continue;
             }
-            
+
             // جلب تاريخ انتهاء التقديم - استبعاد التدريبات التي انتهى موعد التقديم فيها
             $applicationDeadline = $program->registrationRequirements->application_deadline ?? null;
             if ($applicationDeadline) {
@@ -219,7 +219,7 @@ class TrainingsController extends Controller
                     continue; // استبعاد التدريب إذا انتهى موعد التقديم
                 }
             }
-            
+
             $filteredOrgPrograms[] = $program;
         }
 
@@ -282,7 +282,7 @@ class TrainingsController extends Controller
                 if (!empty($trainerIds)) {
                     $trainerUsers = User::whereIn('id', $trainerIds)->get();
                 }
-                
+
                 // الحصول على المساعدين
                 $assistantIds = $assistantManagement->getAllAssistants();
                 if (!empty($assistantIds)) {
@@ -291,7 +291,7 @@ class TrainingsController extends Controller
             }
         }
 
-        
+
         // التحقق من تسجيل المستخدم
         $has_enrolled = false;
         $enrollment = null;
@@ -343,7 +343,7 @@ class TrainingsController extends Controller
         $program->total_duration_hours = round($minutes / 60, 2);
         // بعد حساب total_duration_hours
         $program->duration_text = $this->formatDuration($program);
-        
+
         return view('trainingAnnouncement.show', compact(
             'program',
             'trainer',
