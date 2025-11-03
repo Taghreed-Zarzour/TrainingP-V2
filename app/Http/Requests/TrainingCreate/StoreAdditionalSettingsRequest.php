@@ -89,8 +89,23 @@ class StoreAdditionalSettingsRequest extends FormRequest
                     // الحصول على معرف التدريب من المسار
                     $trainingId = $this->route('trainingId');
                     
-                    // التحقق من أن التاريخ ليس قبل اليوم
-                    if (strtotime($value) < strtotime(date('Y-m-d'))) {
+                    // التحقق من أن التاريخ ليس قبل اليوم (إلا إذا كان التدريب معلن وتاريخ الانتهاء قد مضى)
+                    $skipPastDateCheck = false;
+                    if ($trainingId) {
+                        $program = TrainingProgram::with(['AdditionalSetting', 'sessions'])->find($trainingId);
+                        if ($program) {
+                            $existingSettings = $program->AdditionalSetting;
+                            if ($existingSettings && $existingSettings->application_deadline) {
+                                $existingDeadline = Carbon::parse($existingSettings->application_deadline)->format('Y-m-d');
+                                // إذا كانت القيمة المدخلة هي نفس القيمة القديمة وكانت في الماضي، تجاوز التحقق
+                                if ($value === $existingDeadline && strtotime($value) < strtotime(date('Y-m-d'))) {
+                                    $skipPastDateCheck = true;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (!$skipPastDateCheck && strtotime($value) < strtotime(date('Y-m-d'))) {
                         $fail('لا يمكن أن يكون آخر موعد للتقديم قبل اليوم.');
                     }
                     

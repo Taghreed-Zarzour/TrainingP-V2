@@ -411,17 +411,21 @@ class Trainings_CURD_Controller extends Controller
                 }
             }
 
-            // إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى، منع التعديل
+            // إذا كان التدريب معلن وتاريخ انتهاء التقديم قد مضى، استخدام القيمة القديمة
             if ($isAnnounced) {
                 $existingSettings = $training->AdditionalSetting;
                 if ($existingSettings && $existingSettings->application_deadline) {
                     $deadlineDate = Carbon::parse($existingSettings->application_deadline)->endOfDay();
                     $now = Carbon::now();
 
+                    // إذا انتهى موعد التقديم، استخدام القيمة القديمة وتجاوز التحقق منها
                     if ($now->greaterThan($deadlineDate)) {
-                        return redirect()->back()
-                            ->withErrors(['application_deadline' => 'لا يمكن تعديل الإعدادات لأن موعد التقديم على هذا التدريب قد انتهى.'])
-                            ->withInput();
+                        // دمج القيمة القديمة في الطلب قبل التحقق من الصحة
+                        $oldDeadline = $existingSettings->application_deadline instanceof \DateTime
+                            ? $existingSettings->application_deadline->format('Y-m-d')
+                            : Carbon::parse($existingSettings->application_deadline)->format('Y-m-d');
+                        
+                        $request->merge(['application_deadline' => $oldDeadline]);
                     }
                 }
             }
